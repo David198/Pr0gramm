@@ -201,8 +201,8 @@
     <comment>Navigation view item name for Settings</comment>
   </data>
   <data name="FirstRun_Body.Text" xml:space="preserve">
-    <value>Hallo und herzlich Willkommen bei der neuen inoffizielen Pr0gramm UWP App.
-Bisher implentierte Features:
+    <value>Hallo und herzlich Willkommen bei der neuen inoffiziellen Pr0gramm UWP App.
+Bisher implementierte Features:
 
 - Top Feed anzeigen
 - New Feed anzeigen
@@ -211,10 +211,7 @@ Bisher implentierte Features:
 - Bilder herunterladen
 -Theme switch
 
-Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedback Funktion die sich auf der Download-Page befindet.
-
-Liebste Grüße
-Eure Bummkug3l</value>
+Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedback Funktion die sich auf der Download-Page befindet.</value>
     <comment>First use prompt message body</comment>
   </data>
   <data name="FirstRun_Title.Text" xml:space="preserve">
