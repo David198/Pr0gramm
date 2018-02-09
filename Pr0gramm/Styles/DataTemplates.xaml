@@ -1,0 +1,37 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:nameSpace="using:Pr0gramm.Styles"
+    xmlns:models="using:Pr0gramm.Models"
+    xmlns:feeds="using:Pr0grammAPI.Feeds"
+    x:Class="Pr0gramm.Styles.DataTemplates">
+
+    <DataTemplate x:Key="ThumbImageTemplate" x:DataType="models:FeedItemViewModel">
+        <Grid>
+            <Image
+            Stretch="Uniform"
+            Source="{Binding FeedItem.ThumbSource}"
+            HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <SymbolIcon Symbol="Video" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}"
+                        Visibility="{Binding FeedItem.IsVideo, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
+            <SymbolIcon Symbol="Volume" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}"
+                        Visibility="{Binding FeedItem.Audio, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="TagTemplate" x:DataType="feeds:TagItem">
+        <Border BorderThickness="2" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                HorizontalAlignment="Stretch" CornerRadius="5">
+            <TextBlock x:Phase="1"
+                Padding="{StaticResource SmallAllMargin}" Width="Auto" VerticalAlignment="Center"
+                Text="{x:Bind Tag}"
+                HorizontalAlignment="Center" />
+        </Border>
+    </DataTemplate>
+
+    
+
+</ResourceDictionary>
+
+
+

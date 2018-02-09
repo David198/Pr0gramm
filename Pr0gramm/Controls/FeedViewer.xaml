@@ -1,0 +1,253 @@
+﻿<UserControl
+    x:Class="Pr0gramm.Controls.FeedViewer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:primitives="using:Telerik.UI.Xaml.Controls.Primitives"
+    xmlns:models="using:Pr0gramm.Models"
+    xmlns:micro="using:Caliburn.Micro"
+    xmlns:controls1="using:Pr0gramm.Controls"
+    xmlns:feeds="using:Pr0grammAPI.Feeds"
+    xmlns:playback="using:Windows.Media.Playback"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400" Loaded="OnLoaded" Unloaded="FeedViewer_OnUnloaded">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="165" Width="0.6*" />
+            <ColumnDefinition Width="13" />
+            <ColumnDefinition Width="0.4*" />
+        </Grid.ColumnDefinitions>
+        <controls:AdaptiveGridView x:Name="FeedItemGridView" Grid.Column="0"
+                                   ItemsSource="{x:Bind FeedItems}"
+                                   SelectedItem="{x:Bind SelectedFeedItem, Mode=TwoWay}"
+                                   OneRowModeEnabled="False"
+                                   ItemHeight="150"
+                                   DesiredWidth="150"
+                                   SelectionMode="Single"
+                                   ItemTemplate="{StaticResource ThumbImageTemplate}" />
+        <controls:GridSplitter Grid.Column="1" Width="14" ResizeBehavior="BasedOnAlignment"
+                               ResizeDirection="Auto"
+                               FontSize="13" Background="{ThemeResource ApplicationForegroundThemeBrush}">
+            <controls:GridSplitter.Element>
+                <TextBlock HorizontalAlignment="Center"
+                           IsHitTestVisible="False"
+                           VerticalAlignment="Center"
+                           Text="&#xE784;"
+                           Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"
+                           FontFamily="Segoe MDL2 Assets" />
+            </controls:GridSplitter.Element>
+        </controls:GridSplitter>
+
+        <FlipView Grid.Column="2" ItemsSource="{x:Bind FeedItems}" x:Name="FlipView"
+                  SelectedItem="{x:Bind SelectedFeedItem, Mode=TwoWay}">
+            <FlipView.ItemTemplate>
+                <DataTemplate x:DataType="models:FeedItemViewModel">
+                    <ScrollViewer HorizontalScrollMode="Disabled">
+                        <StackPanel>
+
+                            <Border BorderThickness="2" BorderBrush="{ThemeResource AppBarBorderThemeBrush}"
+                                    x:Name="MediaBorder">
+                                <Grid>
+                                    <Image
+                                        Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
+                                        Stretch="Uniform"
+                                        Source="{x:Bind FeedItem.ImageSource, Converter= {StaticResource ImageSourceFromUriConverter}}"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <MediaPlayerElement
+                                        Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BoolToVisConverter}}"
+                                        AreTransportControlsEnabled="True" HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Stretch="Uniform">
+                                        <MediaPlayerElement.TransportControls>
+                                            <MediaTransportControls IsCompact="False"
+                                                                    IsVolumeButtonVisible="False" />
+                                        </MediaPlayerElement.TransportControls>
+                                    </MediaPlayerElement>
+                                </Grid>
+                            </Border>
+
+                            <controls:DockPanel HorizontalAlignment="Stretch"
+                                                Margin="{StaticResource MediumLeftMargin}">
+                                <HyperlinkButton controls:DockPanel.Dock="Left"
+                                                 micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
+                                                 NavigateUri="{x:Bind FeedItem.User, Converter={StaticResource UserTextConverter}}"
+                                                 Content="{x:Bind FeedItem.User}" x:Phase="5" />
+                                <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" controls:DockPanel.Dock="Left">-</TextBlock>
+                                <TextBlock VerticalAlignment="Center"
+                                           Text="{x:Bind FeedItem.Created}"
+                                           Margin="{StaticResource MediumLeftMargin}"
+                                           x:Phase="2" controls:DockPanel.Dock="Left" />
+                                <TextBlock Margin="{StaticResource MediumLeftMargin}" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" controls:DockPanel.Dock="Left">
+                                    Score
+                                </TextBlock>
+                                <TextBlock controls:DockPanel.Dock="Left" Margin="{StaticResource MediumLeftMargin}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Bind FeedItem,Converter={StaticResource FeedScoreConverter}}">
+                                    <ToolTipService.ToolTip>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Margin="{StaticResource MediumLeftMargin}"
+                                                       Text="{x:Bind FeedItem.Up}"
+                                                       VerticalAlignment="Center" x:Phase="5" />
+                                            <Viewbox MaxHeight="15" MaxWidth="15">
+                                                <SymbolIcon Symbol="Up" Margin="{StaticResource SmallLeftMargin}" />
+                                            </Viewbox>
+                                            <TextBlock Margin="{StaticResource MediumLeftMargin}"
+                                                       Text="{x:Bind FeedItem.Down}"
+                                                       VerticalAlignment="Center" x:Phase="5" />
+                                            <Viewbox MaxHeight="15" MaxWidth="15">
+                                                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74B;"
+                                                          Margin="{StaticResource SmallLeftMargin}" />
+                                            </Viewbox>
+                                        </StackPanel>
+                                    </ToolTipService.ToolTip>
+                                </TextBlock>
+                                <AppBarButton Click="ButtonBase_OnClick"
+                                              Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
+                                              controls:DockPanel.Dock="Right" HorizontalAlignment="Right"
+                                              Label="Download" Icon="Download" />
+                            </controls:DockPanel>
+                            <ItemsControl x:Name="TagsList" ItemsSource="{x:Bind Tags}"
+                                          Margin="{StaticResource SmallLeftRightMargin}"
+
+                                          HorizontalContentAlignment="Stretch">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <controls1:CustomWrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="feeds:TagItem">
+                                        <Border BorderThickness="2"
+                                                Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                                                HorizontalAlignment="Stretch" CornerRadius="5">
+                                            <TextBlock
+                                                Padding="{StaticResource SmallAllMargin}" Width="Auto"
+                                                VerticalAlignment="Center"
+                                                Text="{x:Bind Tag}"
+                                                HorizontalAlignment="Center" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+
+                            </ItemsControl>
+                            <StackPanel Orientation="Horizontal" Margin="{StaticResource MediumAllMargin}"
+                                        x:Name="CommentCountPanel">
+                                <SymbolIcon Margin="{StaticResource MediumLeftMargin}" Symbol="Comment" />
+                                <TextBlock Margin="{StaticResource MediumLeftMargin}"
+                                           Text="{Binding CommentViewModels.Count}" />
+                                <TextBlock Margin="{StaticResource MediumLeftMargin}" x:Uid="Comments" />
+                            </StackPanel>
+                            <ListView x:Name="CommentsList" SelectionMode="None"
+                                      ItemsSource="{x:Bind CommentViewModels}">
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <ItemsStackPanel />
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:CommentViewModel">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <ItemsControl ItemsSource="{x:Bind ParentDepthList}"
+                                                          HorizontalContentAlignment="Stretch"
+                                                          x:Phase="3"
+                                                          VerticalContentAlignment="Stretch">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <VirtualizingStackPanel Orientation="Horizontal" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Rectangle
+                                                            Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                                            VerticalAlignment="Stretch" Opacity="0.2" Width="1"
+                                                            StrokeThickness="1"
+                                                            StrokeDashArray="1,2" StrokeDashCap="Round"
+                                                            Margin="{StaticResource BigRightMargin}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <Border BorderThickness="0 0 0 1 " HorizontalAlignment="Stretch"
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Stretch"
+                                                    BorderBrush="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                                    Margin="{StaticResource MediumLeftMargin}">
+                                                <StackPanel HorizontalAlignment="Stretch">
+                                                    <controls:MarkdownTextBlock Text="{x:Bind Comment.Content}"
+                                                                                VerticalContentAlignment="Center"
+                                                                                x:Phase="4"
+                                                                                HorizontalContentAlignment="Center"
+                                                                                VerticalAlignment="Center"
+                                                                                micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
+                                                                                Margin="{StaticResource SmallLeftMargin}"
+                                                                                LinkForeground="{ThemeResource SystemControlForegroundBaseHighBrush}" />
+                                                    <StackPanel Orientation="Horizontal"
+                                                                Margin="{StaticResource MediumAllMargin}">
+
+                                                        <HyperlinkButton
+                                                            micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
+                                                            NavigateUri="{x:Bind Comment.Name, Converter={StaticResource UserTextConverter}}"
+                                                            Content="{x:Bind Comment.Name}" x:Phase="5" />
+                                                        <TextBlock Margin="10 0 0 0" VerticalAlignment="Center">-</TextBlock>
+                                                        <TextBlock VerticalAlignment="Center"
+                                                                   Text="{x:Bind Comment.Created}"
+                                                                   Margin="{StaticResource MediumLeftMargin}"
+                                                                   x:Phase="2" />
+                                                        <TextBlock Margin="{StaticResource MediumLeftMargin}"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"
+                                                                   Text="{x:Bind Comment,Converter={StaticResource FeedScoreConverter}}">
+                                                            <ToolTipService.ToolTip>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock
+                                                                        Margin="{StaticResource MediumLeftMargin}"
+                                                                        Text="{x:Bind Comment.Up}"
+                                                                        VerticalAlignment="Center" x:Phase="5" />
+                                                                    <Viewbox MaxHeight="15" MaxWidth="15">
+                                                                        <SymbolIcon Symbol="Up"
+                                                                                    Margin="{StaticResource SmallLeftMargin}" />
+                                                                    </Viewbox>
+                                                                    <TextBlock
+                                                                        Margin="{StaticResource MediumLeftMargin}"
+                                                                        Text="{x:Bind Comment.Down}"
+                                                                        VerticalAlignment="Center" x:Phase="5" />
+                                                                    <Viewbox MaxHeight="15" MaxWidth="15">
+                                                                        <FontIcon FontFamily="Segoe MDL2 Assets"
+                                                                                  Glyph="&#xE74B;"
+                                                                                  Margin="{StaticResource SmallLeftMargin}" />
+                                                                    </Viewbox>
+                                                                </StackPanel>
+                                                            </ToolTipService.ToolTip>
+                                                        </TextBlock>
+
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DataTemplate>
+            </FlipView.ItemTemplate>
+        </FlipView>
+
+    </Grid>
+</UserControl>
+

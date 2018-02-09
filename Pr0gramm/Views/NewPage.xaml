@@ -1,0 +1,14 @@
+﻿<Page
+    x:Class="Pr0gramm.Views.NewPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Pr0gramm.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Pr0gramm.Controls"
+    xmlns:micro="using:Caliburn.Micro"
+    mc:Ignorable="d">
+    <controls:FeedViewer x:Name="FeedViewer" FeedItems="{x:Bind ViewModel.FeedItems}"
+                         SelectedFeedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
+                         micro:Message.Attach="[Event LoadNewItems] = [Action LoadOlderItems()]" />
+</Page>

@@ -1,0 +1,56 @@
+﻿<Page
+    x:Class="Pr0gramm.Views.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:Pr0gramm.ViewModels"
+    xmlns:ic="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:cm="using:Caliburn.Micro"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:fcu="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,5)"
+    xmlns:cu="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,5)"
+    mc:Ignorable="d">
+    <NavigationView
+        x:Name="NavigationMenu"
+        OpenPaneLength="150"
+        MenuItemsSource="{x:Bind ViewModel.NavigationItems}"
+        SelectedItem="{x:Bind ViewModel.SelectedItem}"
+        Canvas.ZIndex="0"
+        Header="{x:Bind ViewModel.Header, Mode=TwoWay}"
+        IsPaneOpen="{x:Bind ViewModel.IsPaneOpen, Mode=TwoWay}"
+        cm:Message.Attach="[Event ItemInvoked] = [Action ItemInvoked($eventArgs)]">
+        <NavigationView.HeaderTemplate>
+            <DataTemplate>
+                <Grid Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Margin="24,0,0,0" Style="{StaticResource PageTitleStyle}"
+                               FontSize="28"
+                               Text="{Binding}" />
+                    <CommandBar Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                DefaultLabelPosition="Right"
+                                Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
+                        <AppBarToggleButton Label="Mute" Icon="Mute"
+                                            cm:Message.Attach="[Event Checked] = [Action Mute]; [Event Unchecked] = [Action UnMute]"
+                                            Visibility="{Binding ElementName=NavigationMenu,
+                       Path=DataContext.IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
+                        <AppBarButton Label="Refresh" Icon="Refresh" cm:Message.Attach="RefreshCommand"
+                                      Visibility="{Binding ElementName=NavigationMenu,
+                       Path=DataContext.IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
+                      
+                    </CommandBar>
+                </Grid>
+            </DataTemplate>
+        </NavigationView.HeaderTemplate>
+        <Grid Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
+            <Frame x:Name="shellFrame" DataContext="{x:Null}" />
+        </Grid>
+    </NavigationView>
+</Page>
+

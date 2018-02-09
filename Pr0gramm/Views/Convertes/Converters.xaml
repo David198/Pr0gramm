@@ -1,0 +1,45 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Pr0gramm.Views.Convertes"
+    xmlns:micro="using:Caliburn.Micro">
+    <local:NullVisibilityConverter x:Key="NullVisibilityConverter" />
+    <micro:BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
+    <local:BooleanToVisibilityConverterInverse x:Key="BooleanToVisibilityConverterInverse" />
+    <local:MediaSourceFromUriConverter x:Key="MediaSourceFromUriConverter" />
+    <local:ParentCommentMarginConverter x:Key="CommentMarginConverter" />
+    <local:UserTextConverter x:Key="UserTextConverter" />
+    <local:ImageSourceFromUriConverter x:Key="ImageSourceFromUriConverter"></local:ImageSourceFromUriConverter>
+    <local:FeedScoreConverter x:Key="FeedScoreConverter"></local:FeedScoreConverter>
+</ResourceDictionary>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
