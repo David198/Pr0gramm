@@ -18,6 +18,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Caliburn.Micro;
+using Microsoft.HockeyApp;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
 using Pr0gramm.Models;
@@ -107,8 +109,7 @@ namespace Pr0gramm.Controls
                     Source = MediaSource.CreateFromUri(item.FeedItem.ImageSource),
                     IsMuted = SettingsService.IsMuted,
                     AutoPlay = true,
-                    AudioCategory = MediaPlayerAudioCategory.Media,
-                    RealTimePlayback = true, 
+                    AudioCategory = MediaPlayerAudioCategory.Media,                   
                 };
                 var flipViewItem = FlipView.ContainerFromItem(item);
                 if (flipViewItem == null) return;
@@ -151,8 +152,16 @@ namespace Pr0gramm.Controls
         public void Handle(MuteEvent message)
         {
             IsMuted = message.IsMuted;
-            if(_mediaPlayer!=null)
-             _mediaPlayer.IsMuted = IsMuted;
+            try
+            {
+                if (_mediaPlayer != null)
+                    _mediaPlayer.IsMuted = IsMuted;
+            }
+            catch (Exception e)
+            {
+              HockeyClient.Current.TrackException(e);
+            }
+
         }
 
 
@@ -160,7 +169,7 @@ namespace Pr0gramm.Controls
         {
             var flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
             if (flipViewItem == null) return;
-            var myImageSource = ViewHelper.FindVisualChild<Image>(flipViewItem);
+            var myImageSource = ViewHelper.FindVisualChild<ImageEx>(flipViewItem);
             var bitmap = new RenderTargetBitmap();
             await bitmap.RenderAsync(myImageSource);
 

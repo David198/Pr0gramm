@@ -55,10 +55,11 @@ namespace Pr0gramm.Models
             if (_commentsAndTagsLoaded)
                 return;
             _commentsAndTagsLoaded = true;
-            try
-            {
+
                 CoreDispatcher dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>  
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            {
+                try
                 {
                     CommentViewModels.Clear();
                     Tags.Clear();
@@ -78,13 +79,15 @@ namespace Pr0gramm.Models
 
                     CommentViewModels.AddRange(temptCommentViewModel);
                     Tags.AddRange(feedItemCommentItem.Tags.OrderByDescending(tag => tag.Confidence).ToList());
-                });
-              
-            }
-            catch (ApplicationException)
-            {
-                _toastNotificationsService.ShowToastNotificationWebSocketExeception();
-            }
+                }
+                catch (ApplicationException)
+                {
+                    _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                }
+
+
+            });
+
         }
 
         public void FlatHierarchy(Node<Comment> node, List<Comment> tempList)

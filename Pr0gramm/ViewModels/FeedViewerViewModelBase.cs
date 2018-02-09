@@ -42,14 +42,25 @@ namespace Pr0gramm.ViewModels
             set
             {
                 Set(ref _selectedItem, value);
-                if(value!=null)
-                 LoadComments(value);
+                if (value != null)
+                {
+                    LoadComments(value);
+                    var index = FeedItems.IndexOf(value);
+                    if (index < FeedItems.Count - 3)
+                    {
+                        LoadComments(FeedItems[index + 1]);
+                        LoadComments(FeedItems[index + 2]);
+                        LoadComments(FeedItems[index + 3]);
+                    }
+                  
+                }
+               
             }
         }
 
         private async void LoadComments(FeedItemViewModel itemViewModel)
         {
-                await itemViewModel?.LoadCommentsAndTags();
+            await itemViewModel?.LoadCommentsAndTags();
         }
 
         public void Handle(RefreshEvent message)
@@ -108,6 +119,7 @@ namespace Pr0gramm.ViewModels
                     catch (ApplicationException)
                     {
                         _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                        _boolLoadingNewItems = false;
                     }
                 }
             }

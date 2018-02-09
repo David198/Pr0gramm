@@ -68,13 +68,13 @@ namespace Pr0gramm.ViewModels
         public void Mute()
         {
             SettingsService.IsMuted = true;
-            _eventAggregator.PublishOnUIThread(new MuteEvent(true));
+            _eventAggregator.PublishOnBackgroundThread(new MuteEvent(true));
         }
 
         public void UnMute()
         {
             SettingsService.IsMuted = false;
-            _eventAggregator.PublishOnUIThread(new MuteEvent(false));
+            _eventAggregator.PublishOnBackgroundThread(new MuteEvent(false));
         }
 
 

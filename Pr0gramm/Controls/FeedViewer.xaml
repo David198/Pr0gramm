@@ -52,9 +52,9 @@
                             <Border BorderThickness="2" BorderBrush="{ThemeResource AppBarBorderThemeBrush}"
                                     x:Name="MediaBorder">
                                 <Grid>
-                                    <Image
+                                    <controls:ImageEx
                                         Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
-                                        Stretch="Uniform"
+                                        Stretch="Uniform" PlaceholderSource="{x:Bind FeedItem.ThumbSource, Converter={StaticResource ImageSourceFromUriConverter}}"
                                         Source="{x:Bind FeedItem.ImageSource, Converter= {StaticResource ImageSourceFromUriConverter}}"
                                         HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     <MediaPlayerElement
