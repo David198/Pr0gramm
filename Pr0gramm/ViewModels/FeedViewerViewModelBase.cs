@@ -42,7 +42,8 @@ namespace Pr0gramm.ViewModels
             set
             {
                 Set(ref _selectedItem, value);
-                LoadComments(value);
+                if(value!=null)
+                 LoadComments(value);
             }
         }
 
