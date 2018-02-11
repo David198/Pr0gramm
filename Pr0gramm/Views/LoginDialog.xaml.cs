@@ -26,12 +26,14 @@ namespace Pr0gramm.Views
     {
         private readonly IEventAggregator _ieventAggregator;
         private readonly IProgrammApi _iprogrammApi;
+        private readonly UserLoginService _userLoginService;
         private bool userIsLogginIn;
 
-        public LoginDialog(IEventAggregator IeventAggregator, IProgrammApi IprogrammApi)
+        public LoginDialog(IEventAggregator IeventAggregator, IProgrammApi IprogrammApi, UserLoginService userLoginService)
         {
             _ieventAggregator = IeventAggregator;
             _iprogrammApi = IprogrammApi;
+            _userLoginService = userLoginService;
             this.InitializeComponent();
         }
 
@@ -49,7 +51,7 @@ namespace Pr0gramm.Views
                 var user = await _iprogrammApi.Login(UserName.Text, PasswordBox.Password);
                 if (user != null)
                 {
-                    UserLoginService.SaveUserLogin(UserName.Text, PasswordBox.Password);
+                    _userLoginService.SaveUserLogin(UserName.Text, PasswordBox.Password);
                     _ieventAggregator.PublishOnUIThread(new UserLoggedInEvent(UserName.Text));
                     ErrorText.Visibility = Visibility.Collapsed;
                     userIsLogginIn = false;

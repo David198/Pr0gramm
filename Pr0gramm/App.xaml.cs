@@ -60,6 +60,7 @@ namespace Pr0gramm
             _container = new WinRTContainer();
             _container.RegisterWinRTServices();
             _container.PerRequest<ToastNotificationsService>();
+            _container.Singleton<UserLoginService>();
             _container.Singleton<IProgrammApi, ProgrammApi>();
             _container.PerRequest<ShellViewModel>();
             _container.PerRequest<TopViewModel>();

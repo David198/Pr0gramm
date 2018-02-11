@@ -9,7 +9,7 @@
     xmlns:controls="using:Pr0gramm.Controls"
     xmlns:micro="using:Caliburn.Micro"
     mc:Ignorable="d">
-    <controls:FeedViewer FeedItems="{x:Bind ViewModel.FeedItems}"
+    <controls:FeedViewer FeedItems="{x:Bind ViewModel.FeedItems, Mode=TwoWay}"
                          SelectedFeedItem="{x:Bind ViewModel.SelectedItem, Mode =TwoWay}"
                          micro:Message.Attach="[Event LoadNewItems] = [Action LoadOlderItems()]" />
 </Page>

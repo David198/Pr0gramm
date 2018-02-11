@@ -19,6 +19,7 @@ namespace Pr0gramm.ViewModels
         private readonly WinRTContainer _container;
         private readonly IEventAggregator _eventAggregator;
         private readonly IProgrammApi _programmApi;
+        private readonly UserLoginService _userLoginService;
 
         private string _header;
 
@@ -35,11 +36,12 @@ namespace Pr0gramm.ViewModels
         private bool _isMuted;
         public string ActualUser { get; set; }
 
-        public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator,IProgrammApi programmApi)
+        public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator,IProgrammApi programmApi, UserLoginService userLoginService)
         {
             _container = container;
             _eventAggregator = eventAggregator;
             _programmApi = programmApi;
+            _userLoginService = userLoginService;
             _eventAggregator.Subscribe(this);
         }
 
@@ -314,8 +316,8 @@ namespace Pr0gramm.ViewModels
             }
             if (args.InvokedItem.ToString().Equals("Login".GetLocalized()))
             {
-                LoginDialog dlg = new LoginDialog(_eventAggregator, _programmApi);
-                await dlg.ShowAsync();
+                _userLoginService.ShowUserLogin();
+
                 return;
             }
             if (args.InvokedItem.ToString().Equals("Logout".GetLocalized()))
@@ -354,7 +356,7 @@ namespace Pr0gramm.ViewModels
 
         private void LogoutUser()
         {
-            if (UserLoginService.DeleteUser(ActualUser))
+            if (_userLoginService.DeleteUser(ActualUser))
             {
                 NavigationItems.Remove(NavigationItems.First(item =>
                 {
@@ -389,7 +391,7 @@ namespace Pr0gramm.ViewModels
             });
             ActualUser = message.UserName;
             IsUserLoggedIn = true;
-            UserLoginService.IsLoggedIn = true;
+            _userLoginService.IsLoggedIn = true;
             FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, NsfwChecked, NsflChecked, IsUserLoggedIn);
             PublishRefreshCommand();
         }

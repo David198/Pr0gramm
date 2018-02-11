@@ -139,7 +139,7 @@ namespace Pr0gramm.Controls
             }        
             catch (Exception e)
             {
-                //HockeyClient.Current.TrackException(e);
+                HockeyClient.Current.TrackException(e);
             }
     
             _mediaPlayer = null;
@@ -155,7 +155,7 @@ namespace Pr0gramm.Controls
             }
             catch (Exception ex)
             {
-                //HockeyClient.Current.TrackException(ex);
+                HockeyClient.Current.TrackException(ex);
             }
         }
 
@@ -175,7 +175,7 @@ namespace Pr0gramm.Controls
             }
             catch (Exception e)
             {
-             // HockeyClient.Current.TrackException(e);
+               HockeyClient.Current.TrackException(e);
             }
 
         }
@@ -221,6 +221,7 @@ namespace Pr0gramm.Controls
                 image.MaxWidth = e.NewSize.Width;
                 var mediaPlayerElement = ViewHelper.FindVisualChild<MediaPlayerElement>(sender as DependencyObject);
                 mediaPlayerElement.MaxWidth = e.NewSize.Width;
+                mediaPlayerElement.MaxHeight = FlipView.ActualHeight * 0.5;
             }
         }
     }

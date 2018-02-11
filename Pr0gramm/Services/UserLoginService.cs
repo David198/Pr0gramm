@@ -4,23 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Security.Credentials;
+using Caliburn.Micro;
 using Microsoft.Identity.Client;
+using Pr0gramm.Views;
+using Pr0grammAPI.Interfaces;
 
 namespace Pr0gramm.Services
 {
     public class UserLoginService
     {
+        private readonly IEventAggregator _iEventAggregator;
+        private readonly IProgrammApi _iprogrammApi;
 
-        private static string resourceName = "Pr0gramm";
-        public static bool IsLoggedIn;
-        public static void  SaveUserLogin(string username, string password)
+        public UserLoginService(IEventAggregator iEventAggregator, IProgrammApi iprogrammApi)
+        {
+            _iEventAggregator = iEventAggregator;
+            _iprogrammApi = iprogrammApi;
+        }
+        private const string resourceName = "Pr0gramm";
+        public  bool IsLoggedIn;
+        public  void  SaveUserLogin(string username, string password)
         {
             var vault = new Windows.Security.Credentials.PasswordVault();
             vault.Add(new Windows.Security.Credentials.PasswordCredential(
                 resourceName, username, password));
         }
 
-        public static PasswordCredential GetCredentialFromLocker()
+        public  PasswordCredential GetCredentialFromLocker()
         {
             Windows.Security.Credentials.PasswordCredential credential = null;
 
@@ -46,7 +56,7 @@ namespace Pr0gramm.Services
          
         }
 
-        public static bool DeleteUser(string username)
+        public  bool DeleteUser(string username)
         {
             Windows.Security.Credentials.PasswordCredential credential = null;
 
@@ -72,6 +82,12 @@ namespace Pr0gramm.Services
             {
                 return false;
             }  
+        }
+
+        public  async void ShowUserLogin()
+        {
+            LoginDialog dlg = new LoginDialog(_iEventAggregator, _iprogrammApi, this);
+            await dlg.ShowAsync();
         }
     }
 }

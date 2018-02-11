@@ -281,7 +281,7 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   </data>
   <data name="NSFWCheckbox.Content" xml:space="preserve">
     <value>NSFW - Beinhalte nackte Haut, Pornos
- und leicht offensiven Kram,</value>
+ und leicht offensiven Kram.</value>
   </data>
   <data name="SFWCheckbox.Content" xml:space="preserve">
     <value>SFW - Safe for work</value>

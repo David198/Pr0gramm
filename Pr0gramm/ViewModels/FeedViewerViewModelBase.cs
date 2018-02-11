@@ -31,7 +31,6 @@ namespace Pr0gramm.ViewModels
             EventAggregator = eventAggregator;
             _toastNotificationsService = toastNotificationsService;
             ShowTop = true;
-     
         }
 
         public bool ShowTop { get; set; }
@@ -71,32 +70,15 @@ namespace Pr0gramm.ViewModels
             }
         }
 
-        private async void InitializeTheme()
-        {
-            await ThemeSelectorService.InitializeAsync();
-            ThemeSelectorService.SetRequestedTheme();
-        }
-
-        protected override async void OnInitialize()
+        protected override void OnInitialize()
         {
             base.OnInitialize();
-            InitializeTheme();
             EventAggregator.Subscribe(this);
             FeedItems = new BindableCollection<FeedItemViewModel>();
-            var credentials = UserLoginService.GetCredentialFromLocker();
-            if (credentials != null && !UserLoginService.IsLoggedIn)
-            {
-                credentials.RetrievePassword();
-                var user = await ProgrammApi.Login(credentials.UserName, credentials.Password);
-                if (user != null)
-                {
-                    EventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
-                    UserLoginService.IsLoggedIn = true;
-                }
-                    
-            }
             LoadFeedItems();
         }
+
+
 
         private async void LoadFeedItems()
         {
@@ -147,11 +129,7 @@ namespace Pr0gramm.ViewModels
         public async void OpenLink(LinkClickedEventArgs e)
         {
             var uri = new Uri(e.Link);
-            var success = await Launcher.LaunchUriAsync(uri);
-            if (!success)
-            {
-// URI launched
-            }
+             await Launcher.LaunchUriAsync(uri);
         }
     }
 }
