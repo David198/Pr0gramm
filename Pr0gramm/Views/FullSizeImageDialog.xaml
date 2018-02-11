@@ -1,0 +1,21 @@
+﻿<ContentDialog
+    x:Class="Pr0gramm.Views.FullSizeImageDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Pr0gramm.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    HorizontalContentAlignment="Stretch"
+    VerticalContentAlignment="Stretch"
+    Canvas.ZIndex="1" MaxHeight="1920" MaxWidth="1440"
+    FullSizeDesired="True"
+    PrimaryButtonText="Button1"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+    <ScrollViewer ZoomMode="Enabled" MinZoomFactor="1" HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled">
+        <Image x:Name="Image" />
+    </ScrollViewer>
+</ContentDialog>
+

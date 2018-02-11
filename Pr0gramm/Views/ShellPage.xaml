@@ -4,18 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="using:Pr0gramm.ViewModels"
-    xmlns:ic="using:Microsoft.Xaml.Interactions.Core"
-    xmlns:i="using:Microsoft.Xaml.Interactivity"
     xmlns:cm="using:Caliburn.Micro"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:fcu="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractPresent(Windows.Foundation.UniversalApiContract,5)"
-    xmlns:cu="http://schemas.microsoft.com/winfx/2006/xaml/presentation?IsApiContractNotPresent(Windows.Foundation.UniversalApiContract,5)"
     mc:Ignorable="d">
     <NavigationView
         x:Name="NavigationMenu"
         OpenPaneLength="150"
-        MenuItemsSource="{x:Bind ViewModel.NavigationItems}"
+        MenuItemsSource="{x:Bind ViewModel.NavigationItems,Mode=TwoWay}"
         SelectedItem="{x:Bind ViewModel.SelectedItem}"
         Canvas.ZIndex="0"
         Header="{x:Bind ViewModel.Header, Mode=TwoWay}"
@@ -36,14 +30,40 @@
                                 VerticalAlignment="Top"
                                 DefaultLabelPosition="Right"
                                 Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
-                        <AppBarToggleButton Label="Mute" Icon="Mute"
+                        <AppBarButton Icon="Flag"  Visibility="{Binding ElementName=NavigationMenu,
+                       Path=DataContext.ShowFlagButton, Converter={StaticResource BoolToVisConverter}}" 
+                                      Label="{Binding ElementName=NavigationMenu, Path=DataContext.FlagLabel}"
+                                      Click="ButtonBase_OnClick">
+                            <FlyoutBase.AttachedFlyout>
+                                <Flyout Closed="FlagsUpdated">
+                                    <StackPanel>
+                                        <CheckBox x:Uid="SFWCheckbox"
+                                            IsEnabled="{Binding ElementName=NavigationMenu, Path=DataContext.SfwCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                            IsChecked="{Binding ElementName=NavigationMenu, Path=DataContext.SfwChecked, Mode=TwoWay}">
+                                           
+                                        </CheckBox>
+                                        <CheckBox x:Uid="NSFWCheckbox"
+                                            IsEnabled="{Binding ElementName=NavigationMenu, Path=DataContext.NsfwCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                            IsChecked="{Binding ElementName=NavigationMenu, Path=DataContext.NsfwChecked, Mode=TwoWay}">
+                                         
+                                        </CheckBox>
+                                        <CheckBox  x:Uid="NSFLCheckbox"
+                                            IsEnabled="{Binding ElementName=NavigationMenu, Path=DataContext.NsflCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                            IsChecked="{Binding ElementName=NavigationMenu, Path=DataContext.NsflChecked, Mode=TwoWay}">
+                                          
+                                        </CheckBox>
+                                    </StackPanel>
+                                </Flyout>
+                            </FlyoutBase.AttachedFlyout>
+                        </AppBarButton>
+                        <AppBarToggleButton Label="Mute" Icon="Mute" IsChecked="{Binding ElementName=NavigationMenu, Path=DataContext.IsMuted ,Mode=TwoWay}"
                                             cm:Message.Attach="[Event Checked] = [Action Mute]; [Event Unchecked] = [Action UnMute]"
                                             Visibility="{Binding ElementName=NavigationMenu,
                        Path=DataContext.IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
-                        <AppBarButton Label="Refresh" Icon="Refresh" cm:Message.Attach="RefreshCommand"
+                        <AppBarButton x:Uid="AppBarButtonRefresh" Icon="Refresh" cm:Message.Attach="RefreshCommand"
                                       Visibility="{Binding ElementName=NavigationMenu,
                        Path=DataContext.IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
-                      
+
                     </CommandBar>
                 </Grid>
             </DataTemplate>
@@ -53,4 +73,18 @@
         </Grid>
     </NavigationView>
 </Page>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -15,6 +15,8 @@ using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Caliburn.Micro;
@@ -24,6 +26,7 @@ using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
 using Pr0gramm.Models;
 using Pr0gramm.Services;
+using Pr0gramm.Views;
 using Pr0gramm.Views.Convertes;
 using Pr0grammAPI.Annotations;
 
@@ -40,7 +43,6 @@ namespace Pr0gramm.Controls
         public static readonly DependencyProperty SelectedFeedItemProperty = DependencyProperty.Register(
             "PropertyType", typeof(FeedItemViewModel), typeof(FeedViewer),
             new PropertyMetadata(default(FeedItemViewModel)));
-
 
         public FeedViewer()
         {
@@ -109,7 +111,7 @@ namespace Pr0gramm.Controls
                     Source = MediaSource.CreateFromUri(item.FeedItem.ImageSource),
                     IsMuted = SettingsService.IsMuted,
                     AutoPlay = true,
-                    AudioCategory = MediaPlayerAudioCategory.Media,                   
+                    AudioCategory = MediaPlayerAudioCategory.Media,   
                 };
                 var flipViewItem = FlipView.ContainerFromItem(item);
                 if (flipViewItem == null) return;
@@ -126,7 +128,20 @@ namespace Pr0gramm.Controls
 
         private void StopOldMediaPlayer()
         {
-            _mediaPlayer?.Pause();
+            try
+            {
+                if (_mediaPlayer != null)
+                {
+                    _mediaPlayer.Pause();
+                    _mediaPlayer.Source = null;
+                }
+                    
+            }        
+            catch (Exception e)
+            {
+                //HockeyClient.Current.TrackException(e);
+            }
+    
             _mediaPlayer = null;
         }
 
@@ -135,11 +150,12 @@ namespace Pr0gramm.Controls
         {
             try
             {
-                _mediaPlayer?.Dispose();
+                if (_mediaPlayer != null)
+                    _mediaPlayer.Dispose();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                LogManager.GetLog(GetType()).Error(exception);
+                //HockeyClient.Current.TrackException(ex);
             }
         }
 
@@ -159,13 +175,12 @@ namespace Pr0gramm.Controls
             }
             catch (Exception e)
             {
-              HockeyClient.Current.TrackException(e);
+             // HockeyClient.Current.TrackException(e);
             }
 
         }
 
-
-        private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private async void DownloadImageClick(object sender, RoutedEventArgs e)
         {
             var flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
             if (flipViewItem == null) return;
@@ -195,6 +210,17 @@ namespace Pr0gramm.Controls
                     bytes);
 
                 await encoder.FlushAsync();
+            }
+        }
+
+        private void ScrollViewerSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.PreviousSize != e.NewSize)
+            {
+                var image = ViewHelper.FindVisualChild<ImageEx>(sender as DependencyObject);
+                image.MaxWidth = e.NewSize.Width;
+                var mediaPlayerElement = ViewHelper.FindVisualChild<MediaPlayerElement>(sender as DependencyObject);
+                mediaPlayerElement.MaxWidth = e.NewSize.Width;
             }
         }
     }

@@ -6,9 +6,9 @@ namespace Pr0gramm.ViewModels
 {
     public class NewViewModel : FeedViewerViewModelBase
     {
-        public NewViewModel(IProgrammApi programmApi, IEventAggregator eventAggregator,
+        public NewViewModel(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
             ToastNotificationsService toastNotificationsService) :
-            base(programmApi, eventAggregator, toastNotificationsService)
+            base(programmProgrammApi, eventAggregator, toastNotificationsService)
         {
             ShowTop = false;
         }

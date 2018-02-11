@@ -85,7 +85,6 @@ namespace Pr0gramm.Models
                     _toastNotificationsService.ShowToastNotificationWebSocketExeception();
                 }
 
-
             });
 
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI.Xaml.Controls;
@@ -8,13 +9,16 @@ using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
 using Pr0gramm.Services;
 using Pr0gramm.Views;
+using Pr0grammAPI.Feeds;
+using Pr0grammAPI.Interfaces;
 
 namespace Pr0gramm.ViewModels
 {
-    public class ShellViewModel : Screen
+    public class ShellViewModel : Screen, IHandle<UserLoggedInEvent>
     {
         private readonly WinRTContainer _container;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IProgrammApi _programmApi;
 
         private string _header;
 
@@ -22,12 +26,106 @@ namespace Pr0gramm.ViewModels
         private bool _isSettingPageOpen;
         private INavigationService _navigationService;
 
-        private NavigationViewItem _selectedItem;
+        private NavigationViewItemBase _selectedItem;
+        private bool _sfwChecked;
+        private bool _nsfwChecked;
+        private bool _nsflChecked;
+        private string _flagLabel;
+        private bool _isUserLoggedIn;
+        private bool _isMuted;
+        public string ActualUser { get; set; }
 
-        public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator)
+        public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator,IProgrammApi programmApi)
         {
             _container = container;
             _eventAggregator = eventAggregator;
+            _programmApi = programmApi;
+            _eventAggregator.Subscribe(this);
+        }
+
+        public bool ShowFlagButton
+        {
+            get { return IsUserLoggedIn && !IsSettingPageOpen; }
+        }
+
+        public bool IsUserLoggedIn
+        {
+            get { return _isUserLoggedIn; }
+            set
+            {
+                _isUserLoggedIn = value;
+                NotifyOfPropertyChange(nameof(ShowFlagButton));
+            }
+        }
+
+        public bool SfwChecked
+        {
+            get => _sfwChecked;
+            set
+            {
+                Set(ref _sfwChecked, value);
+                UpdateFlagCheckboxEnabledState();
+            }
+        }
+
+        public bool SfwCheckedEnabled
+        {
+            get
+            {
+                if (!NsflChecked && !NsfwChecked) return false;
+                return true;
+            }
+        }
+
+        public bool NsfwChecked
+        {
+            get => _nsfwChecked;
+            set
+            {
+                Set(ref _nsfwChecked, value);
+                UpdateFlagCheckboxEnabledState();
+            }
+        }
+
+        public bool NsfwCheckedEnabled
+        {
+            get
+            {
+                if (!NsflChecked && !SfwChecked) return false;
+                return true;
+            }
+        }
+
+        public bool NsflChecked
+        {
+            get => _nsflChecked;
+            set
+            {
+                Set(ref _nsflChecked, value);
+                UpdateFlagCheckboxEnabledState();
+            }
+        }
+
+        public bool NsflCheckedEnabled
+        {
+            get
+            {
+                if (!NsfwChecked && !SfwChecked) return false;
+                return true;
+            }
+        }
+
+        private void UpdateFlagCheckboxEnabledState()
+        {
+            NotifyOfPropertyChange(nameof(SfwCheckedEnabled));
+            NotifyOfPropertyChange(nameof(NsfwCheckedEnabled));
+            NotifyOfPropertyChange(nameof(NsflCheckedEnabled));
+        }
+
+        public string FlagLabel
+        {
+            get => _flagLabel;
+            set => Set(ref _flagLabel, value);
         }
 
         public string Header
@@ -39,25 +137,48 @@ namespace Pr0gramm.ViewModels
         public bool IsSettingPageOpen
         {
             get => _isSettingPageOpen;
-            set => Set(ref _isSettingPageOpen, value);
+            set
+            {
+                Set(ref _isSettingPageOpen, value);
+                NotifyOfPropertyChange(nameof(ShowFlagButton));
+            }
         }
 
         public bool IsPaneOpen
         {
             get => _isPaneOpen;
-            set => Set(ref _isPaneOpen, value);
+            set
+            {
+                Set(ref _isPaneOpen, value);
+                NotifyOfPropertyChange(nameof(ShowFlagButton));
+            }
         }
 
-        public NavigationViewItem SelectedItem
+        public bool IsMuted
+        {
+            get => _isMuted;
+            set
+            {
+                Set(ref _isMuted, value);
+                NotifyOfPropertyChange(nameof(IsMuted));
+            }
+        }
+
+        public NavigationViewItemBase SelectedItem
         {
             get => _selectedItem;
             set => Set(ref _selectedItem, value);
         }
 
-        public ObservableCollection<NavigationViewItem> NavigationItems { get; } =
-            new ObservableCollection<NavigationViewItem>();
+        public ObservableCollection<NavigationViewItemBase> NavigationItems { get; set; } =
+            new ObservableCollection<NavigationViewItemBase>();
 
         public void RefreshCommand()
+        {
+            PublishRefreshCommand();
+        }
+
+        private void PublishRefreshCommand()
         {
             var viewType = _navigationService.CurrentSourcePageType;
             if (viewType == null) return;
@@ -77,6 +198,28 @@ namespace Pr0gramm.ViewModels
             _eventAggregator.PublishOnBackgroundThread(new MuteEvent(false));
         }
 
+        public void FlagsUpdated()
+        {
+            FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, NsfwChecked, NsflChecked, IsUserLoggedIn);
+            PublishRefreshCommand();
+            UpdateFlagLabel();
+        }
+
+        private void UpdateFlagLabel()
+        {
+            FlagLabel = "";
+            if (SfwChecked && NsfwChecked && NsflChecked)
+            {
+                FlagLabel = "All".GetLocalized();
+                return;
+            }
+            if (SfwChecked)
+                FlagLabel += "SFW";
+            if (NsfwChecked)
+                FlagLabel += " NSFW";
+            if (NsflChecked)
+                FlagLabel += " NSFL";
+        }
 
         public void Open()
         {
@@ -86,13 +229,110 @@ namespace Pr0gramm.ViewModels
 
         protected override void OnInitialize()
         {
+    
+            InitializeFeedFlags();
             var view = GetView() as IShellView;
             _navigationService = view?.CreateNavigationService(_container);
             if (_navigationService != null)
                 _navigationService.Navigated += NavigationService_Navigated;
             PopulateNavItems();
+            NotifyOfPropertyChange(nameof(ShowFlagButton));
+            IsMuted = true;
+            Mute();
         }
 
+        private async void InitializeFeedFlags()
+        {
+            //await FlagSelectorService.InitializeAsync();
+            switch (FlagSelectorService.ActualFlag)
+            {
+                case FeedFlags.NSFW:
+                    NsfwChecked = true;
+                    break;
+                case FeedFlags.NSFL:
+                    NsflChecked = true;
+                    break;
+                case FeedFlags.SFW:
+                    SfwChecked = true;
+                    break;
+                case FeedFlags.SFWLogin:
+                    SfwChecked = true;
+                    break;
+                case FeedFlags.SFWNSFW:
+                    SfwChecked = true;
+                    NsfwChecked = true;
+                    break;
+                case FeedFlags.SFWNSFL:
+                    SfwChecked = true;
+                    NsflChecked = true;
+                    break;
+                case FeedFlags.ALL:
+                    SfwChecked = true;
+                    NsflChecked = true;
+                    NsfwChecked = true;
+                    break;
+                case FeedFlags.NSFWNSFL:
+                    NsflChecked = true;
+                    NsfwChecked = true;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            UpdateFlagLabel();
+        }
+
+        private void PopulateNavItems()
+        {
+            NavigationItems.Clear();
+            NavigationItems.Add(new NavigationViewItem
+            {
+                Content = "Shell_Top".GetLocalized(),
+                Icon = new SymbolIcon(Symbol.Home),
+                Tag = typeof(TopViewModel)
+            });
+
+            NavigationItems.Add(new NavigationViewItem
+            {
+                Content = "Shell_New".GetLocalized(),
+                Icon = new SymbolIcon(Symbol.Up),
+                Tag = typeof(NewViewModel)
+            });
+            NavigationItems.Add(new NavigationViewItemSeparator());
+            NavigationItems.Add(new NavigationViewItem
+            {
+                Content = "Login".GetLocalized(),
+                Icon = new SymbolIcon(Symbol.Contact)
+            });
+        }
+
+        public async void ItemInvoked(NavigationViewItemInvokedEventArgs args)
+        {
+            if (args.IsSettingsInvoked)
+            {
+                _navigationService.NavigateToViewModel(typeof(SettingsViewModel));
+                return;
+            }
+            if (args.InvokedItem.ToString().Equals("Login".GetLocalized()))
+            {
+                LoginDialog dlg = new LoginDialog(_eventAggregator, _programmApi);
+                await dlg.ShowAsync();
+                return;
+            }
+            if (args.InvokedItem.ToString().Equals("Logout".GetLocalized()))
+            {
+                LogoutUser();
+                return;
+            }
+
+            Navigate(args.InvokedItem);
+        }
+
+        private void Navigate(object item)
+        {
+            var navigationItem = NavigationItems.FirstOrDefault(items => items.Content.Equals(item.ToString()));
+            if (navigationItem != null)
+                _navigationService.NavigateToViewModel(navigationItem.Tag as Type);
+        }
 
         private void NavigationService_Navigated(object sender, NavigationEventArgs e)
         {
@@ -112,41 +352,46 @@ namespace Pr0gramm.ViewModels
             }
         }
 
-        private void PopulateNavItems()
+        private void LogoutUser()
         {
-            NavigationItems.Clear();
-            NavigationItems.Add(new NavigationViewItem
+            if (UserLoginService.DeleteUser(ActualUser))
             {
-                Content = "Shell_Top".GetLocalized(),
-                Icon = new SymbolIcon(Symbol.Home),
-                Tag = typeof(TopViewModel)
-            });
-
-            NavigationItems.Add(new NavigationViewItem
-            {
-                Content = "Shell_New".GetLocalized(),
-                Icon = new SymbolIcon(Symbol.Up),
-                Tag = typeof(NewViewModel)
-            });
-        }
-
-        public void ItemInvoked(NavigationViewItemInvokedEventArgs args)
-        {
-            if (args.IsSettingsInvoked)
-            {
-                _navigationService.NavigateToViewModel(typeof(SettingsViewModel));
-
-                return;
+                NavigationItems.Remove(NavigationItems.First(item =>
+                {
+                    if (item.Content != null)
+                        return item.Content.Equals("Logout".GetLocalized());
+                    return false;
+                }));
+                NavigationItems.Insert(NavigationItems.Count, new NavigationViewItem
+                {
+                    Content = "Login".GetLocalized(),
+                    Icon = new SymbolIcon(Symbol.Contact)
+                });
+                IsUserLoggedIn = false;
+                FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, false, false, IsUserLoggedIn);
+                PublishRefreshCommand();
             }
-            Navigate(args.InvokedItem);
         }
 
 
-        private void Navigate(object item)
+        public void Handle(UserLoggedInEvent message)
         {
-            var navigationItem = NavigationItems.FirstOrDefault(items => items.Content.Equals(item.ToString()));
-            if (navigationItem != null)
-                _navigationService.NavigateToViewModel(navigationItem.Tag as Type);
+            NavigationItems.Remove(NavigationItems.First(item =>
+            {
+                if (item.Content != null)
+                  return  item.Content.Equals("Login".GetLocalized());
+                return false;
+            }));
+            NavigationItems.Insert(NavigationItems.Count, new NavigationViewItem
+            {
+                Content = "Logout".GetLocalized(),
+                Icon = new SymbolIcon(Symbol.BlockContact)
+            });
+            ActualUser = message.UserName;
+            IsUserLoggedIn = true;
+            UserLoginService.IsLoggedIn = true;
+            FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, NsfwChecked, NsflChecked, IsUserLoggedIn);
+            PublishRefreshCommand();
         }
     }
 }

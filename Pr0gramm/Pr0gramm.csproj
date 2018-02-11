@@ -22,7 +22,7 @@
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
-    <AppxPackageDir>C:\Users\David\Documents\pr0gramm\Pr0gramm\AppPackages\</AppxPackageDir>
+    <AppxPackageDir>C:\Users\David\Documents\Pr0grammGit\Pr0gramm\AppPackages\</AppxPackageDir>
     <PackageCertificateThumbprint>50C6A339293FB701B4C2048708583AA6F5C220F8</PackageCertificateThumbprint>
     <HockeyAppResourceId>d2ef27ea7e7342b3befa7922cacd4c47</HockeyAppResourceId>
   </PropertyGroup>
@@ -142,6 +142,7 @@
     <Compile Include="EventHandlers\CameraControlEventArgs.cs" />
     <Compile Include="EventHandlers\MuteEvent.cs" />
     <Compile Include="EventHandlers\RefreshEvent.cs" />
+    <Compile Include="EventHandlers\UserLoggedInEvent.cs" />
     <Compile Include="Helpers\CameraOrientationExtensions.cs" />
     <Compile Include="Helpers\EnumToBooleanConverter.cs" />
     <Compile Include="Helpers\Json.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="Services\DragAndDrop\ListViewDropConfiguration.cs" />
     <Compile Include="Services\DragAndDrop\VisualDropConfiguration.cs" />
     <Compile Include="Services\FirstRunDisplayService.cs" />
+    <Compile Include="Services\FlagSelectorService.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\OnBackgroundEnteringEventArgs.cs" />
     <Compile Include="Services\SuspendAndResumeService.cs" />
@@ -172,6 +174,7 @@
     <Compile Include="Services\ToastNotificationsService.cs" />
     <Compile Include="Services\ToastNotificationsService.Samples.cs" />
     <Compile Include="Services\ToastNotificationsService.WebSocket.cs" />
+    <Compile Include="Services\UserLoginService.cs" />
     <Compile Include="Services\WhatsNewDisplayService.cs" />
     <Compile Include="Styles\DataTemplates.cs" />
     <Compile Include="ViewModels\CameraViewModel.cs" />
@@ -193,7 +196,13 @@
     <Compile Include="Views\FirstRunDialog.xaml.cs">
       <DependentUpon>FirstRunDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\FullSizeImageDialog.xaml.cs">
+      <DependentUpon>FullSizeImageDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\IShellView.cs" />
+    <Compile Include="Views\LoginDialog.xaml.cs">
+      <DependentUpon>LoginDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\NewPage.xaml.cs">
       <DependentUpon>NewPage.xaml</DependentUpon>
     </Compile>
@@ -271,6 +280,14 @@
     <Page Include="Views\FirstRunDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\FullSizeImageDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\LoginDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\NewPage.xaml">
       <SubType>Designer</SubType>

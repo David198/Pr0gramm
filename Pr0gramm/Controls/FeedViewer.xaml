@@ -12,14 +12,14 @@
     xmlns:feeds="using:Pr0grammAPI.Feeds"
     xmlns:playback="using:Windows.Media.Playback"
     mc:Ignorable="d"
+    x:Name="UserControl"
     d:DesignHeight="300"
     d:DesignWidth="400" Loaded="OnLoaded" Unloaded="FeedViewer_OnUnloaded">
-
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition MinWidth="165" Width="0.6*" />
-            <ColumnDefinition Width="13" />
-            <ColumnDefinition Width="0.4*" />
+            <ColumnDefinition Width="15" />
+            <ColumnDefinition Width="0.4*" MinWidth="375" />
         </Grid.ColumnDefinitions>
         <controls:AdaptiveGridView x:Name="FeedItemGridView" Grid.Column="0"
                                    ItemsSource="{x:Bind FeedItems}"
@@ -29,9 +29,10 @@
                                    DesiredWidth="150"
                                    SelectionMode="Single"
                                    ItemTemplate="{StaticResource ThumbImageTemplate}" />
-        <controls:GridSplitter Grid.Column="1" Width="14" ResizeBehavior="BasedOnAlignment"
+        <controls:GridSplitter Grid.Column="1" Width="15" ResizeBehavior="BasedOnAlignment"
                                ResizeDirection="Auto"
-                               FontSize="13" Background="{ThemeResource ApplicationForegroundThemeBrush}">
+                               FontSize="13" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            
             <controls:GridSplitter.Element>
                 <TextBlock HorizontalAlignment="Center"
                            IsHitTestVisible="False"
@@ -42,24 +43,30 @@
             </controls:GridSplitter.Element>
         </controls:GridSplitter>
 
-        <FlipView Grid.Column="2" ItemsSource="{x:Bind FeedItems}" x:Name="FlipView"
+        <FlipView Grid.Column="2"  ItemsSource="{x:Bind FeedItems}" x:Name="FlipView"
                   SelectedItem="{x:Bind SelectedFeedItem, Mode=TwoWay}">
             <FlipView.ItemTemplate>
                 <DataTemplate x:DataType="models:FeedItemViewModel">
                     <ScrollViewer HorizontalScrollMode="Disabled">
                         <StackPanel>
-
                             <Border BorderThickness="2" BorderBrush="{ThemeResource AppBarBorderThemeBrush}"
                                     x:Name="MediaBorder">
-                                <Grid>
-                                    <controls:ImageEx
-                                        Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
-                                        Stretch="Uniform" PlaceholderSource="{x:Bind FeedItem.ThumbSource, Converter={StaticResource ImageSourceFromUriConverter}}"
-                                        Source="{x:Bind FeedItem.ImageSource, Converter= {StaticResource ImageSourceFromUriConverter}}"
-                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <MediaPlayerElement
+                                <ScrollViewer ZoomMode="Enabled" MinZoomFactor="1" ZoomSnapPointsType="MandatorySingle"
+                                              SizeChanged="ScrollViewerSizeChanged"
+                                              VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Enabled"
+                                              VerticalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto">
+                                    <Grid>
+                                        <controls:ImageEx
+                                            Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
+                                            Stretch="Uniform"
+                                            PlaceholderSource="{x:Bind FeedItem.ThumbSource, Converter={StaticResource ImageSourceFromUriConverter}}"
+                                            PlaceholderStretch="Fill"
+                                            Source="{x:Bind FeedItem.ImageSource, Converter= {StaticResource ImageSourceFromUriConverter}}"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                   
+                                    <MediaPlayerElement 
                                         Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BoolToVisConverter}}"
-                                        AreTransportControlsEnabled="True" HorizontalContentAlignment="Stretch"
+                                        AreTransportControlsEnabled="True" 
                                         VerticalContentAlignment="Stretch"
                                         Stretch="Uniform">
                                         <MediaPlayerElement.TransportControls>
@@ -68,7 +75,8 @@
                                         </MediaPlayerElement.TransportControls>
                                     </MediaPlayerElement>
                                 </Grid>
-                            </Border>
+                    </ScrollViewer>
+                    </Border>
 
                             <controls:DockPanel HorizontalAlignment="Stretch"
                                                 Margin="{StaticResource MediumLeftMargin}">
@@ -83,11 +91,10 @@
                                            x:Phase="2" controls:DockPanel.Dock="Left" />
                                 <TextBlock Margin="{StaticResource MediumLeftMargin}" HorizontalAlignment="Center"
                                            VerticalAlignment="Center" controls:DockPanel.Dock="Left">
-                                    Score
                                 </TextBlock>
                                 <TextBlock controls:DockPanel.Dock="Left" Margin="{StaticResource MediumLeftMargin}"
                                            HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
+                                           VerticalAlignment="Center" x:Phase="5"
                                            Text="{x:Bind FeedItem,Converter={StaticResource FeedScoreConverter}}">
                                     <ToolTipService.ToolTip>
                                         <StackPanel Orientation="Horizontal">
@@ -107,7 +114,7 @@
                                         </StackPanel>
                                     </ToolTipService.ToolTip>
                                 </TextBlock>
-                                <AppBarButton Click="ButtonBase_OnClick"
+                                <AppBarButton Click="DownloadImageClick"
                                               Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
                                               controls:DockPanel.Dock="Right" HorizontalAlignment="Right"
                                               Label="Download" Icon="Download" />
@@ -143,7 +150,7 @@
                                            Text="{Binding CommentViewModels.Count}" />
                                 <TextBlock Margin="{StaticResource MediumLeftMargin}" x:Uid="Comments" />
                             </StackPanel>
-                            <ListView x:Name="CommentsList" SelectionMode="None"
+                            <ListView x:Name="CommentsList" SelectionMode="None" MaxHeight="700"
                                       ItemsSource="{x:Bind CommentViewModels}">
                                 <ListView.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -234,7 +241,6 @@
                                                                 </StackPanel>
                                                             </ToolTipService.ToolTip>
                                                         </TextBlock>
-
                                                     </StackPanel>
                                                 </StackPanel>
                                             </Border>
@@ -247,7 +253,6 @@
                 </DataTemplate>
             </FlipView.ItemTemplate>
         </FlipView>
-
     </Grid>
 </UserControl>
 

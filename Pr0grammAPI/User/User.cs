@@ -8,5 +8,9 @@ namespace Pr0grammAPI.User
 {
    public class User
     {
+        public int InboxCount { get; set; }
+        public string Log { get; set; }
+        public int LogLength { get; set; }
+        public int Score { get; set; }
     }
 }

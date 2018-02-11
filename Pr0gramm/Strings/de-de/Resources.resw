@@ -242,4 +242,48 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   <data name="Comments.Text" xml:space="preserve">
     <value>Kommentare</value>
   </data>
+  <data name="All" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="AppBarButtonRefresh.Label" xml:space="preserve">
+    <value>Neu Laden</value>
+  </data>
+  <data name="ErrorTextLogin" xml:space="preserve">
+    <value>Fehler beim Login. Bitte überprüfen Sie ihr Password und Nutzernamen!</value>
+  </data>
+  <data name="ErrorTextCredentialsMissing" xml:space="preserve">
+    <value>Username oder Passwort nicht eingegeben!</value>
+  </data>
+  <data name="LoginDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginDialog.CloseButtonText" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="LoginDialog.Title" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="LoginText.Text" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="PasswordText.Text" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Ausloggen</value>
+  </data>
+  <data name="NSFLCheckbox.Content" xml:space="preserve">
+    <value>NSFL - Alles. Gewalt, zerplatschte Menschen,
+ ekligen Scheiß.</value>
+  </data>
+  <data name="NSFWCheckbox.Content" xml:space="preserve">
+    <value>NSFW - Beinhalte nackte Haut, Pornos
+ und leicht offensiven Kram,</value>
+  </data>
+  <data name="SFWCheckbox.Content" xml:space="preserve">
+    <value>SFW - Safe for work</value>
+  </data>
 </root>

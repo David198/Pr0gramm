@@ -22,8 +22,8 @@ namespace Pr0gramm
 
         public App()
         {
-            HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
-                new TelemetryConfiguration {EnableDiagnostics = true});
+            //HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
+            //    new TelemetryConfiguration {EnableDiagnostics = true});
             InitializeComponent();
             EnteredBackground += App_EnteredBackground;
             Initialize();

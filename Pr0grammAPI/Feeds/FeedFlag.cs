@@ -10,6 +10,11 @@ namespace Pr0grammAPI.Feeds
     {
         NSFW = 2,
         NSFL = 4,
-        SFW = 1
+        SFW = 1,
+        SFWLogin = 9,
+        SFWNSFW = 11,
+        SFWNSFL = 13,
+        ALL = 15,
+        NSFWNSFL = 6
     }
 }

@@ -22,15 +22,16 @@ namespace Pr0gramm.ViewModels
         protected readonly IEventAggregator EventAggregator;
         private bool _boolLoadingNewItems;
         private FeedItemViewModel _selectedItem;
-        protected IProgrammApi Api;
+        protected IProgrammApi ProgrammApi;
 
-        internal FeedViewerViewModelBase(IProgrammApi programmApi, IEventAggregator eventAggregator,
+        internal FeedViewerViewModelBase(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
             ToastNotificationsService toastNotificationsService)
         {
-            Api = programmApi;
+            ProgrammApi = programmProgrammApi;
             EventAggregator = eventAggregator;
             _toastNotificationsService = toastNotificationsService;
             ShowTop = true;
+     
         }
 
         public bool ShowTop { get; set; }
@@ -51,10 +52,8 @@ namespace Pr0gramm.ViewModels
                         LoadComments(FeedItems[index + 1]);
                         LoadComments(FeedItems[index + 2]);
                         LoadComments(FeedItems[index + 3]);
-                    }
-                  
-                }
-               
+                    }    
+                }        
             }
         }
 
@@ -78,12 +77,24 @@ namespace Pr0gramm.ViewModels
             ThemeSelectorService.SetRequestedTheme();
         }
 
-        protected override void OnInitialize()
+        protected override async void OnInitialize()
         {
             base.OnInitialize();
             InitializeTheme();
             EventAggregator.Subscribe(this);
             FeedItems = new BindableCollection<FeedItemViewModel>();
+            var credentials = UserLoginService.GetCredentialFromLocker();
+            if (credentials != null && !UserLoginService.IsLoggedIn)
+            {
+                credentials.RetrievePassword();
+                var user = await ProgrammApi.Login(credentials.UserName, credentials.Password);
+                if (user != null)
+                {
+                    EventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
+                    UserLoginService.IsLoggedIn = true;
+                }
+                    
+            }
             LoadFeedItems();
         }
 
@@ -91,7 +102,7 @@ namespace Pr0gramm.ViewModels
         {
             try
             {
-                var feed = await Api.GetFeed(FeedFlags.SFW, ShowTop);
+                var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop);
                 InitializeFeedItemViewModels(feed);
             }
             catch (ApplicationException)
@@ -112,7 +123,7 @@ namespace Pr0gramm.ViewModels
                         : FeedItems[FeedItems.Count - 1].FeedItem.Id;
                     try
                     {
-                        var feed = await Api.GetOlderFeed(id, FeedFlags.SFW, ShowTop);
+                        var feed = await ProgrammApi.GetOlderFeed(id, FlagSelectorService.ActualFlag, ShowTop);
                         InitializeFeedItemViewModels(feed);
                         _boolLoadingNewItems = false;
                     }
@@ -129,7 +140,7 @@ namespace Pr0gramm.ViewModels
         {
             feed.Items.ForEach(item =>
             {
-                FeedItems.Add(new FeedItemViewModel(item, Api, _toastNotificationsService));
+                FeedItems.Add(new FeedItemViewModel(item, ProgrammApi, _toastNotificationsService));
             });
         }
 
