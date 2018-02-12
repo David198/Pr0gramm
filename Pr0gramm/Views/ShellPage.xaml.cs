@@ -19,15 +19,6 @@ namespace Pr0gramm.Views
             return container.RegisterNavigationService(shellFrame);
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            FlyoutBase.ShowAttachedFlyout((FrameworkElement)sender);
-        }
-
-        private void FlagsUpdated(object sender, object e)
-        {
-            // cm:Message.Attach= not working for flyout.
-            ViewModel.FlagsUpdated();
-        }
+        private void FlyoutBase_OnClosed(object sender, object e) => ViewModel.FlagsUpdated();
     }
 }

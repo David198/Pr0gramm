@@ -10,12 +10,12 @@
         <Grid>
             <Image
             Stretch="Uniform"
-            Source="{Binding FeedItem.ThumbSource}"
-            HorizontalAlignment="Center" VerticalAlignment="Center" />
+            Source="{Binding ThumbSource}"
+            HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="150" />
             <SymbolIcon Symbol="Video" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}"
-                        Visibility="{Binding FeedItem.IsVideo, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
+                        Visibility="{Binding IsVideo, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
             <SymbolIcon Symbol="Volume" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}"
-                        Visibility="{Binding FeedItem.Audio, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
+                        Visibility="{Binding Audio, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
         </Grid>
     </DataTemplate>
 

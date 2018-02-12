@@ -102,13 +102,13 @@ namespace Pr0gramm.Controls
 
         private void SetVideoPlayBack(FeedItemViewModel item)
         {
-            if (item.FeedItem.IsVideo)
+            if (item.IsVideo)
             {
                 StopOldMediaPlayer();
                 _mediaPlayer = new MediaPlayer
                 {
                     IsLoopingEnabled = true,
-                    Source = MediaSource.CreateFromUri(item.FeedItem.ImageSource),
+                    Source = MediaSource.CreateFromUri(item.ImageSource),
                     IsMuted = SettingsService.IsMuted,
                     AutoPlay = true,
                     AudioCategory = MediaPlayerAudioCategory.Media,   
@@ -116,9 +116,11 @@ namespace Pr0gramm.Controls
                 var flipViewItem = FlipView.ContainerFromItem(item);
                 if (flipViewItem == null) return;
                 var mediaPlayerElement = ViewHelper.FindVisualChild<MediaPlayerElement>(flipViewItem);
-                mediaPlayerElement.SetMediaPlayer(_mediaPlayer);
-                mediaPlayerElement.Stretch = Stretch.Uniform;
-
+                if (mediaPlayerElement != null)
+                {
+                    mediaPlayerElement.SetMediaPlayer(_mediaPlayer);
+                    mediaPlayerElement.Stretch = Stretch.Uniform;
+                }   
             }
             else
             {
@@ -134,14 +136,12 @@ namespace Pr0gramm.Controls
                 {
                     _mediaPlayer.Pause();
                     _mediaPlayer.Source = null;
-                }
-                    
+                }                 
             }        
             catch (Exception e)
             {
-                HockeyClient.Current.TrackException(e);
+               // HockeyClient.Current.TrackException(e);
             }
-    
             _mediaPlayer = null;
         }
 
@@ -155,7 +155,7 @@ namespace Pr0gramm.Controls
             }
             catch (Exception ex)
             {
-                HockeyClient.Current.TrackException(ex);
+               // HockeyClient.Current.TrackException(ex);
             }
         }
 
@@ -175,9 +175,8 @@ namespace Pr0gramm.Controls
             }
             catch (Exception e)
             {
-               HockeyClient.Current.TrackException(e);
+             //  HockeyClient.Current.TrackException(e);
             }
-
         }
 
         private async void DownloadImageClick(object sender, RoutedEventArgs e)
@@ -208,7 +207,6 @@ namespace Pr0gramm.Controls
                     200,
                     200,
                     bytes);
-
                 await encoder.FlushAsync();
             }
         }

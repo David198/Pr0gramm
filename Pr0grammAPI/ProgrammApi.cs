@@ -19,21 +19,21 @@ namespace Pr0grammAPI
 {
     public class ProgrammApi : IProgrammApi
     {
-
         #region Singleton
 
-        public ProgrammApi() { }
-
+        public ProgrammApi()
+        {
+        }
 
         #endregion
 
         #region VARIABLES
+
         private const string PR0URL = "https://pr0gramm.com";
-        private const string PROITEMSGET ="/api/items/get";
+        private const string PROITEMSGET = "/api/items/get";
         private const string PROCOMMENTGET = "/api/items/info";
         private const string PROLOGIN = "/api/user/login";
         private const string PROUSERSYNC = "/api/user/sync";
-
 
         #endregion
 
@@ -42,7 +42,6 @@ namespace Pr0grammAPI
 
         private async Task<T> Execute<T>(RestRequest request) where T : new()
         {
-          
             client.Proxy = new WebProxy("127.0.0.1", 8888);
 
             var response = await client.ExecuteTaskAsync<T>(request);
@@ -56,43 +55,48 @@ namespace Pr0grammAPI
             return response.Data;
         }
 
-        public async Task<Feed> GetFeed(FeedFlags flags, bool promoted)
+        public async Task<Feed> GetFeed(FeedFlags flags, bool promoted, string searchTags)
         {
             var request = new RestRequest {Resource = PROITEMSGET};
-            request.AddParameter("flags", (int)flags);
-            if (promoted)
-                request.AddParameter("promoted", 1);
+            FinishRequest(flags, promoted, request, searchTags);
             return await Execute<Feed>(request);
         }
 
-        public async Task<Feed> GetOlderFeed(int id, FeedFlags flags, bool promoted)
+        public async Task<Feed> GetOlderFeed(int id, FeedFlags flags, bool promoted, string searchTags)
         {
             var request = new RestRequest {Resource = PROITEMSGET};
             request.AddParameter("older", id);
-            request.AddParameter("flags", (int)flags);
+            FinishRequest(flags, promoted, request, searchTags);
+            return await Execute<Feed>(request);
+        }
+
+        private static void FinishRequest(FeedFlags flags, bool promoted, RestRequest request, string searchwords)
+        {
+            request.AddParameter("flags", (int) flags);
             if (promoted)
                 request.AddParameter("promoted", 1);
-            return await Execute<Feed>(request);
+            if (!string.IsNullOrEmpty(searchwords))
+                request.AddParameter("tags", searchwords);
         }
 
         public async Task<FeedItemCommentItem> GetFeedItemComments(int id)
         {
-            var request = new RestRequest { Resource = PROCOMMENTGET };
+            var request = new RestRequest {Resource = PROCOMMENTGET};
             request.AddParameter("itemId", id);
             return await Execute<FeedItemCommentItem>(request);
         }
 
         public async Task<User.User> Login(string accountSid, string password)
         {
-            var request = new RestRequest(Method.POST) { Resource = PROLOGIN };
+            var request = new RestRequest(Method.POST) {Resource = PROLOGIN};
             client.CookieContainer = new CookieContainer();
             client.Authenticator = new SimpleAuthenticator("name", accountSid, "password", password);
-            var LoginInfo = await Login<User.UserLoginInfo>(request);
-            if (LoginInfo.Success)
+            var loginInfo = await Login<User.UserLoginInfo>(request);
+            if (loginInfo.Success)
             {
-              
-                var userInfoRequest = new RestRequest(Method.GET) {Resource = PROUSERSYNC };
+                var userInfoRequest = new RestRequest(Method.GET) {Resource = PROUSERSYNC};
                 userInfoRequest.AddParameter("offset", 577);
+                client.Authenticator = null;
                 return await Login<User.User>(userInfoRequest);
             }
             else
@@ -103,7 +107,6 @@ namespace Pr0grammAPI
 
         private async Task<T> Login<T>(RestRequest request) where T : new()
         {
-
             client.Proxy = new WebProxy("127.0.0.1", 8888);
 
             var response = await client.ExecuteTaskAsync<T>(request);

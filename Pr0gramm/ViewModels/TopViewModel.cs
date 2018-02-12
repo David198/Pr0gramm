@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using Pr0gramm.EventHandlers;
 using Pr0gramm.Services;
@@ -36,12 +37,20 @@ namespace Pr0gramm.ViewModels
             if (credentials != null && !_userLoginService.IsLoggedIn)
             {
                 credentials.RetrievePassword();
-                var user = await ProgrammApi.Login(credentials.UserName, credentials.Password);
-                if (user != null)
+                try
                 {
-                    EventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
-                    _userLoginService.IsLoggedIn = true;
+                    var user = await ProgrammApi.Login(credentials.UserName, credentials.Password);
+                    if (user != null)
+                    {
+                        EventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
+                        _userLoginService.IsLoggedIn = true;
+                    }
                 }
+                catch (Exception e)
+                {
+                   _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                }
+
             }
         }
     }

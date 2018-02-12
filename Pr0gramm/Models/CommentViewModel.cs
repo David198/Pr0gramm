@@ -8,18 +8,15 @@ using Pr0grammAPI.Feeds;
 
 namespace Pr0gramm.Models
 {
-    public class CommentViewModel : INotifyPropertyChanged
+    public class CommentViewModel : Comment, INotifyPropertyChanged
     {
         private int _parentDepth;
 
-        public CommentViewModel(Comment comment)
+        public CommentViewModel(Comment comment) : base (comment)
         {
-            Comment = comment;
             if (comment.Parent == 0) comment.Parent = null;
             ParentDepthList = new BindableCollection<int>();
         }
-
-        public Comment Comment { get; set; }
 
         public BindableCollection<int> ParentDepthList { get; set; }
 
@@ -39,9 +36,8 @@ namespace Pr0gramm.Models
 
         public void CalculateCommentDepth(List<Comment> comments)
         {
-            if (Comment.Parent == null) return;
-            var current = this;
-            var currentComment = Comment;
+            if (Parent == null) return;
+            var currentComment = (Comment)this;
             var depth = 0;
 
             while (true)
@@ -50,7 +46,7 @@ namespace Pr0gramm.Models
                 currentComment = comments.FirstOrDefault(comment => comment.Id.Equals(currentComment.Parent));
                 if (currentComment == null) break;
             }
-            current.ParentDepth = depth;
+            ParentDepth = depth;
         }
 
         [NotifyPropertyChangedInvocator]

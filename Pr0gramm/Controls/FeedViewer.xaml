@@ -57,15 +57,15 @@
                                               VerticalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto">
                                     <Grid>
                                         <controls:ImageEx
-                                            Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
-                                            Stretch="Uniform"
-                                            PlaceholderSource="{x:Bind FeedItem.ThumbSource, Converter={StaticResource ImageSourceFromUriConverter}}"
-                                            PlaceholderStretch="Fill"
-                                            Source="{x:Bind FeedItem.ImageSource, Converter= {StaticResource ImageSourceFromUriConverter}}"
+                                            Visibility="{x:Bind IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
+                                            Stretch="UniformToFill"
+                                            PlaceholderSource="{x:Bind ThumbSource, Converter={StaticResource ImageSourceFromUriConverter}}"
+                                            PlaceholderStretch="UniformToFill"
+                                            Source="{x:Bind ImageSource, Converter= {StaticResource ImageSourceFromUriConverter}}"
                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
                                    
                                     <MediaPlayerElement 
-                                        Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BoolToVisConverter}}"
+                                        Visibility="{x:Bind IsVideo, Converter={StaticResource BoolToVisConverter}}"
                                         AreTransportControlsEnabled="True" 
                                         VerticalContentAlignment="Stretch"
                                         Stretch="Uniform">
@@ -82,11 +82,11 @@
                                                 Margin="{StaticResource MediumLeftMargin}">
                                 <HyperlinkButton controls:DockPanel.Dock="Left"
                                                  micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
-                                                 NavigateUri="{x:Bind FeedItem.User, Converter={StaticResource UserTextConverter}}"
-                                                 Content="{x:Bind FeedItem.User}" x:Phase="5" />
+                                                 NavigateUri="{x:Bind User, Converter={StaticResource UserTextConverter}}"
+                                                 Content="{x:Bind User}" x:Phase="5" />
                                 <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" controls:DockPanel.Dock="Left">-</TextBlock>
                                 <TextBlock VerticalAlignment="Center"
-                                           Text="{x:Bind FeedItem.Created}"
+                                           Text="{x:Bind Created}"
                                            Margin="{StaticResource MediumLeftMargin}"
                                            x:Phase="2" controls:DockPanel.Dock="Left" />
                                 <TextBlock Margin="{StaticResource MediumLeftMargin}" HorizontalAlignment="Center"
@@ -95,17 +95,17 @@
                                 <TextBlock controls:DockPanel.Dock="Left" Margin="{StaticResource MediumLeftMargin}"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center" x:Phase="5"
-                                           Text="{x:Bind FeedItem,Converter={StaticResource FeedScoreConverter}}">
+                                           Text="{x:Bind Converter={StaticResource FeedScoreConverter}}">
                                     <ToolTipService.ToolTip>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Margin="{StaticResource MediumLeftMargin}"
-                                                       Text="{x:Bind FeedItem.Up}"
+                                                       Text="{x:Bind Up}"
                                                        VerticalAlignment="Center" x:Phase="5" />
                                             <Viewbox MaxHeight="15" MaxWidth="15">
                                                 <SymbolIcon Symbol="Up" Margin="{StaticResource SmallLeftMargin}" />
                                             </Viewbox>
                                             <TextBlock Margin="{StaticResource MediumLeftMargin}"
-                                                       Text="{x:Bind FeedItem.Down}"
+                                                       Text="{x:Bind Down}"
                                                        VerticalAlignment="Center" x:Phase="5" />
                                             <Viewbox MaxHeight="15" MaxWidth="15">
                                                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74B;"
@@ -115,7 +115,7 @@
                                     </ToolTipService.ToolTip>
                                 </TextBlock>
                                 <AppBarButton Click="DownloadImageClick"
-                                              Visibility="{x:Bind FeedItem.IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
+                                              Visibility="{x:Bind IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
                                               controls:DockPanel.Dock="Right" HorizontalAlignment="Right"
                                               Label="Download" Icon="Download" />
                             </controls:DockPanel>
@@ -195,7 +195,7 @@
                                                     BorderBrush="{ThemeResource SystemControlForegroundBaseHighBrush}"
                                                     Margin="{StaticResource MediumLeftMargin}">
                                                 <StackPanel HorizontalAlignment="Stretch">
-                                                    <controls:MarkdownTextBlock Text="{x:Bind Comment.Content}"
+                                                    <controls:MarkdownTextBlock Text="{x:Bind Content}"
                                                                                 VerticalContentAlignment="Center"
                                                                                 x:Phase="4"
                                                                                 HorizontalContentAlignment="Center"
@@ -208,22 +208,22 @@
 
                                                         <HyperlinkButton
                                                             micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
-                                                            NavigateUri="{x:Bind Comment.Name, Converter={StaticResource UserTextConverter}}"
-                                                            Content="{x:Bind Comment.Name}" x:Phase="5" />
+                                                            NavigateUri="{x:Bind Name, Converter={StaticResource UserTextConverter}}"
+                                                            Content="{x:Bind Name}" x:Phase="5" />
                                                         <TextBlock Margin="10 0 0 0" VerticalAlignment="Center">-</TextBlock>
                                                         <TextBlock VerticalAlignment="Center"
-                                                                   Text="{x:Bind Comment.Created}"
+                                                                   Text="{x:Bind Created}"
                                                                    Margin="{StaticResource MediumLeftMargin}"
                                                                    x:Phase="2" />
                                                         <TextBlock Margin="{StaticResource MediumLeftMargin}"
                                                                    HorizontalAlignment="Center"
                                                                    VerticalAlignment="Center"
-                                                                   Text="{x:Bind Comment,Converter={StaticResource FeedScoreConverter}}">
+                                                                   Text="{x:Bind Converter={StaticResource FeedScoreConverter}}">
                                                             <ToolTipService.ToolTip>
                                                                 <StackPanel Orientation="Horizontal">
                                                                     <TextBlock
                                                                         Margin="{StaticResource MediumLeftMargin}"
-                                                                        Text="{x:Bind Comment.Up}"
+                                                                        Text="{x:Bind Up}"
                                                                         VerticalAlignment="Center" x:Phase="5" />
                                                                     <Viewbox MaxHeight="15" MaxWidth="15">
                                                                         <SymbolIcon Symbol="Up"
@@ -231,7 +231,7 @@
                                                                     </Viewbox>
                                                                     <TextBlock
                                                                         Margin="{StaticResource MediumLeftMargin}"
-                                                                        Text="{x:Bind Comment.Down}"
+                                                                        Text="{x:Bind Down}"
                                                                         VerticalAlignment="Center" x:Phase="5" />
                                                                     <Viewbox MaxHeight="15" MaxWidth="15">
                                                                         <FontIcon FontFamily="Segoe MDL2 Assets"

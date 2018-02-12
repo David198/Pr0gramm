@@ -11,7 +11,7 @@ using Pr0grammAPI.Annotations;
 
 namespace Pr0grammAPI.Feeds
 {
-    public class FeedItem : INotifyPropertyChanged
+    public class FeedItem
     {
         private const string PROTHUMBURL = "http://thumb.pr0gramm.com/";
         private const string PROIMAGEURL = "http://img.pr0gramm.com/";
@@ -29,7 +29,7 @@ namespace Pr0grammAPI.Feeds
         public int Height { get; set; }
         public bool Audio { get; set; }
         public string Source { get; set; }
-        public FeedFlags Flags { get; set; }
+        //public FeedFlags Flags { get; set; }
         public string User { get; set; }
         public int Mark { get; set; }
 
@@ -40,12 +40,27 @@ namespace Pr0grammAPI.Feeds
 
         public Uri ThumbSource => new Uri(PROTHUMBURL+ Thumb);
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public FeedItem(FeedItem copyItem)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            Id = copyItem.Id;
+            Promoted = copyItem.Promoted;
+            Up = copyItem.Up;
+            Down = copyItem.Down;
+            Created = copyItem.Created;
+            Image = copyItem.Image;
+            Thumb = copyItem.Thumb;
+            FullSize = copyItem.FullSize;
+            Width = copyItem.Width;
+            Height = copyItem.Height;
+            Audio = copyItem.Audio;
+            Source = copyItem.Source;
+            User = copyItem.User;
+            Mark = copyItem.Mark;
+        }
+
+        public FeedItem()
+        {
+            
         }
     }
 }

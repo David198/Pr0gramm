@@ -27,13 +27,15 @@ namespace Pr0gramm.Views
         private readonly IEventAggregator _ieventAggregator;
         private readonly IProgrammApi _iprogrammApi;
         private readonly UserLoginService _userLoginService;
+        private readonly ToastNotificationsService _toastNotificationsService;
         private bool userIsLogginIn;
 
-        public LoginDialog(IEventAggregator IeventAggregator, IProgrammApi IprogrammApi, UserLoginService userLoginService)
+        public LoginDialog(IEventAggregator IeventAggregator, IProgrammApi IprogrammApi, UserLoginService userLoginService, ToastNotificationsService toastNotificationsService)
         {
             _ieventAggregator = IeventAggregator;
             _iprogrammApi = IprogrammApi;
             _userLoginService = userLoginService;
+            _toastNotificationsService = toastNotificationsService;
             this.InitializeComponent();
         }
 
@@ -51,11 +53,19 @@ namespace Pr0gramm.Views
                 var user = await _iprogrammApi.Login(UserName.Text, PasswordBox.Password);
                 if (user != null)
                 {
-                    _userLoginService.SaveUserLogin(UserName.Text, PasswordBox.Password);
-                    _ieventAggregator.PublishOnUIThread(new UserLoggedInEvent(UserName.Text));
-                    ErrorText.Visibility = Visibility.Collapsed;
-                    userIsLogginIn = false;
-                    this.Hide();
+                    try
+                    {
+                        _userLoginService.SaveUserLogin(UserName.Text, PasswordBox.Password);
+                        _ieventAggregator.PublishOnUIThread(new UserLoggedInEvent(UserName.Text));
+                        ErrorText.Visibility = Visibility.Collapsed;
+                        userIsLogginIn = false;
+                        this.Hide();
+                    }
+                    catch (Exception e)
+                    {
+                        _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                    }
+
                 }
                 else
                 {

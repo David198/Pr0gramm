@@ -14,33 +14,22 @@ using Pr0grammAPI.Interfaces;
 
 namespace Pr0gramm.Models
 {
-    public class FeedItemViewModel : INotifyPropertyChanged
+    public class FeedItemViewModel : FeedItem, INotifyPropertyChanged
 
     {
         private readonly IProgrammApi _api;
         private readonly ToastNotificationsService _toastNotificationsService;
         private bool _commentsAndTagsLoaded;
-        private FeedItem _feedItem;
 
         public FeedItemViewModel(FeedItem feedItem, IProgrammApi api,
-            ToastNotificationsService toastNotificationsService)
+            ToastNotificationsService toastNotificationsService):base (feedItem)
         {
-            FeedItem = feedItem;
             _api = api;
             _toastNotificationsService = toastNotificationsService;
             CommentViewModels = new BindableCollection<CommentViewModel>();
             Tags = new BindableCollection<TagItem>();
         }
 
-        public FeedItem FeedItem
-        {
-            get => _feedItem;
-            set
-            {
-                _feedItem = value;
-                OnPropertyChanged(nameof(FeedItem));
-            }
-        }
 
         public int ParentCount { get; set; }
 
@@ -63,7 +52,7 @@ namespace Pr0gramm.Models
                 {
                     CommentViewModels.Clear();
                     Tags.Clear();
-                    var feedItemCommentItem = await _api.GetFeedItemComments(FeedItem.Id);
+                    var feedItemCommentItem = await _api.GetFeedItemComments(Id);
                     var tempList = new List<Comment>();
                     var rootNodes = Node<Comment>.CreateTree(feedItemCommentItem.Comments, l => l.Id, l => l.Parent);
                     rootNodes = rootNodes.OrderByDescending(o => o.Value.Confidence);

@@ -15,11 +15,13 @@ namespace Pr0gramm.Services
     {
         private readonly IEventAggregator _iEventAggregator;
         private readonly IProgrammApi _iprogrammApi;
+        private readonly ToastNotificationsService _toastNotifications;
 
-        public UserLoginService(IEventAggregator iEventAggregator, IProgrammApi iprogrammApi)
+        public UserLoginService(IEventAggregator iEventAggregator, IProgrammApi iprogrammApi,ToastNotificationsService toastNotifications)
         {
             _iEventAggregator = iEventAggregator;
             _iprogrammApi = iprogrammApi;
+            _toastNotifications = toastNotifications;
         }
         private const string resourceName = "Pr0gramm";
         public  bool IsLoggedIn;
@@ -86,7 +88,7 @@ namespace Pr0gramm.Services
 
         public  async void ShowUserLogin()
         {
-            LoginDialog dlg = new LoginDialog(_iEventAggregator, _iprogrammApi, this);
+            LoginDialog dlg = new LoginDialog(_iEventAggregator, _iprogrammApi, this, _toastNotifications);
             await dlg.ShowAsync();
         }
     }

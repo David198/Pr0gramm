@@ -34,6 +34,7 @@ namespace Pr0gramm.ViewModels
         private string _flagLabel;
         private bool _isUserLoggedIn;
         private bool _isMuted;
+        private string _searchText;
         public string ActualUser { get; set; }
 
         public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator,IProgrammApi programmApi, UserLoginService userLoginService)
@@ -166,6 +167,12 @@ namespace Pr0gramm.ViewModels
             }
         }
 
+        public string SearchText
+        {
+            get { return _searchText; }
+            set => Set(ref _searchText, value);
+        }
+
         public NavigationViewItemBase SelectedItem
         {
             get => _selectedItem;
@@ -243,7 +250,12 @@ namespace Pr0gramm.ViewModels
             Mute();
         }
 
-        private async void InitializeFeedFlags()
+        public void Search()
+        {
+            _eventAggregator.PublishOnUIThread(new SearchFeedItemsEvent(SearchText));
+        }
+
+        private void InitializeFeedFlags()
         {
             //await FlagSelectorService.InitializeAsync();
             switch (FlagSelectorService.ActualFlag)
@@ -307,7 +319,7 @@ namespace Pr0gramm.ViewModels
             });
         }
 
-        public async void ItemInvoked(NavigationViewItemInvokedEventArgs args)
+        public void ItemInvoked(NavigationViewItemInvokedEventArgs args)
         {
             if (args.IsSettingsInvoked)
             {
@@ -340,6 +352,7 @@ namespace Pr0gramm.ViewModels
         {
             var viewType = _navigationService.CurrentSourcePageType;
             var viewModelType = ViewModelLocator.LocateTypeForViewType(viewType, false);
+            SearchText = "";
             var navigationitem = NavigationItems?.FirstOrDefault(i => i.Tag as Type == viewModelType);
             if (navigationitem != null)
             {
@@ -371,6 +384,7 @@ namespace Pr0gramm.ViewModels
                 });
                 IsUserLoggedIn = false;
                 FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, false, false, IsUserLoggedIn);
+
                 PublishRefreshCommand();
             }
         }

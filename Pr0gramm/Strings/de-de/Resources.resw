@@ -286,4 +286,10 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   <data name="SFWCheckbox.Content" xml:space="preserve">
     <value>SFW - Safe for work</value>
   </data>
+  <data name="SearchButton.Content" xml:space="preserve">
+    <value>Suchen</value>
+  </data>
+  <data name="SearchAppBarButton.Label" xml:space="preserve">
+    <value>Suchen</value>
+  </data>
 </root>

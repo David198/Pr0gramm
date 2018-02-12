@@ -18,6 +18,25 @@ namespace Pr0grammAPI.Feeds
         public string Name { get; set; }
         private int? _parent;
 
+        public Comment(Comment copyElement)
+        {
+            Content = copyElement.Content;
+            Confidence = copyElement.Confidence;
+            Created = copyElement.Created;
+            Down = copyElement.Down;
+            Id = copyElement.Id;
+            Mark = copyElement.Mark;
+            Name = copyElement.Name;
+            Parent = copyElement.Parent;
+            Up = copyElement.Up;
+
+        }
+
+        public Comment()
+        {
+            
+        }
+
         public int? Parent
         {
             get {  return _parent.Equals(0)? null : _parent; }

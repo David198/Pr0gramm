@@ -20,49 +20,64 @@
                 <Grid Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="200" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <TextBlock Margin="24,0,0,0" Style="{StaticResource PageTitleStyle}"
                                FontSize="28"
                                Text="{Binding}" />
-                    <CommandBar Grid.Column="1"
+                    <CommandBar HorizontalAlignment="Right" Grid.Column="1" Margin="{StaticResource BigLeftMargin}"
+                                VerticalAlignment="Top"
+                                DefaultLabelPosition="Right"
+                                Background="{ThemeResource SystemControlBackgroundAltHighBrush}" />
+                    <CommandBar Grid.Column="2" DataContext="{Binding ElementName=NavigationMenu, Path=DataContext}"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
                                 DefaultLabelPosition="Right"
                                 Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
-                        <AppBarButton Icon="Flag"  Visibility="{Binding ElementName=NavigationMenu,
-                       Path=DataContext.ShowFlagButton, Converter={StaticResource BoolToVisConverter}}" 
-                                      Label="{Binding ElementName=NavigationMenu, Path=DataContext.FlagLabel}"
-                                      Click="ButtonBase_OnClick">
-                            <FlyoutBase.AttachedFlyout>
-                                <Flyout Closed="FlagsUpdated">
-                                    <StackPanel>
-                                        <CheckBox x:Uid="SFWCheckbox"
-                                            IsEnabled="{Binding ElementName=NavigationMenu, Path=DataContext.SfwCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
-                                            IsChecked="{Binding ElementName=NavigationMenu, Path=DataContext.SfwChecked, Mode=TwoWay}">
-                                           
-                                        </CheckBox>
-                                        <CheckBox x:Uid="NSFWCheckbox"
-                                            IsEnabled="{Binding ElementName=NavigationMenu, Path=DataContext.NsfwCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
-                                            IsChecked="{Binding ElementName=NavigationMenu, Path=DataContext.NsfwChecked, Mode=TwoWay}">
-                                         
-                                        </CheckBox>
-                                        <CheckBox  x:Uid="NSFLCheckbox"
-                                            IsEnabled="{Binding ElementName=NavigationMenu, Path=DataContext.NsflCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
-                                            IsChecked="{Binding ElementName=NavigationMenu, Path=DataContext.NsflChecked, Mode=TwoWay}">
-                                          
-                                        </CheckBox>
+                        <AppBarButton
+                            Visibility="{Binding IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
+                            Icon="Find" x:Uid="SearchAppBarButton" AllowFocusOnInteraction="True">
+                            <AppBarButton.Flyout>
+                                <Flyout>
+                                    <StackPanel DataContext="{Binding ElementName=NavigationMenu, Path=DataContext}"
+                                                Orientation="Horizontal" Margin="{StaticResource MediumAllMargin}">
+                                        <TextBox
+                                            Text="{Binding SearchText , Mode=TwoWay}"
+                                            IsHitTestVisible="True"
+                                            Margin="{StaticResource MediumLeftMargin}" />
+                                        <Button x:Uid="SearchButton"
+                                                cm:Message.Attach="[Event Click] = [Action Search]"
+                                                Margin="{StaticResource MediumLeftMargin}" />
                                     </StackPanel>
                                 </Flyout>
-                            </FlyoutBase.AttachedFlyout>
+                            </AppBarButton.Flyout>
                         </AppBarButton>
-                        <AppBarToggleButton Label="Mute" Icon="Mute" IsChecked="{Binding ElementName=NavigationMenu, Path=DataContext.IsMuted ,Mode=TwoWay}"
+                        <AppBarButton Icon="Flag" AllowFocusOnInteraction="True"
+                                      Visibility="{Binding ShowFlagButton, Converter={StaticResource BoolToVisConverter}}"
+                                      Label="{Binding FlagLabel}">
+                            <AppBarButton.Flyout>
+                                <Flyout Closed="FlyoutBase_OnClosed">
+                                    <StackPanel DataContext="{Binding ElementName=NavigationMenu, Path=DataContext}">
+                                        <CheckBox x:Uid="SFWCheckbox"
+                                                  IsEnabled="{Binding SfwCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                                  IsChecked="{Binding SfwChecked, Mode=TwoWay}" />
+                                        <CheckBox x:Uid="NSFWCheckbox"
+                                                  IsEnabled="{Binding NsfwCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                                  IsChecked="{Binding NsfwChecked, Mode=TwoWay}" />
+                                        <CheckBox x:Uid="NSFLCheckbox"
+                                                  IsEnabled="{Binding NsflCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                                  IsChecked="{Binding NsflChecked, Mode=TwoWay}" />
+                                    </StackPanel>
+                                </Flyout>
+                            </AppBarButton.Flyout>
+                        </AppBarButton>
+                        <AppBarToggleButton Label="Mute" Icon="Mute"
+                                            IsChecked="{Binding IsMuted ,Mode=TwoWay}"
                                             cm:Message.Attach="[Event Checked] = [Action Mute]; [Event Unchecked] = [Action UnMute]"
-                                            Visibility="{Binding ElementName=NavigationMenu,
-                       Path=DataContext.IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
+                                            Visibility="{Binding IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
                         <AppBarButton x:Uid="AppBarButtonRefresh" Icon="Refresh" cm:Message.Attach="RefreshCommand"
-                                      Visibility="{Binding ElementName=NavigationMenu,
-                       Path=DataContext.IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
+                                      Visibility="{Binding IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
 
                     </CommandBar>
                 </Grid>
@@ -73,18 +88,3 @@
         </Grid>
     </NavigationView>
 </Page>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
