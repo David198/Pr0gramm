@@ -18,18 +18,7 @@
                         Visibility="{Binding Audio, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
         </Grid>
     </DataTemplate>
-
-    <DataTemplate x:Key="TagTemplate" x:DataType="feeds:TagItem">
-        <Border BorderThickness="2" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-                HorizontalAlignment="Stretch" CornerRadius="5">
-            <TextBlock x:Phase="1"
-                Padding="{StaticResource SmallAllMargin}" Width="Auto" VerticalAlignment="Center"
-                Text="{x:Bind Tag}"
-                HorizontalAlignment="Center" />
-        </Border>
-    </DataTemplate>
-
-    
+ 
 
 </ResourceDictionary>
 

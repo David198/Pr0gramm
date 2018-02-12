@@ -128,6 +128,11 @@ namespace Pr0gramm.Controls
             }
         }
 
+        public void SearchTag(string tag)
+        {
+
+        }
+
         private void StopOldMediaPlayer()
         {
             try

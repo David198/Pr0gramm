@@ -218,4 +218,12 @@ Previously implemented features:
     <value>What's new in this version</value>
     <comment>What's new prompt message title</comment>
   </data>
+  <data name="Controversal_Title.Text" xml:space="preserve">
+    <value>Controversal</value>
+    <comment>Page title for Controversal</comment>
+  </data>
+  <data name="Shell_Controversal" xml:space="preserve">
+    <value>Controversal</value>
+    <comment>Navigation view item name for Controversal</comment>
+  </data>
 </root>

@@ -5,12 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:primitives="using:Telerik.UI.Xaml.Controls.Primitives"
+
     xmlns:models="using:Pr0gramm.Models"
     xmlns:micro="using:Caliburn.Micro"
     xmlns:controls1="using:Pr0gramm.Controls"
-    xmlns:feeds="using:Pr0grammAPI.Feeds"
-    xmlns:playback="using:Windows.Media.Playback"
     mc:Ignorable="d"
     x:Name="UserControl"
     d:DesignHeight="300"
@@ -32,7 +30,6 @@
         <controls:GridSplitter Grid.Column="1" Width="15" ResizeBehavior="BasedOnAlignment"
                                ResizeDirection="Auto"
                                FontSize="13" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-            
             <controls:GridSplitter.Element>
                 <TextBlock HorizontalAlignment="Center"
                            IsHitTestVisible="False"
@@ -43,7 +40,7 @@
             </controls:GridSplitter.Element>
         </controls:GridSplitter>
 
-        <FlipView Grid.Column="2"  ItemsSource="{x:Bind FeedItems}" x:Name="FlipView"
+        <FlipView Grid.Column="2" ItemsSource="{x:Bind FeedItems}" x:Name="FlipView"
                   SelectedItem="{x:Bind SelectedFeedItem, Mode=TwoWay}">
             <FlipView.ItemTemplate>
                 <DataTemplate x:DataType="models:FeedItemViewModel">
@@ -63,20 +60,20 @@
                                             PlaceholderStretch="UniformToFill"
                                             Source="{x:Bind ImageSource, Converter= {StaticResource ImageSourceFromUriConverter}}"
                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                   
-                                    <MediaPlayerElement 
-                                        Visibility="{x:Bind IsVideo, Converter={StaticResource BoolToVisConverter}}"
-                                        AreTransportControlsEnabled="True" 
-                                        VerticalContentAlignment="Stretch"
-                                        Stretch="Uniform">
-                                        <MediaPlayerElement.TransportControls>
-                                            <MediaTransportControls IsCompact="False"
-                                                                    IsVolumeButtonVisible="False" />
-                                        </MediaPlayerElement.TransportControls>
-                                    </MediaPlayerElement>
-                                </Grid>
-                    </ScrollViewer>
-                    </Border>
+
+                                        <MediaPlayerElement
+                                            Visibility="{x:Bind IsVideo, Converter={StaticResource BoolToVisConverter}}"
+                                            AreTransportControlsEnabled="True"
+                                            VerticalContentAlignment="Stretch"
+                                            Stretch="Uniform">
+                                            <MediaPlayerElement.TransportControls>
+                                                <MediaTransportControls IsCompact="False"
+                                                                        IsVolumeButtonVisible="False" />
+                                            </MediaPlayerElement.TransportControls>
+                                        </MediaPlayerElement>
+                                    </Grid>
+                                </ScrollViewer>
+                            </Border>
 
                             <controls:DockPanel HorizontalAlignment="Stretch"
                                                 Margin="{StaticResource MediumLeftMargin}">
@@ -90,8 +87,7 @@
                                            Margin="{StaticResource MediumLeftMargin}"
                                            x:Phase="2" controls:DockPanel.Dock="Left" />
                                 <TextBlock Margin="{StaticResource MediumLeftMargin}" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" controls:DockPanel.Dock="Left">
-                                </TextBlock>
+                                           VerticalAlignment="Center" controls:DockPanel.Dock="Left" />
                                 <TextBlock controls:DockPanel.Dock="Left" Margin="{StaticResource MediumLeftMargin}"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center" x:Phase="5"
@@ -121,7 +117,6 @@
                             </controls:DockPanel>
                             <ItemsControl x:Name="TagsList" ItemsSource="{x:Bind Tags}"
                                           Margin="{StaticResource SmallLeftRightMargin}"
-
                                           HorizontalContentAlignment="Stretch">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -129,7 +124,7 @@
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="feeds:TagItem">
+                                    <DataTemplate x:DataType="models:TagViewModel">
                                         <Border BorderThickness="2"
                                                 Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                                                 HorizontalAlignment="Stretch" CornerRadius="5">
@@ -137,7 +132,8 @@
                                                 Padding="{StaticResource SmallAllMargin}" Width="Auto"
                                                 VerticalAlignment="Center"
                                                 Text="{x:Bind Tag}"
-                                                HorizontalAlignment="Center" />
+                                                HorizontalAlignment="Center"
+                                                micro:Message.Attach="[Event PointerPressed] = [Action SearchTag($dataContext)]" />
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -255,4 +251,6 @@
         </FlipView>
     </Grid>
 </UserControl>
+
+
 

@@ -18,20 +18,20 @@ namespace Pr0gramm.ViewModels
 {
     public class FeedViewerViewModelBase : Screen, IHandle<RefreshEvent>, IHandle<SearchFeedItemsEvent>
     {
-        protected readonly ToastNotificationsService _toastNotificationsService;
+        protected readonly ToastNotificationsService ToastNotificationsService;
         protected readonly IEventAggregator EventAggregator;
         private bool _boolLoadingNewItems;
         private FeedItemViewModel _selectedItem;
         protected IProgrammApi ProgrammApi;
 
-        private string _actualSearchTags;
+        protected string ActualSearchTags;
 
         internal FeedViewerViewModelBase(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
             ToastNotificationsService toastNotificationsService)
         {
             ProgrammApi = programmProgrammApi;
             EventAggregator = eventAggregator;
-            _toastNotificationsService = toastNotificationsService;
+            ToastNotificationsService = toastNotificationsService;
             ShowTop = true;
         }
 
@@ -86,12 +86,12 @@ namespace Pr0gramm.ViewModels
         {
             try
             {
-                var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, _actualSearchTags);
+                var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
                 InitializeFeedItemViewModels(feed);
             }
             catch (ApplicationException)
             {
-                _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                ToastNotificationsService.ShowToastNotificationWebSocketExeception();
             }
         }
 
@@ -107,24 +107,30 @@ namespace Pr0gramm.ViewModels
                         : FeedItems[FeedItems.Count - 1].Id;
                     try
                     {
-                        var feed = await ProgrammApi.GetOlderFeed(id, FlagSelectorService.ActualFlag, ShowTop, _actualSearchTags);
+                        var feed = await ProgrammApi.GetOlderFeed(id, FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
                         InitializeFeedItemViewModels(feed);
                         _boolLoadingNewItems = false;
                     }
                     catch (ApplicationException)
                     {
-                        _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                        ToastNotificationsService.ShowToastNotificationWebSocketExeception();
                         _boolLoadingNewItems = false;
                     }
                 }
             }
         }
 
+        public void SearchTag(TagViewModel tag)
+        {
+            Handle(new SearchFeedItemsEvent(tag.Tag));
+            EventAggregator.PublishOnUIThread(new TagSearchEvent(tag.Tag));
+        }
+
         private void InitializeFeedItemViewModels(Feed feed)
         {
             feed.Items.ForEach(item =>
             {
-                FeedItems.Add(new FeedItemViewModel(item, ProgrammApi, _toastNotificationsService));
+                FeedItems.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService));
             });
         }
 
@@ -134,11 +140,11 @@ namespace Pr0gramm.ViewModels
              await Launcher.LaunchUriAsync(uri);
         }
 
-        public async void Handle(SearchFeedItemsEvent message)
+        public  async void Handle(SearchFeedItemsEvent message)
         {
             FeedItems.Clear();
-            _actualSearchTags = message.SearchTags;
-            var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, _actualSearchTags);
+            ActualSearchTags = message.SearchTags;
+            var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
             InitializeFeedItemViewModels(feed);
         }
     }

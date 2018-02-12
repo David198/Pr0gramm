@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.UI.Xaml;
+
 using Caliburn.Micro;
+
 using Microsoft.HockeyApp;
+
 using Pr0gramm.Helpers;
 using Pr0gramm.Services;
 using Pr0gramm.ViewModels;
 using Pr0gramm.Views;
+
 using Pr0grammAPI;
 using Pr0grammAPI.Interfaces;
+
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
+using Windows.UI.Xaml;
 
 namespace Pr0gramm
 {
@@ -67,6 +72,7 @@ namespace Pr0gramm
             _container.PerRequest<NewViewModel>();
             _container.PerRequest<CameraViewModel>();
             _container.Singleton<SettingsViewModel>();
+           // _container.PerRequest<ControversalViewModel>();
         }
 
         protected override object GetInstance(Type service, string key)

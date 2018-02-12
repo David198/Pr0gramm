@@ -2,19 +2,23 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
+
 using Caliburn.Micro;
+
 using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
 using Pr0gramm.Services;
 using Pr0gramm.Views;
+
 using Pr0grammAPI.Feeds;
 using Pr0grammAPI.Interfaces;
 
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
+
 namespace Pr0gramm.ViewModels
 {
-    public class ShellViewModel : Screen, IHandle<UserLoggedInEvent>
+    public class ShellViewModel : Screen, IHandle<UserLoggedInEvent>, IHandle<TagSearchEvent>
     {
         private readonly WinRTContainer _container;
         private readonly IEventAggregator _eventAggregator;
@@ -255,6 +259,12 @@ namespace Pr0gramm.ViewModels
             _eventAggregator.PublishOnUIThread(new SearchFeedItemsEvent(SearchText));
         }
 
+        public void ClearSearch()
+        {
+            SearchText = "";
+            _eventAggregator.PublishOnUIThread(new SearchFeedItemsEvent(SearchText));
+        }
+
         private void InitializeFeedFlags()
         {
             //await FlagSelectorService.InitializeAsync();
@@ -311,6 +321,12 @@ namespace Pr0gramm.ViewModels
                 Icon = new SymbolIcon(Symbol.Up),
                 Tag = typeof(NewViewModel)
             });
+            //NavigationItems.Add(new NavigationViewItem
+            //{
+            //    Content = "Shell_Controversial".GetLocalized(),
+            //    Icon = new SymbolIcon(Symbol.SolidStar),
+            //    Tag = typeof(ControversalViewModel)
+            //});
             NavigationItems.Add(new NavigationViewItemSeparator());
             NavigationItems.Add(new NavigationViewItem
             {
@@ -408,6 +424,11 @@ namespace Pr0gramm.ViewModels
             _userLoginService.IsLoggedIn = true;
             FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, NsfwChecked, NsflChecked, IsUserLoggedIn);
             PublishRefreshCommand();
+        }
+
+        public void Handle(TagSearchEvent message)
+        {
+            SearchText = message.Tag;
         }
     }
 }

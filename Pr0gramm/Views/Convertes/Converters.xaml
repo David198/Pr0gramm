@@ -11,6 +11,7 @@
     <local:UserTextConverter x:Key="UserTextConverter" />
     <local:ImageSourceFromUriConverter x:Key="ImageSourceFromUriConverter"></local:ImageSourceFromUriConverter>
     <local:FeedScoreConverter x:Key="FeedScoreConverter"></local:FeedScoreConverter>
+    <local:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"></local:StringEmptyToVisibilityConverter>
 </ResourceDictionary>
 
 

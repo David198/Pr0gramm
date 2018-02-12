@@ -143,6 +143,7 @@
     <Compile Include="EventHandlers\MuteEvent.cs" />
     <Compile Include="EventHandlers\RefreshEvent.cs" />
     <Compile Include="EventHandlers\SearchFeedItemsEvent.cs" />
+    <Compile Include="EventHandlers\TagSearchEvent.cs" />
     <Compile Include="EventHandlers\UserLoggedInEvent.cs" />
     <Compile Include="Helpers\CameraOrientationExtensions.cs" />
     <Compile Include="Helpers\EnumToBooleanConverter.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Models\DragDropStartingData.cs" />
     <Compile Include="Models\FeedItemViewModel.cs" />
     <Compile Include="Models\Node.cs" />
+    <Compile Include="Models\TagViewModel.cs" />
     <Compile Include="Services\ActivationService.cs" />
     <Compile Include="Activation\DefaultLaunchActivationHandler.cs" />
     <Compile Include="Services\BackgroundTaskService.cs" />
@@ -179,6 +181,7 @@
     <Compile Include="Services\WhatsNewDisplayService.cs" />
     <Compile Include="Styles\DataTemplates.cs" />
     <Compile Include="ViewModels\CameraViewModel.cs" />
+    <Compile Include="ViewModels\ControversalViewModel.cs" />
     <Compile Include="ViewModels\FeedViewerViewModelBase.cs" />
     <Compile Include="ViewModels\NewViewModel.cs" />
     <Compile Include="ViewModels\TopViewModel.cs" />
@@ -187,12 +190,16 @@
     <Compile Include="Views\CameraPage.xaml.cs">
       <DependentUpon>CameraPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ControversalPage.xaml.cs">
+      <DependentUpon>ControversalPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Convertes\BooleanToVisibilityConverterInverse.cs" />
     <Compile Include="Views\Convertes\FeedScoreConverter.cs" />
     <Compile Include="Views\Convertes\ImageSourceFromUriConverter.cs" />
     <Compile Include="Views\Convertes\MediaSourceFromUriConverter.cs" />
     <Compile Include="Views\Convertes\NullVisibilityConverter.cs" />
     <Compile Include="Views\Convertes\ParentCommentMarginConverter.cs" />
+    <Compile Include="Views\Convertes\StringEmptyToVisibilityConverter.cs" />
     <Compile Include="Views\Convertes\UserTextConverter.cs" />
     <Compile Include="Views\FirstRunDialog.xaml.cs">
       <DependentUpon>FirstRunDialog.xaml</DependentUpon>
@@ -270,6 +277,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="Views\CameraPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ControversalPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

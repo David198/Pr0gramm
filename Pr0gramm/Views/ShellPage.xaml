@@ -20,17 +20,40 @@
                 <Grid Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Margin="24,0,0,0" Style="{StaticResource PageTitleStyle}"
+                    <TextBlock FontSize="28"
+                               Visibility="{Binding ElementName=NavigationMenu, Path =DataContext.SearchText, Converter={StaticResource StringEmptyToVisibilityConverter}}"
+                               Style="{StaticResource PageTitleStyle}" Margin="{StaticResource MediumLeftMargin}">
+                        Aktuelle Suche in
+                    </TextBlock>
+                    <TextBlock Grid.Column="1" Margin="{StaticResource MediumLeftMargin}"
+                               Style="{StaticResource PageTitleStyle}"
                                FontSize="28"
                                Text="{Binding}" />
-                    <CommandBar HorizontalAlignment="Right" Grid.Column="1" Margin="{StaticResource BigLeftMargin}"
-                                VerticalAlignment="Top"
-                                DefaultLabelPosition="Right"
-                                Background="{ThemeResource SystemControlBackgroundAltHighBrush}" />
-                    <CommandBar Grid.Column="2" DataContext="{Binding ElementName=NavigationMenu, Path=DataContext}"
+                    <TextBlock Grid.Column="2"
+                               Visibility="{Binding ElementName=NavigationMenu, Path =DataContext.SearchText, Converter={StaticResource StringEmptyToVisibilityConverter}}"
+                               VerticalAlignment="Center "
+                               Style="{StaticResource PageTitleStyle}" FontSize="28"
+                               Margin="{StaticResource SmallLeftMargin}">
+                        :
+                    </TextBlock>
+                    <TextBlock Grid.Column="3" FontSize="20"
+                               Text="{Binding ElementName=NavigationMenu, Path =DataContext.SearchText, Mode=TwoWay}"
+                               Style="{StaticResource PageTitleStyle}" Margin="{StaticResource MediumLeftRightMargin}" />
+                    <CommandBar Grid.Column="4" DataContext="{Binding ElementName=NavigationMenu, Path=DataContext}"
+                                Visibility="{Binding ElementName=NavigationMenu, Path =DataContext.SearchText, Converter={StaticResource StringEmptyToVisibilityConverter}}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" 
+                                Background="{ThemeResource SystemControlBackgroundAltHighBrush}">
+                        <AppBarButton Icon="Clear" Width="30"  VerticalContentAlignment="Center"
+                                      cm:Message.Attach="[Event Click] = [Action ClearSearch]" />
+                    </CommandBar>
+                    <CommandBar Grid.Column="5" DataContext="{Binding ElementName=NavigationMenu, Path=DataContext}"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
                                 DefaultLabelPosition="Right"
@@ -39,13 +62,13 @@
                             Visibility="{Binding IsSettingPageOpen, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
                             Icon="Find" x:Uid="SearchAppBarButton" AllowFocusOnInteraction="True">
                             <AppBarButton.Flyout>
-                                <Flyout>
+                                <Flyout LightDismissOverlayMode="On">
                                     <StackPanel DataContext="{Binding ElementName=NavigationMenu, Path=DataContext}"
                                                 Orientation="Horizontal" Margin="{StaticResource MediumAllMargin}">
-                                        <TextBox
-                                            Text="{Binding SearchText , Mode=TwoWay}"
-                                            IsHitTestVisible="True"
-                                            Margin="{StaticResource MediumLeftMargin}" />
+                                        <TextBox x:Uid="SearchTextBox" TextWrapping="Wrap"
+                                                 Text="{Binding SearchText , Mode=TwoWay}"
+                                                 IsHitTestVisible="True"
+                                                 Margin="{StaticResource MediumLeftMargin}" />
                                         <Button x:Uid="SearchButton"
                                                 cm:Message.Attach="[Event Click] = [Action Search]"
                                                 Margin="{StaticResource MediumLeftMargin}" />
@@ -57,7 +80,7 @@
                                       Visibility="{Binding ShowFlagButton, Converter={StaticResource BoolToVisConverter}}"
                                       Label="{Binding FlagLabel}">
                             <AppBarButton.Flyout>
-                                <Flyout Closed="FlyoutBase_OnClosed">
+                                <Flyout LightDismissOverlayMode="On" Closed="FlyoutBase_OnClosed">
                                     <StackPanel DataContext="{Binding ElementName=NavigationMenu, Path=DataContext}">
                                         <CheckBox x:Uid="SFWCheckbox"
                                                   IsEnabled="{Binding SfwCheckedEnabled, UpdateSourceTrigger=PropertyChanged}"
@@ -88,3 +111,18 @@
         </Grid>
     </NavigationView>
 </Page>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

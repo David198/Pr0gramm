@@ -22,12 +22,12 @@ namespace Pr0gramm.Models
         private bool _commentsAndTagsLoaded;
 
         public FeedItemViewModel(FeedItem feedItem, IProgrammApi api,
-            ToastNotificationsService toastNotificationsService):base (feedItem)
+            ToastNotificationsService toastNotificationsService) : base(feedItem)
         {
             _api = api;
             _toastNotificationsService = toastNotificationsService;
             CommentViewModels = new BindableCollection<CommentViewModel>();
-            Tags = new BindableCollection<TagItem>();
+            Tags = new BindableCollection<TagViewModel>();
         }
 
 
@@ -35,7 +35,7 @@ namespace Pr0gramm.Models
 
         public BindableCollection<CommentViewModel> CommentViewModels { get; set; }
 
-        public BindableCollection<TagItem> Tags { get; set; }
+        public BindableCollection<TagViewModel> Tags { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -45,7 +45,7 @@ namespace Pr0gramm.Models
                 return;
             _commentsAndTagsLoaded = true;
 
-                CoreDispatcher dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+            CoreDispatcher dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
                 try
@@ -67,15 +67,14 @@ namespace Pr0gramm.Models
                     });
 
                     CommentViewModels.AddRange(temptCommentViewModel);
-                    Tags.AddRange(feedItemCommentItem.Tags.OrderByDescending(tag => tag.Confidence).ToList());
+                    feedItemCommentItem.Tags.OrderByDescending(tag => tag.Confidence).ToList()
+                        .ForEach(item => Tags.Add(new TagViewModel(item)));
                 }
                 catch (ApplicationException)
                 {
                     _toastNotificationsService.ShowToastNotificationWebSocketExeception();
                 }
-
             });
-
         }
 
         public void FlatHierarchy(Node<Comment> node, List<Comment> tempList)

@@ -48,7 +48,7 @@ namespace Pr0gramm.ViewModels
                 }
                 catch (Exception e)
                 {
-                   _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                   ToastNotificationsService.ShowToastNotificationWebSocketExeception();
                 }
 
             }

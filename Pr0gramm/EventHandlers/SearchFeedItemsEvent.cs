@@ -10,9 +10,10 @@ namespace Pr0gramm.EventHandlers
     {
         public string SearchTags { get; set; }
 
-        public SearchFeedItemsEvent(string searchString)
+        public SearchFeedItemsEvent(string searchTags)
         {
-           var tags = searchString.Split(" ");
+            if (string.IsNullOrEmpty(searchTags)) return;
+           var tags = searchTags.Split(" ");
             for (int i = 0; i < tags.Length; i++)
             {
                 if (i == 0)
