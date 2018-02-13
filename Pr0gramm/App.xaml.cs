@@ -58,9 +58,9 @@ namespace Pr0gramm
 
             ViewLocator.ConfigureTypeMappings(config);
             ViewModelLocator.ConfigureTypeMappings(config);
-
             _container = new WinRTContainer();
             _container.RegisterWinRTServices();
+            _container.Singleton<SettingsService>();
             _container.PerRequest<ToastNotificationsService>();
             _container.Singleton<UserLoginService>();
             _container.Singleton<IProgrammApi, ProgrammApi>();

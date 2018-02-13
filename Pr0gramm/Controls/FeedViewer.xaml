@@ -13,11 +13,11 @@
     x:Name="UserControl"
     d:DesignHeight="300"
     d:DesignWidth="400" Loaded="OnLoaded" Unloaded="FeedViewer_OnUnloaded">
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid x:Name="MainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition MinWidth="165" Width="0.6*" />
+            <ColumnDefinition x:Name="FeedColumn" MinWidth="165" Width="0.6*" />
             <ColumnDefinition Width="15" />
-            <ColumnDefinition Width="0.4*" MinWidth="375" />
+            <ColumnDefinition x:Name="FeedItemColumn" Width="0.4*" MinWidth="375" />
         </Grid.ColumnDefinitions>
         <controls:AdaptiveGridView x:Name="FeedItemGridView" Grid.Column="0"
                                    ItemsSource="{x:Bind FeedItems}"
@@ -27,9 +27,9 @@
                                    DesiredWidth="150"
                                    SelectionMode="Single"
                                    ItemTemplate="{StaticResource ThumbImageTemplate}" />
-        <controls:GridSplitter Grid.Column="1" Width="15" ResizeBehavior="BasedOnAlignment"
+        <controls:GridSplitter  Grid.Column="1" Width="15" ResizeBehavior="BasedOnAlignment"
                                ResizeDirection="Auto"
-                               FontSize="13" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                               FontSize="13" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" ManipulationCompleted="GridSplitter_ManipulationCompleted">
             <controls:GridSplitter.Element>
                 <TextBlock HorizontalAlignment="Center"
                            IsHitTestVisible="False"

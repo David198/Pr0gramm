@@ -24,6 +24,7 @@ namespace Pr0gramm.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IProgrammApi _programmApi;
         private readonly UserLoginService _userLoginService;
+        private readonly SettingsService _settingsService;
 
         private string _header;
 
@@ -41,12 +42,13 @@ namespace Pr0gramm.ViewModels
         private string _searchText;
         public string ActualUser { get; set; }
 
-        public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator,IProgrammApi programmApi, UserLoginService userLoginService)
+        public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator,IProgrammApi programmApi, UserLoginService userLoginService, SettingsService settingsService)
         {
             _container = container;
             _eventAggregator = eventAggregator;
             _programmApi = programmApi;
             _userLoginService = userLoginService;
+            _settingsService = settingsService;
             _eventAggregator.Subscribe(this);
         }
 
@@ -201,13 +203,13 @@ namespace Pr0gramm.ViewModels
 
         public void Mute()
         {
-            SettingsService.IsMuted = true;
+            _settingsService.IsMuted = true;
             _eventAggregator.PublishOnBackgroundThread(new MuteEvent(true));
         }
 
         public void UnMute()
         {
-            SettingsService.IsMuted = false;
+            _settingsService.IsMuted = false;
             _eventAggregator.PublishOnBackgroundThread(new MuteEvent(false));
         }
 
@@ -240,7 +242,7 @@ namespace Pr0gramm.ViewModels
         }
 
 
-        protected override void OnInitialize()
+        protected override async void OnInitialize()
         {
     
             InitializeFeedFlags();
@@ -250,6 +252,7 @@ namespace Pr0gramm.ViewModels
                 _navigationService.Navigated += NavigationService_Navigated;
             PopulateNavItems();
             NotifyOfPropertyChange(nameof(ShowFlagButton));
+            await _settingsService.InitializeSettings();
             IsMuted = true;
             Mute();
         }

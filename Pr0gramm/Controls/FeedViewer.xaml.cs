@@ -51,11 +51,14 @@ namespace Pr0gramm.Controls
         {
             InitializeComponent();
             IoC.Get<IEventAggregator>().Subscribe(this);
+            _settingsService = IoC.Get<SettingsService>();
+            
         }
 
 
         private bool IsMuted { get; set; }
         private  MediaPlayer _mediaPlayer;
+        private readonly SettingsService _settingsService;
 
 
         public BindableCollection<FeedItemViewModel> FeedItems
@@ -86,6 +89,9 @@ namespace Pr0gramm.Controls
         {
             var scrollViewer = FeedItemGridView.ChildrenBreadthFirst().OfType<ScrollViewer>().First();
             scrollViewer.ViewChanged += ScrollViewer_OnViewChanged;
+            FeedItemColumn.Width = new GridLength(_settingsService.FeedViewerRightGridColumnWidth, GridUnitType.Star);
+            FeedColumn.Width = new GridLength(_settingsService.FeedViewerLeftGridColumnWidth, GridUnitType.Star);
+
         }
 
         private void ScrollViewer_OnViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
@@ -112,7 +118,7 @@ namespace Pr0gramm.Controls
                 {
                     IsLoopingEnabled = true,
                     Source = MediaSource.CreateFromUri(item.ImageSource),
-                    IsMuted = SettingsService.IsMuted,
+                    IsMuted = _settingsService.IsMuted,
                     AutoPlay = true,
                     AudioCategory = MediaPlayerAudioCategory.Media,   
                 };
@@ -264,6 +270,13 @@ namespace Pr0gramm.Controls
             request.Data.Properties.Title = "SharePostTitel".GetLocalized();
             request.Data.Properties.Description = "SharePostDescription".GetLocalized();
             request.Data.SetWebLink(SelectedFeedItem.ShareLink);
+        }
+
+        private  void GridSplitter_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
+        {
+            float rightColumnWidth = ((float)Math.Round(FeedItemColumn.ActualWidth * 100  / MainGrid.ActualWidth)*0.01f);
+            float leftColumnWidht = 1 - rightColumnWidth;
+            _settingsService.SaveFeedViewerColumnWidthFromSettingsAsync(leftColumnWidht, rightColumnWidth);
         }
     }
 }
