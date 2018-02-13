@@ -103,7 +103,7 @@
       <Version>4.1.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.0.6</Version>
+      <Version>6.0.7</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Uwp.Managed">
       <Version>2.0.0</Version>
@@ -123,9 +123,6 @@
     </PackageReference>
     <PackageReference Include="RestSharp">
       <Version>106.2.1</Version>
-    </PackageReference>
-    <PackageReference Include="Telerik.UI.for.UniversalWindowsPlatform">
-      <Version>1.0.0.9</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -181,7 +178,6 @@
     <Compile Include="Services\WhatsNewDisplayService.cs" />
     <Compile Include="Styles\DataTemplates.cs" />
     <Compile Include="ViewModels\CameraViewModel.cs" />
-    <Compile Include="ViewModels\ControversalViewModel.cs" />
     <Compile Include="ViewModels\FeedViewerViewModelBase.cs" />
     <Compile Include="ViewModels\NewViewModel.cs" />
     <Compile Include="ViewModels\TopViewModel.cs" />
@@ -189,9 +185,6 @@
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="Views\CameraPage.xaml.cs">
       <DependentUpon>CameraPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ControversalPage.xaml.cs">
-      <DependentUpon>ControversalPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Convertes\BooleanToVisibilityConverterInverse.cs" />
     <Compile Include="Views\Convertes\FeedScoreConverter.cs" />
@@ -242,6 +235,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Styles\Button.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
     <Page Include="Styles\DataTemplates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -255,6 +253,11 @@
     <Page Include="Styles\Page.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\ThemeDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="Styles\_Colors.xaml">
       <SubType>Designer</SubType>
@@ -277,10 +280,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="Views\CameraPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ControversalPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

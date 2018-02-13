@@ -17,7 +17,10 @@
                 <ResourceDictionary Source="Styles/DataTemplates.xaml" />
                 <ResourceDictionary Source="Views/Convertes/Converters.xaml" />
                 <ResourceDictionary Source="Styles/ListView.xaml" />
+                <ResourceDictionary Source="Styles/ThemeDictionary.xaml"/>
+                <ResourceDictionary Source="Styles/Button.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+        
     </Application.Resources>
 </cm:CaliburnApplication>

@@ -131,9 +131,9 @@
                                             <TextBlock
                                                 Padding="{StaticResource SmallAllMargin}" Width="Auto"
                                                 VerticalAlignment="Center"
-                                                Text="{x:Bind Tag}"
+                                                Text="{x:Bind Tag}" Foreground="{StaticResource LinkColorBrush}"
                                                 HorizontalAlignment="Center"
-                                                micro:Message.Attach="[Event PointerPressed] = [Action SearchTag($dataContext)]" />
+                                                micro:Message.Attach="[Event PointerPressed] = [Action SearchTag($dataContext)]"  />
                                         </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

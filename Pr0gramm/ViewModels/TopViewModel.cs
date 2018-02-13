@@ -46,7 +46,7 @@ namespace Pr0gramm.ViewModels
                         _userLoginService.IsLoggedIn = true;
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                    ToastNotificationsService.ShowToastNotificationWebSocketExeception();
                 }
