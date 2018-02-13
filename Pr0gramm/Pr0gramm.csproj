@@ -17,13 +17,13 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
-    <PackageCertificateKeyFile>Pr0gramm_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>Pr0gramm_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
     <AppxPackageDir>C:\Users\David\Documents\Pr0grammGit\Pr0gramm\AppPackages\</AppxPackageDir>
-    <PackageCertificateThumbprint>50C6A339293FB701B4C2048708583AA6F5C220F8</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>4ECD593D6B915351869BB7469F59EA2DC7A1BC49</PackageCertificateThumbprint>
     <HockeyAppResourceId>d2ef27ea7e7342b3befa7922cacd4c47</HockeyAppResourceId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
@@ -143,7 +143,7 @@
     <Compile Include="EventHandlers\TagSearchEvent.cs" />
     <Compile Include="EventHandlers\UserLoggedInEvent.cs" />
     <Compile Include="Helpers\CameraOrientationExtensions.cs" />
-    <Compile Include="Helpers\EnumToBooleanConverter.cs" />
+    <Compile Include="Views\Convertes\EnumToBooleanConverter.cs" />
     <Compile Include="Helpers\Json.cs" />
     <Compile Include="Helpers\NodeExtensions.cs" />
     <Compile Include="Helpers\PropertyChangedBaseExtensions.cs" />
@@ -338,6 +338,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\placeHolderImage.jpg" />
+    <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -351,6 +352,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
+    <None Include="Pr0gramm_StoreKey.pfx" />
     <None Include="Pr0gramm_TemporaryKey.pfx" />
     <PRIResource Include="Strings\en-us\Resources.resw" />
     <PRIResource Include="Strings\de-de\Resources.resw" />

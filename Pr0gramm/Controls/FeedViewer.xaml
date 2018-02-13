@@ -110,10 +110,15 @@
                                         </StackPanel>
                                     </ToolTipService.ToolTip>
                                 </TextBlock>
-                                <AppBarButton Click="DownloadImageClick"
-                                              Visibility="{x:Bind IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
-                                              controls:DockPanel.Dock="Right" HorizontalAlignment="Right"
-                                              Label="Download" Icon="Download" />
+                                <StackPanel Orientation="Horizontal" controls:DockPanel.Dock="Right"
+                                            HorizontalAlignment="Right">
+                                    <AppBarButton Click="ShareButtonClick" x:Uid="SharePostButton"
+                                                  Icon="Share" />
+                                    <AppBarButton Click="DownloadImageClick"
+                                                  Visibility="{x:Bind IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
+                                                  Label="Download" Icon="Download" />
+                                </StackPanel>
+
                             </controls:DockPanel>
                             <ItemsControl x:Name="TagsList" ItemsSource="{x:Bind Tags}"
                                           Margin="{StaticResource SmallLeftRightMargin}"

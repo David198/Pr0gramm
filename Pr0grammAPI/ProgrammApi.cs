@@ -42,8 +42,9 @@ namespace Pr0grammAPI
 
         private async Task<T> Execute<T>(RestRequest request) where T : new()
         {
+            #if DEBUG
             client.Proxy = new WebProxy("127.0.0.1", 8888);
-
+            #endif
             var response = await client.ExecuteTaskAsync<T>(request);
 
             if (response.ErrorException != null)

@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Caliburn.Micro;
-
 using Microsoft.HockeyApp;
-
 using Pr0gramm.Helpers;
 using Pr0gramm.Services;
 using Pr0gramm.ViewModels;
 using Pr0gramm.Views;
-
 using Pr0grammAPI;
 using Pr0grammAPI.Interfaces;
-
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -27,8 +22,10 @@ namespace Pr0gramm
 
         public App()
         {
-            //HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
-            //    new TelemetryConfiguration {EnableDiagnostics = true});
+#if !DEBUG
+            HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
+              new TelemetryConfiguration {EnableDiagnostics = true});
+#endif
             InitializeComponent();
             EnteredBackground += App_EnteredBackground;
             Initialize();
@@ -70,9 +67,7 @@ namespace Pr0gramm
             _container.PerRequest<ShellViewModel>();
             _container.PerRequest<TopViewModel>();
             _container.PerRequest<NewViewModel>();
-            _container.PerRequest<CameraViewModel>();
             _container.Singleton<SettingsViewModel>();
-           // _container.PerRequest<ControversalViewModel>();
         }
 
         protected override object GetInstance(Type service, string key)

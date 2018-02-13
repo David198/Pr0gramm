@@ -295,4 +295,13 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   <data name="SearchTextBox.PlaceholderText" xml:space="preserve">
     <value>Tags für die Suche hier eingeben.</value>
   </data>
+  <data name="SharePostButton.Label" xml:space="preserve">
+    <value>Teilen</value>
+  </data>
+  <data name="SharePostDescription" xml:space="preserve">
+    <value>Link freigeben.</value>
+  </data>
+  <data name="SharePostTitel" xml:space="preserve">
+    <value>Teilen</value>
+  </data>
 </root>

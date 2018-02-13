@@ -1,7 +1,8 @@
 ﻿using System;
 using Windows.UI.Xaml.Data;
+using Pr0gramm.Helpers;
 
-namespace Pr0gramm.Helpers
+namespace Pr0gramm.Views.Convertes
 {
     public class EnumToBooleanConverter : IValueConverter
     {

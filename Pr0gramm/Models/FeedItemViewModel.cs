@@ -37,6 +37,21 @@ namespace Pr0gramm.Models
 
         public BindableCollection<TagViewModel> Tags { get; set; }
 
+        public Uri ShareLink
+        {
+            get
+            {
+                var link = "https://pr0gramm.com/";
+                if (Promoted != 0)
+                    link = link + "top/" + Promoted;
+                else
+                {
+                    link = link + "new/" + Id;
+                }
+                return new Uri(link);
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public async Task LoadCommentsAndTags()
