@@ -187,7 +187,7 @@
       <DependentUpon>CameraPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Convertes\BooleanToVisibilityConverterInverse.cs" />
-    <Compile Include="Views\Convertes\FeedScoreConverter.cs" />
+    <Compile Include="Views\Convertes\ScoreConverter.cs" />
     <Compile Include="Views\Convertes\ImageSourceFromUriConverter.cs" />
     <Compile Include="Views\Convertes\MediaSourceFromUriConverter.cs" />
     <Compile Include="Views\Convertes\NullVisibilityConverter.cs" />

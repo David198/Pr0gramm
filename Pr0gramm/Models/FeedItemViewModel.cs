@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.UI.Core;
 using Caliburn.Micro;
+using Pr0gramm.Helpers;
 using Pr0gramm.Services;
 using Pr0grammAPI.Annotations;
 using Pr0grammAPI.Feeds;
@@ -49,6 +50,32 @@ namespace Pr0gramm.Models
                     link = link + "new/" + Id;
                 }
                 return new Uri(link);
+            }
+        }
+
+        public bool ScoreIsAwailable
+        {
+            get
+            {
+                if ((DateTime.Now - Created).Hours > 1)
+                    return true;
+                return false;
+            }
+        }
+
+        public string CreatedString
+        {
+            get
+            {
+                if ((DateTime.Now- Created).TotalMinutes < 1)
+                    return "JustNow".GetLocalized();
+                if ((DateTime.Now- Created).TotalHours < 1)
+                    return "Before".GetLocalized()+" " + (DateTime.Now - Created).Minutes + " "+  "Minutes".GetLocalized();
+                if ((DateTime.Now- Created).TotalDays < 1)
+                    return "Before".GetLocalized() + " " + (DateTime.Now - Created).Hours + " "+ "Hours".GetLocalized();
+                if (( DateTime.Now- Created).TotalDays > 1)
+                    return "Before".GetLocalized() + " " + (DateTime.Now - Created).Days + " " + "Days".GetLocalized();
+                return "";
             }
         }
 

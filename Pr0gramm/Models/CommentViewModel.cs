@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Caliburn.Micro;
+using Pr0gramm.Helpers;
 using Pr0grammAPI.Annotations;
 using Pr0grammAPI.Feeds;
 
@@ -29,6 +31,32 @@ namespace Pr0gramm.Models
                 _parentDepth = value;
                 for (var i = 1; i < value; i++)
                     ParentDepthList.Add(0);
+            }
+        }
+
+        public bool ScoreIsAwailable
+        {
+            get
+            {
+                if ((DateTime.Now - Created).Hours > 1)
+                    return true;
+                return false;
+            }
+        }
+
+        public string CreatedString
+        {
+            get
+            {
+                if ((DateTime.Now - Created).TotalMinutes < 1)
+                    return "JustNow".GetLocalized();
+                if ((DateTime.Now - Created).TotalHours < 1)
+                    return "Before".GetLocalized() + " " + (DateTime.Now - Created).Minutes + " " + "Minutes".GetLocalized();
+                if ((DateTime.Now - Created).TotalDays < 1)
+                    return "Before".GetLocalized() + " " + (DateTime.Now - Created).Hours + " " + "Hours".GetLocalized();
+                if ((DateTime.Now - Created).TotalDays > 1)
+                    return "Before".GetLocalized() + " " + (DateTime.Now - Created).Days + " " + "Days".GetLocalized();
+                return "";
             }
         }
 

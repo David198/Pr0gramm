@@ -83,9 +83,16 @@
                                                  Content="{x:Bind User}" x:Phase="5" />
                                 <TextBlock Margin="10 0 0 0" VerticalAlignment="Center" controls:DockPanel.Dock="Left">-</TextBlock>
                                 <TextBlock VerticalAlignment="Center"
-                                           Text="{x:Bind Created}"
+                                           Text="{x:Bind CreatedString}"
                                            Margin="{StaticResource MediumLeftMargin}"
-                                           x:Phase="2" controls:DockPanel.Dock="Left" />
+                                           x:Phase="2" controls:DockPanel.Dock="Left" >
+                                    <ToolTipService.ToolTip>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Text="{x:Bind Created}"
+                                                   Margin="{StaticResource SmallLeftRightMargin}"
+                                        />
+                                    </ToolTipService.ToolTip>
+                                </TextBlock>
                                 <TextBlock Margin="{StaticResource MediumLeftMargin}" HorizontalAlignment="Center"
                                            VerticalAlignment="Center" controls:DockPanel.Dock="Left" />
                                 <TextBlock controls:DockPanel.Dock="Left" Margin="{StaticResource MediumLeftMargin}"
@@ -93,7 +100,8 @@
                                            VerticalAlignment="Center" x:Phase="5"
                                            Text="{x:Bind Converter={StaticResource FeedScoreConverter}}">
                                     <ToolTipService.ToolTip>
-                                        <StackPanel Orientation="Horizontal">
+                                        <Grid>
+                                        <StackPanel Orientation="Horizontal" Visibility="{x:Bind ScoreIsAwailable, Converter={StaticResource BoolToVisConverter}}">
                                             <TextBlock Margin="{StaticResource MediumLeftMargin}"
                                                        Text="{x:Bind Up}"
                                                        VerticalAlignment="Center" x:Phase="5" />
@@ -108,6 +116,8 @@
                                                           Margin="{StaticResource SmallLeftMargin}" />
                                             </Viewbox>
                                         </StackPanel>
+                                        <TextBlock x:Uid="ScoreUnawailableText" Visibility="{x:Bind ScoreIsAwailable, Converter={StaticResource BooleanToVisibilityConverterInverse}}"></TextBlock>
+                                        </Grid>
                                     </ToolTipService.ToolTip>
                                 </TextBlock>
                                 <StackPanel Orientation="Horizontal" controls:DockPanel.Dock="Right"
@@ -213,15 +223,23 @@
                                                             Content="{x:Bind Name}" x:Phase="5" />
                                                         <TextBlock Margin="10 0 0 0" VerticalAlignment="Center">-</TextBlock>
                                                         <TextBlock VerticalAlignment="Center"
-                                                                   Text="{x:Bind Created}"
+                                                                   Text="{x:Bind CreatedString}"
                                                                    Margin="{StaticResource MediumLeftMargin}"
-                                                                   x:Phase="2" />
+                                                                   x:Phase="2" >
+                                                            <ToolTipService.ToolTip>
+                                                                <TextBlock VerticalAlignment="Center"
+                                                                           Text="{x:Bind Created}"
+                                                                           Margin="{StaticResource SmallLeftRightMargin}"
+                                                                           />
+                                                            </ToolTipService.ToolTip>
+                                                        </TextBlock>
                                                         <TextBlock Margin="{StaticResource MediumLeftMargin}"
                                                                    HorizontalAlignment="Center"
                                                                    VerticalAlignment="Center"
                                                                    Text="{x:Bind Converter={StaticResource FeedScoreConverter}}">
                                                             <ToolTipService.ToolTip>
-                                                                <StackPanel Orientation="Horizontal">
+                                                                <Grid>
+                                                                <StackPanel Orientation="Horizontal" Visibility="{x:Bind ScoreIsAwailable, Converter={StaticResource BoolToVisConverter}}">
                                                                     <TextBlock
                                                                         Margin="{StaticResource MediumLeftMargin}"
                                                                         Text="{x:Bind Up}"
@@ -240,6 +258,8 @@
                                                                                   Margin="{StaticResource SmallLeftMargin}" />
                                                                     </Viewbox>
                                                                 </StackPanel>
+                                                                    <TextBlock x:Uid="ScoreUnawailableText" Visibility="{x:Bind ScoreIsAwailable, Converter={StaticResource BooleanToVisibilityConverterInverse}}"></TextBlock>
+                                                                </Grid>
                                                             </ToolTipService.ToolTip>
                                                         </TextBlock>
                                                     </StackPanel>

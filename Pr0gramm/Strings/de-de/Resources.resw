@@ -304,4 +304,22 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   <data name="SharePostTitel" xml:space="preserve">
     <value>Teilen</value>
   </data>
+  <data name="Before" xml:space="preserve">
+    <value>Vor</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>Tage</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>Stunden</value>
+  </data>
+  <data name="JustNow" xml:space="preserve">
+    <value>Gerade eben</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minuten</value>
+  </data>
+  <data name="ScoreUnawailableText.Text" xml:space="preserve">
+    <value>Score noch unsichtbar.</value>
+  </data>
 </root>
