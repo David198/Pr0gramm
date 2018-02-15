@@ -22,7 +22,7 @@ namespace Pr0grammAPI.Feeds
         {
             Content = copyElement.Content;
             Confidence = copyElement.Confidence;
-            Created = copyElement.Created;
+            Created = copyElement.Created.AddHours(1);
             Down = copyElement.Down;
             Id = copyElement.Id;
             Mark = copyElement.Mark;

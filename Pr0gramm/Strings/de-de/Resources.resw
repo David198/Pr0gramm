@@ -331,4 +331,13 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   <data name="Minute" xml:space="preserve">
     <value>Minute</value>
   </data>
+  <data name="ExtraColumnToggleSwitch.Header" xml:space="preserve">
+    <value>Hallo</value>
+  </data>
+  <data name="ExtraColumnToggleSwitch.OffContent" xml:space="preserve">
+    <value>Nein</value>
+  </data>
+  <data name="ExtraColumnToggleSwitch.OnContent" xml:space="preserve">
+    <value>Ja</value>
+  </data>
 </root>

@@ -29,7 +29,6 @@ namespace Pr0grammAPI.Feeds
         public int Height { get; set; }
         public bool Audio { get; set; }
         public string Source { get; set; }
-        //public FeedFlags Flags { get; set; }
         public string User { get; set; }
         public int Mark { get; set; }
 
@@ -46,7 +45,7 @@ namespace Pr0grammAPI.Feeds
             Promoted = copyItem.Promoted;
             Up = copyItem.Up;
             Down = copyItem.Down;
-            Created = copyItem.Created;
+            Created = copyItem.Created.AddHours(1);
             Image = copyItem.Image;
             Thumb = copyItem.Thumb;
             FullSize = copyItem.FullSize;

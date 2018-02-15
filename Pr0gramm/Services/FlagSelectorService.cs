@@ -57,13 +57,13 @@ namespace Pr0gramm.Services
 
         private static async Task<FeedFlags> LoadFlagFromSettingsAsync()
         {
-            var cacheTheme = FeedFlags.SFW;
-            var themeName = await ApplicationData.Current.LocalSettings.ReadAsync<string>(SettingsKey);
+            var chacheFlag = FeedFlags.SFW;
+            var flagName = await ApplicationData.Current.LocalSettings.ReadAsync<string>(SettingsKey);
 
-            if (!string.IsNullOrEmpty(themeName))
-                Enum.TryParse(themeName, out cacheTheme);
+            if (!string.IsNullOrEmpty(flagName))
+                Enum.TryParse(flagName, out chacheFlag);
 
-            return cacheTheme;
+            return chacheFlag;
         }
 
         private const string SettingsKey = "RequestedFlags";

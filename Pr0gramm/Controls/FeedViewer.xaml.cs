@@ -52,14 +52,19 @@ namespace Pr0gramm.Controls
             InitializeComponent();
             IoC.Get<IEventAggregator>().Subscribe(this);
             _settingsService = IoC.Get<SettingsService>();
-            
+            DataContext = this;
         }
 
 
         private bool IsMuted { get; set; }
-        private  MediaPlayer _mediaPlayer;
+        private MediaPlayer _mediaPlayer;
         private readonly SettingsService _settingsService;
+        private ScrollViewer _flipViewScrollViewer;
 
+        public GridLength ExtraColumnGridSplitterWidth { get; set; }
+        public GridLength ExtraColumnGridWidth { get; set; }
+        public GridLength FlipViewColumnWidth { get; set; }
+        public bool ExtraColumnIsActive { get; set; }
 
         public BindableCollection<FeedItemViewModel> FeedItems
         {
@@ -87,11 +92,41 @@ namespace Pr0gramm.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var scrollViewer = FeedItemGridView.ChildrenBreadthFirst().OfType<ScrollViewer>().First();
+            RegisterFeedScrollViewUpdate();
+            SetMainViewColumnWidth();
+            SetExtraCommentColumn();
+        }
+
+        private void RegisterFeedScrollViewUpdate()
+        {
+            var scrollViewer = FeedItemGridView.FindDescendant<ScrollViewer>();
             scrollViewer.ViewChanged += ScrollViewer_OnViewChanged;
+        }
+
+        private void SetMainViewColumnWidth()
+        {
             FeedItemColumn.Width = new GridLength(_settingsService.FeedViewerRightGridColumnWidth, GridUnitType.Star);
             FeedColumn.Width = new GridLength(_settingsService.FeedViewerLeftGridColumnWidth, GridUnitType.Star);
+        }
 
+        private void SetExtraCommentColumn()
+        {
+            ExtraColumnIsActive = _settingsService.FeedViewerExtraColumnVisible;
+           
+            if (ExtraColumnIsActive)
+            {
+                FlipViewColumnWidth = new GridLength(_settingsService.FeedViewerExtraLeftGridColumnWidth,
+                    GridUnitType.Star);
+                ExtraColumnGridSplitterWidth = new GridLength(15, GridUnitType.Pixel);
+                ExtraColumnGridWidth = new GridLength(_settingsService.FeedViewerExtraRightGridColumnWidth,
+                    GridUnitType.Star);
+            }
+            else
+            {
+                FlipViewColumnWidth = new GridLength(1, GridUnitType.Star);
+                ExtraColumnGridSplitterWidth = new GridLength(0, GridUnitType.Pixel);
+                ExtraColumnGridWidth = new GridLength(0, GridUnitType.Pixel);
+            }
         }
 
         private void ScrollViewer_OnViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
@@ -120,7 +155,7 @@ namespace Pr0gramm.Controls
                     Source = MediaSource.CreateFromUri(item.ImageSource),
                     IsMuted = _settingsService.IsMuted,
                     AutoPlay = true,
-                    AudioCategory = MediaPlayerAudioCategory.Media,   
+                    AudioCategory = MediaPlayerAudioCategory.Media,
                 };
                 var flipViewItem = FlipView.ContainerFromItem(item);
                 if (flipViewItem == null) return;
@@ -129,7 +164,7 @@ namespace Pr0gramm.Controls
                 {
                     mediaPlayerElement.SetMediaPlayer(_mediaPlayer);
                     mediaPlayerElement.Stretch = Stretch.Uniform;
-                }   
+                }
             }
             else
             {
@@ -145,8 +180,8 @@ namespace Pr0gramm.Controls
                 {
                     _mediaPlayer.Pause();
                     _mediaPlayer.Source = null;
-                }                 
-            }        
+                }
+            }
             catch (Exception e)
             {
                 HockeyClient.Current.TrackException(e);
@@ -184,7 +219,7 @@ namespace Pr0gramm.Controls
             }
             catch (Exception e)
             {
-               HockeyClient.Current.TrackException(e);
+                HockeyClient.Current.TrackException(e);
             }
         }
 
@@ -197,7 +232,7 @@ namespace Pr0gramm.Controls
             await bitmap.RenderAsync(myImageSource);
 
             var savePicker = new FileSavePicker {SuggestedStartLocation = PickerLocationId.PicturesLibrary};
-            savePicker.FileTypeChoices.Add("Image", new List<string>() { ".jpg" });
+            savePicker.FileTypeChoices.Add("Image", new List<string>() {".jpg"});
             savePicker.SuggestedFileName = "NewImage";
             var savefile = await savePicker.PickSaveFileAsync();
             if (savefile == null)
@@ -211,8 +246,8 @@ namespace Pr0gramm.Controls
                 byte[] bytes = pixels.ToArray();
                 encoder.SetPixelData(BitmapPixelFormat.Bgra8,
                     BitmapAlphaMode.Ignore,
-                    (uint)bitmap.PixelWidth,
-                    (uint)bitmap.PixelHeight,
+                    (uint) bitmap.PixelWidth,
+                    (uint) bitmap.PixelHeight,
                     200,
                     200,
                     bytes);
@@ -232,27 +267,6 @@ namespace Pr0gramm.Controls
             }
         }
 
-        private async void UIElement_OnDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
-        {
-            var flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
-
-            if (flipViewItem == null) return;
-            var fontIcon = flipViewItem.FindDescendantByName("HeartIcon");
-            fontIcon.Fade(value: 1, duration: 1500).StartAsync();
-            await fontIcon.Scale(centerX: 10,
-                centerY: 10,
-                scaleX: 5f,
-                scaleY: 5f,
-                duration: 1500).StartAsync();
-            fontIcon.Fade(value: 0, duration: 1500).StartAsync();
-            await fontIcon.Scale(centerX: 10f,
-                centerY: 10f,
-                scaleX: 1.0f,
-                scaleY: 1f,
-                duration: 1500).StartAsync();
-
-        }
-
         private void ShareButtonClick(object sender, RoutedEventArgs e)
         {
             DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
@@ -260,23 +274,59 @@ namespace Pr0gramm.Controls
             {
                 dataTransferManager.DataRequested += DataTransferManager_DataRequested;
                 DataTransferManager.ShowShareUI();
-            }     
+            }
         }
 
         private void DataTransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
         {
             DataRequest request = args.Request;
-            request.Data.RequestedOperation = DataPackageOperation.Link; ;
+            request.Data.RequestedOperation = DataPackageOperation.Link;
+            ;
             request.Data.Properties.Title = "SharePostTitel".GetLocalized();
             request.Data.Properties.Description = "SharePostDescription".GetLocalized();
             request.Data.SetWebLink(SelectedFeedItem.ShareLink);
         }
 
-        private  void GridSplitter_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
+        private void GridSplitter_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
-            float rightColumnWidth = ((float)Math.Round(FeedItemColumn.ActualWidth * 100  / MainGrid.ActualWidth)*0.01f);
+            float rightColumnWidth = (float) Math.Round((float) (FeedItemColumn.ActualWidth * 1 / MainGrid.ActualWidth),
+                2);
             float leftColumnWidht = 1 - rightColumnWidth;
             _settingsService.SaveFeedViewerColumnWidthFromSettingsAsync(leftColumnWidht, rightColumnWidth);
         }
+
+        private void ExtraCommentColumnGridSplitterManipulationCompleted(object sender,
+            ManipulationCompletedRoutedEventArgs e)
+        {
+            var scrollViewer = FlipView.FindDescendantByName("MainScrollViewer");
+            if (scrollViewer != null)
+            {
+                float leftColumnWidth =
+                    (float) Math.Round((float) (scrollViewer.ActualWidth * 1 / FlipView.ActualWidth), 2);
+                float rightColumnWidth = 1 - leftColumnWidth;
+                _settingsService.SaveFeedViewerExtraColumnWidthFromSettingsAsync(leftColumnWidth, rightColumnWidth);
+            }
+        }
+
+        //private async void UIElement_OnDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        //{
+        //    //var flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
+
+        //    //if (flipViewItem == null) return;
+        //    //var fontIcon = flipViewItem.FindDescendantByName("HeartIcon");
+        //    //fontIcon.Fade(value: 1, duration: 1500).StartAsync();
+        //    //await  fontIcon.Scale(centerX: 10,
+        //    //    centerY: 10,
+        //    //    scaleX: 5f,
+        //    //    scaleY: 5f,
+        //    //    duration: 1500).StartAsync();
+        //    //fontIcon.Fade(value: 0, duration: 1500).StartAsync();
+        //    //await fontIcon.Scale(centerX: 10f,
+        //    //    centerY: 10f,
+        //    //    scaleX: 1.0f,
+        //    //    scaleY: 1f,
+        //    //    duration: 1500).StartAsync();
+
+        //}
     }
 }

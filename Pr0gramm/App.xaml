@@ -19,6 +19,7 @@
                 <ResourceDictionary Source="Styles/ListView.xaml" />
                 <ResourceDictionary Source="Styles/ThemeDictionary.xaml"/>
                 <ResourceDictionary Source="Styles/Button.xaml"/>
+                <ResourceDictionary Source="Styles/GridSplitter.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
         

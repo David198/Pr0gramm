@@ -8,51 +8,34 @@ using Pr0gramm.Helpers;
 
 namespace Pr0gramm.Services
 {
-    public class SettingsService
+    public partial class SettingsService
     {
-        private const string FeedViewerLeftGridColumnWidthKey = "FeedViewerLeftGridColumnWidth";
-        private const string FeedViewerRightGridColumnWidthKey = "FeedViewerRightGridColumnWidth";
+        private const string AlwaysStartWithSfwKey = "AlwaysStartWithSFW";
         public bool IsMuted { get; set; }
-
-        public float FeedViewerLeftGridColumnWidth { get; set; } = 0.6f;
-        public float FeedViewerRightGridColumnWidth { get; set; } = 0.4f;
 
         public async Task InitializeSettings()
         {
-            await LoadFeedViewerColumnWidthFromSettingsAsync();
+            await LoadAlwaysStartWithSFWAsync();
+            await LoadFeedViewerSettingsFromSettingsAsync();
         }
 
-        private async Task InitializeFeedViewerColumnWidthsAsyncTask()
-        {
-            await LoadFeedViewerColumnWidthFromSettingsAsync();
-        }
+        public bool AlwaysStartWithSfw { get; set; } = true;
 
-        private async Task LoadFeedViewerColumnWidthFromSettingsAsync()
+        private async Task LoadAlwaysStartWithSFWAsync()
         {
-         
-            string tempFeedViewerLeftGridColumnWidthString = await ApplicationData.Current.LocalSettings.ReadAsync<string>(FeedViewerLeftGridColumnWidthKey);
-            if (!string.IsNullOrEmpty(tempFeedViewerLeftGridColumnWidthString))
+            string tempAlwaysStartWithSFWKeyString =
+                await ApplicationData.Current.LocalSettings.ReadAsync<string>(AlwaysStartWithSfwKey);
+            if (!string.IsNullOrEmpty(tempAlwaysStartWithSFWKeyString))
             {
-                var feedViewerLeftGridColumnWidth = 0f;
-                if (float.TryParse(tempFeedViewerLeftGridColumnWidthString, out feedViewerLeftGridColumnWidth))
-                    FeedViewerLeftGridColumnWidth = feedViewerLeftGridColumnWidth;
-            }
-
-            string tempFeedViewerRightGridColumnWidthString = await ApplicationData.Current.LocalSettings.ReadAsync<string>(FeedViewerRightGridColumnWidthKey);
-            if (!string.IsNullOrEmpty(tempFeedViewerRightGridColumnWidthString))
-            {
-                var feedViewerRightGridColumnWidth = 0f;
-                if (float.TryParse(tempFeedViewerRightGridColumnWidthString, out feedViewerRightGridColumnWidth))
-                    FeedViewerRightGridColumnWidth = feedViewerRightGridColumnWidth;
+                if (bool.TryParse(tempAlwaysStartWithSFWKeyString, out bool alwaysStartWithSFW))
+                    AlwaysStartWithSfw = alwaysStartWithSFW;
             }
         }
 
-        public async void SaveFeedViewerColumnWidthFromSettingsAsync(float feedViewerLeftGridColumnWidth, float feedViewerRightGridColumnWidth)
+        public async void SaveAlwaysStartWithSFW(bool istrue)
         {
-            FeedViewerLeftGridColumnWidth = feedViewerLeftGridColumnWidth;
-            FeedViewerRightGridColumnWidth = feedViewerRightGridColumnWidth;
-            await ApplicationData.Current.LocalSettings.SaveAsync(FeedViewerLeftGridColumnWidthKey, feedViewerLeftGridColumnWidth.ToString());
-            await ApplicationData.Current.LocalSettings.SaveAsync(FeedViewerRightGridColumnWidthKey, feedViewerRightGridColumnWidth.ToString());
+            AlwaysStartWithSfw = istrue;
+            await ApplicationData.Current.LocalSettings.SaveAsync(AlwaysStartWithSfwKey, istrue.ToString());
         }
     }
 }

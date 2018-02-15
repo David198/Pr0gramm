@@ -245,7 +245,7 @@ namespace Pr0gramm.ViewModels
         protected override async void OnInitialize()
         {
     
-            InitializeFeedFlags();
+         
             var view = GetView() as IShellView;
             _navigationService = view?.CreateNavigationService(_container);
             if (_navigationService != null)
@@ -253,6 +253,7 @@ namespace Pr0gramm.ViewModels
             PopulateNavItems();
             NotifyOfPropertyChange(nameof(ShowFlagButton));
             await _settingsService.InitializeSettings();
+            InitializeFeedFlags();
             IsMuted = true;
             Mute();
         }
@@ -268,9 +269,10 @@ namespace Pr0gramm.ViewModels
             _eventAggregator.PublishOnUIThread(new SearchFeedItemsEvent(SearchText));
         }
 
-        private void InitializeFeedFlags()
+        private async void InitializeFeedFlags()
         {
-            //await FlagSelectorService.InitializeAsync();
+             if(!_settingsService.AlwaysStartWithSfw)
+                await FlagSelectorService.InitializeAsync();
             switch (FlagSelectorService.ActualFlag)
             {
                 case FeedFlags.NSFW:
@@ -425,7 +427,8 @@ namespace Pr0gramm.ViewModels
             ActualUser = message.UserName;
             IsUserLoggedIn = true;
             _userLoginService.IsLoggedIn = true;
-            FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, NsfwChecked, NsflChecked, IsUserLoggedIn);
+            if(_settingsService.AlwaysStartWithSfw)
+                FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, NsfwChecked, NsflChecked, IsUserLoggedIn);
             PublishRefreshCommand();
         }
 
