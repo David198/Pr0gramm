@@ -38,27 +38,13 @@ namespace Pr0gramm.Models
         {
             get
             {
-                if ((DateTime.Now - Created).Hours > 1)
+                if ((DateTime.Now - Created).TotalHours > 1)
                     return true;
                 return false;
             }
         }
 
-        public string CreatedString
-        {
-            get
-            {
-                if ((DateTime.Now - Created).TotalMinutes < 1)
-                    return "JustNow".GetLocalized();
-                if ((DateTime.Now - Created).TotalHours < 1)
-                    return "Before".GetLocalized() + " " + (DateTime.Now - Created).Minutes + " " + "Minutes".GetLocalized();
-                if ((DateTime.Now - Created).TotalDays < 1)
-                    return "Before".GetLocalized() + " " + (DateTime.Now - Created).Hours + " " + "Hours".GetLocalized();
-                if ((DateTime.Now - Created).TotalDays > 1)
-                    return "Before".GetLocalized() + " " + (DateTime.Now - Created).Days + " " + "Days".GetLocalized();
-                return "";
-            }
-        }
+        public string CreatedString => DateTimeUtlis.MakeCreatedString(Created);
 
         public event PropertyChangedEventHandler PropertyChanged;
 

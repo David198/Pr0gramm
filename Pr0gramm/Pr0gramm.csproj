@@ -143,6 +143,7 @@
     <Compile Include="EventHandlers\TagSearchEvent.cs" />
     <Compile Include="EventHandlers\UserLoggedInEvent.cs" />
     <Compile Include="Helpers\CameraOrientationExtensions.cs" />
+    <Compile Include="Helpers\DateTimeUtlis.cs" />
     <Compile Include="Views\Convertes\EnumToBooleanConverter.cs" />
     <Compile Include="Helpers\Json.cs" />
     <Compile Include="Helpers\NodeExtensions.cs" />

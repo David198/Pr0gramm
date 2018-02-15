@@ -234,22 +234,22 @@ namespace Pr0gramm.Controls
 
         private async void UIElement_OnDoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
-            //var flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
-          
-            //if (flipViewItem == null) return;
-            //var fontIcon = flipViewItem.FindDescendantByName("HeartIcon");
-            //fontIcon.Fade(value: 1, duration: 1500).StartAsync();
-            //await  fontIcon.Scale(centerX: 10,
-            //    centerY: 10,
-            //    scaleX: 5f,
-            //    scaleY: 5f,
-            //    duration: 1500).StartAsync();
-            //fontIcon.Fade(value: 0, duration: 1500).StartAsync();
-            //await fontIcon.Scale(centerX: 10f,
-            //    centerY: 10f,
-            //    scaleX: 1.0f,
-            //    scaleY: 1f,
-            //    duration: 1500).StartAsync();
+            var flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
+
+            if (flipViewItem == null) return;
+            var fontIcon = flipViewItem.FindDescendantByName("HeartIcon");
+            fontIcon.Fade(value: 1, duration: 1500).StartAsync();
+            await fontIcon.Scale(centerX: 10,
+                centerY: 10,
+                scaleX: 5f,
+                scaleY: 5f,
+                duration: 1500).StartAsync();
+            fontIcon.Fade(value: 0, duration: 1500).StartAsync();
+            await fontIcon.Scale(centerX: 10f,
+                centerY: 10f,
+                scaleX: 1.0f,
+                scaleY: 1f,
+                duration: 1500).StartAsync();
 
         }
 
