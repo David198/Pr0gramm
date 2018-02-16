@@ -7,6 +7,7 @@ using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Caliburn.Micro;
+using Microsoft.HockeyApp;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Pr0gramm.EventHandlers;
 using Pr0gramm.Models;
@@ -130,7 +131,15 @@ namespace Pr0gramm.ViewModels
         {
             feed.Items.ForEach(item =>
             {
-                FeedItems.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService));
+                try
+                {
+                    FeedItems.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService));
+                }
+                catch (Exception e)
+                {
+                    HockeyClient.Current.TrackException(e);
+                }
+ 
             });
         }
 

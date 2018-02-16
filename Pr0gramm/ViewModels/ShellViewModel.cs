@@ -242,17 +242,14 @@ namespace Pr0gramm.ViewModels
         }
 
 
-        protected override async void OnInitialize()
+        protected override  void OnInitialize()
         {
-    
-         
             var view = GetView() as IShellView;
             _navigationService = view?.CreateNavigationService(_container);
             if (_navigationService != null)
                 _navigationService.Navigated += NavigationService_Navigated;
             PopulateNavItems();
             NotifyOfPropertyChange(nameof(ShowFlagButton));
-            await _settingsService.InitializeSettings();
             InitializeFeedFlags();
             IsMuted = true;
             Mute();

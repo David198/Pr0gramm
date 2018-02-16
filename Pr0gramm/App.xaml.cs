@@ -87,7 +87,7 @@ namespace Pr0gramm
 
         private ActivationService CreateActivationService()
         {
-            return new ActivationService(_container, typeof(TopViewModel), new Lazy<UIElement>(CreateShell));
+            return new ActivationService(_container, typeof(TopViewModel), _container.GetInstance<SettingsService>(), new Lazy<UIElement>(CreateShell));
         }
 
         private UIElement CreateShell()
