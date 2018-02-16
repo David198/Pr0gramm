@@ -12,15 +12,19 @@ namespace Pr0gramm.Models
 {
     public class CommentViewModel : Comment, INotifyPropertyChanged
     {
+        private readonly FeedItem _parentFeedItem;
         private int _parentDepth;
 
-        public CommentViewModel(Comment comment) : base (comment)
+        public CommentViewModel(Comment comment, FeedItem parentFeedItem) : base (comment)
         {
+            _parentFeedItem = parentFeedItem;
             if (comment.Parent == 0) comment.Parent = null;
             ParentDepthList = new BindableCollection<int>();
         }
 
         public BindableCollection<int> ParentDepthList { get; set; }
+
+        public bool IsCreatedByOP => Name.Equals(_parentFeedItem.User);
 
         public int ParentDepth
         {

@@ -54,17 +54,22 @@
                                                     VerticalContentAlignment="Center"
                                                     x:Phase="4"
                                                     HorizontalContentAlignment="Center"
+                                                    LinkForeground="{StaticResource SystemControlHyperlinkTextBrush}"
                                                     VerticalAlignment="Center"
                                                     micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
-                                                    Margin="{StaticResource SmallLeftMargin}"
-                                                    LinkForeground="{ThemeResource SystemControlForegroundBaseHighBrush}" />
+                                                    Margin="{StaticResource SmallLeftMargin}" />
                         <StackPanel Orientation="Horizontal"
                                     Margin="{StaticResource MediumAllMargin}">
-
-                            <HyperlinkButton
-                                micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
-                                NavigateUri="{x:Bind Name, Converter={StaticResource UserTextConverter}}"
-                                Content="{x:Bind Name}" x:Phase="5" />
+                            <Border Margin="{StaticResource MediumLeftRightMargin}"  Background="{ThemeResource SystemControlHighlightAccentBrush}" CornerRadius="3">
+                                <TextBlock HorizontalTextAlignment="Center"
+                                           Visibility="{x:Bind IsCreatedByOP, Converter={StaticResource BoolToVisConverter}}"
+                                            VerticalAlignment="Center" x:Phase="5" HorizontalAlignment="Left"
+                                         Margin="{StaticResource SmallLeftRightMargin}">OP</TextBlock>
+                            </Border>
+                            <HyperlinkButton Foreground="{ThemeResource SystemControlHyperlinkTextBrush}"
+                                             micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
+                                             NavigateUri="{x:Bind Name, Converter={StaticResource UserTextConverter}}"
+                                             Content="{x:Bind Name}" x:Phase="5" />
                             <TextBlock Margin="10 0 0 0" VerticalAlignment="Center">-</TextBlock>
                             <TextBlock VerticalAlignment="Center"
                                        Text="{x:Bind CreatedString}"
@@ -133,15 +138,18 @@
                                ManipulationCompleted="GridSplitter_ManipulationCompleted"
                                Style="{StaticResource  FeedViewerGridSplitterStyle}" />
 
-        <FlipView  Grid.Column="2" ItemsSource="{x:Bind FeedItems}" x:Name="FlipView" 
+        <FlipView Grid.Column="2" ItemsSource="{x:Bind FeedItems}" x:Name="FlipView"
                   SelectedItem="{x:Bind SelectedFeedItem, Mode=TwoWay}">
             <FlipView.ItemTemplate>
                 <DataTemplate x:DataType="models:FeedItemViewModel">
-                    <Grid >
+                    <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{Binding ElementName=MainGrid, Path=DataContext.FlipViewColumnWidth}" />
-                            <ColumnDefinition Width="{Binding ElementName=MainGrid, Path=DataContext.ExtraColumnGridSplitterWidth}" />
-                            <ColumnDefinition Width="{Binding ElementName=MainGrid, Path=DataContext.ExtraColumnGridWidth}"/>
+                            <ColumnDefinition
+                                Width="{Binding ElementName=MainGrid, Path=DataContext.FlipViewColumnWidth}" />
+                            <ColumnDefinition
+                                Width="{Binding ElementName=MainGrid, Path=DataContext.ExtraColumnGridSplitterWidth}" />
+                            <ColumnDefinition
+                                Width="{Binding ElementName=MainGrid, Path=DataContext.ExtraColumnGridWidth}" />
                         </Grid.ColumnDefinitions>
                         <ScrollViewer x:Name="MainScrollViewer" HorizontalScrollMode="Disabled">
                             <StackPanel>
@@ -157,7 +165,6 @@
                                             PlaceholderStretch="UniformToFill"
                                             Source="{x:Bind ImageSource, Converter= {StaticResource ImageSourceFromUriConverter}}"
                                             HorizontalAlignment="Center" VerticalAlignment="Center" />
-
                                         <MediaPlayerElement
                                             Visibility="{x:Bind IsVideo, Converter={StaticResource BoolToVisConverter}}"
                                             AreTransportControlsEnabled="True"
@@ -247,14 +254,16 @@
                                                 <TextBlock
                                                     Padding="{StaticResource SmallAllMargin}" Width="Auto"
                                                     VerticalAlignment="Center"
-                                                    Text="{x:Bind Tag}" Foreground="{StaticResource LinkColorBrush}"
+                                                    Text="{x:Bind Tag}"
+                                                    Foreground="{StaticResource SystemControlHyperlinkTextBrush}"
                                                     HorizontalAlignment="Center"
                                                     micro:Message.Attach="[Event PointerPressed] = [Action SearchTag($dataContext)]" />
                                             </Border>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <Grid Visibility="{Binding ElementName=MainGrid, Path=DataContext.ExtraColumnIsActive,Converter={StaticResource BooleanToVisibilityConverterInverse}}">
+                                <Grid
+                                    Visibility="{Binding ElementName=MainGrid, Path=DataContext.ExtraColumnIsActive,Converter={StaticResource BooleanToVisibilityConverterInverse}}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition />
@@ -274,7 +283,8 @@
                         </ScrollViewer>
                         <controls:GridSplitter Grid.Column="1" Width="15" FontSize="13"
                                                Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
-                                               ResizeDirection="Columns" ManipulationCompleted="ExtraCommentColumnGridSplitterManipulationCompleted">
+                                               ResizeDirection="Columns"
+                                               ManipulationCompleted="ExtraCommentColumnGridSplitterManipulationCompleted">
                             <controls:GridSplitter.Element>
                                 <TextBlock HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
@@ -283,7 +293,7 @@
                                            FontFamily="Segoe MDL2 Assets" />
                             </controls:GridSplitter.Element>
                         </controls:GridSplitter>
-                        <Grid Grid.Column="2" >
+                        <Grid Grid.Column="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
@@ -306,18 +316,6 @@
         </FlipView>
     </Grid>
 </UserControl>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

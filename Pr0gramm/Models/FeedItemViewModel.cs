@@ -89,7 +89,7 @@ namespace Pr0gramm.Models
                     var temptCommentViewModel = new List<CommentViewModel>();
                     tempList.ForEach(comment =>
                     {
-                        var commentViewModel = new CommentViewModel(comment);
+                        var commentViewModel = new CommentViewModel(comment, this);
                         commentViewModel.CalculateCommentDepth(tempList);
                         temptCommentViewModel.Add(commentViewModel);
                     });

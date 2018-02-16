@@ -3,24 +3,24 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Pr0gramm.Styles">
     <ResourceDictionary.ThemeDictionaries>
-        <ResourceDictionary x:Key="Default">
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="{StaticResource ProgrammBaseColor}" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{StaticResource ProgrammBaseColor}" />
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource ProgrammBaseColor}" />
+        <!--<ResourceDictionary x:Key="Default">
+            --><!--<SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="{StaticResource ProgrammBaseColor}" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{StaticResource ProgrammBaseColor}" />-->
+            <!--<SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource ProgrammBaseColor}" />--><!--
             <SolidColorBrush x:Key="SystemControlHyperlinkTextBrush" Color="{StaticResource LinkColor}"></SolidColorBrush>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="{StaticResource ProgrammBaseColor}" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{StaticResource ProgrammBaseColor}" />
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource ProgrammBaseColor}" />
+            --><!--<SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="{StaticResource ProgrammBaseColor}" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{StaticResource ProgrammBaseColor}" />-->
+            <!--<SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource ProgrammBaseColor}" />--><!--
             <SolidColorBrush x:Key="SystemControlHyperlinkTextBrush" Color="{StaticResource LinkColor}"></SolidColorBrush>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="{StaticResource ProgrammBaseColor}" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{StaticResource ProgrammBaseColor}" />
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource ProgrammBaseColor}" />
+            --><!--<SolidColorBrush x:Key="NavigationViewItemBackgroundPointerOver" Color="{StaticResource ProgrammBaseColor}" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="{StaticResource ProgrammBaseColor}" />-->
+            <!--<SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{StaticResource ProgrammBaseColor}" />--><!--
             <SolidColorBrush x:Key="SystemControlHyperlinkTextBrush" Color="{StaticResource LinkColor}"></SolidColorBrush>
-        </ResourceDictionary>
+        </ResourceDictionary>-->
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>
 

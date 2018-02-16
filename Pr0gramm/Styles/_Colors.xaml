@@ -5,5 +5,6 @@
     <Color x:Key="ProgrammBaseColor" >#FFD5372A</Color>
     <Color x:Key="LinkColor" >#75c0c7</Color>
     <SolidColorBrush x:Key="ProgrammBaseColorBrush" Color="{StaticResource ProgrammBaseColor}" />
+    <SolidColorBrush x:Key="SystemControlHyperlinkTextBrush" Color="{StaticResource LinkColor}"></SolidColorBrush>
     <SolidColorBrush x:Key="LinkColorBrush" Color="{StaticResource LinkColor}" />
 </ResourceDictionary>
