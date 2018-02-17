@@ -12,9 +12,9 @@
             Stretch="Uniform"
             Source="{Binding ThumbSource}"
             HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="150" />
-            <SymbolIcon Symbol="Video" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}"
+            <SymbolIcon Symbol="Video" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}" Foreground="{ThemeResource SystemControlHighlightAccentBrush }"
                         Visibility="{Binding IsVideo, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
-            <SymbolIcon Symbol="Volume" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}"
+            <SymbolIcon Symbol="Volume" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}"   Foreground="{ThemeResource SystemControlHighlightAccentBrush}"
                         Visibility="{Binding Audio, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
         </Grid>
     </DataTemplate>

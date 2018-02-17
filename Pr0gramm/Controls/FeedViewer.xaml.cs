@@ -5,11 +5,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Graphics.Imaging;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -33,6 +35,7 @@ using Pr0gramm.Services;
 using Pr0gramm.Views;
 using Pr0gramm.Views.Convertes;
 using Pr0grammAPI.Annotations;
+using RestSharp;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -53,6 +56,7 @@ namespace Pr0gramm.Controls
             InitializeComponent();
             IoC.Get<IEventAggregator>().Subscribe(this);
             _settingsService = IoC.Get<SettingsService>();
+            _toastNotificationService = IoC.Get<ToastNotificationsService>();
             DataContext = this;
         }
 
@@ -63,6 +67,7 @@ namespace Pr0gramm.Controls
         private ScrollViewer _flipViewScrollViewer;
         private GridLength _flipViewMainColumnWidth;
         private GridLength _flipViewExtraColumnWidth;
+        private ToastNotificationsService _toastNotificationService;
 
         public GridLength FlipViewExtraColumnGridSplitterWidth { get; set; }
 
@@ -246,35 +251,42 @@ namespace Pr0gramm.Controls
             }
         }
 
+
+
         private async void DownloadImageClick(object sender, RoutedEventArgs e)
         {
-            var flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
-            if (flipViewItem == null) return;
-            var myImageSource = ViewHelper.FindVisualChild<ImageEx>(flipViewItem);
-            var bitmap = new RenderTargetBitmap();
-            await bitmap.RenderAsync(myImageSource);
-
-            var savePicker = new FileSavePicker {SuggestedStartLocation = PickerLocationId.PicturesLibrary};
-            savePicker.FileTypeChoices.Add("Image", new List<string>() {".jpg"});
-            savePicker.SuggestedFileName = "NewImage";
+             var savePicker = new FileSavePicker {SuggestedStartLocation = PickerLocationId.PicturesLibrary};
+            if (!SelectedFeedItem.IsVideo)
+            {
+                savePicker.FileTypeChoices.Add("Image", new List<string>() {".jpg"});
+                savePicker.SuggestedFileName = "NewImage";
+            }
+            else
+            {
+                savePicker.FileTypeChoices.Add("Video", new List<string>() { ".mp4" });
+                savePicker.SuggestedFileName = "NewVideo";
+            }     
             var savefile = await savePicker.PickSaveFileAsync();
             if (savefile == null)
                 return;
+            await  SaveFileAsync(SelectedFeedItem.FullSizeSource, savefile);
+        }
 
-            var pixels = await bitmap.GetPixelsAsync();
-            using (IRandomAccessStream stream = await savefile.OpenAsync(FileAccessMode.ReadWrite))
+
+        private async Task SaveFileAsync(Uri fileUri, StorageFile file)
+        {
+            try
             {
-                var encoder = await
-                    BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
-                byte[] bytes = pixels.ToArray();
-                encoder.SetPixelData(BitmapPixelFormat.Bgra8,
-                    BitmapAlphaMode.Ignore,
-                    (uint) bitmap.PixelWidth,
-                    (uint) bitmap.PixelHeight,
-                    200,
-                    200,
-                    bytes);
-                await encoder.FlushAsync();
+                var backgroundDownloader = new BackgroundDownloader();
+                var downloadOperation = backgroundDownloader.CreateDownload(fileUri, file);
+                await downloadOperation.StartAsync();
+                _toastNotificationService.ShowToastNotificationDownloadSucceded();
+
+            }
+            catch (Exception exc)
+            {
+                _toastNotificationService.ShowToastNotificationDownloadFailed();
+                HockeyClient.Current.TrackException(exc);
             }
         }
 
@@ -286,7 +298,7 @@ namespace Pr0gramm.Controls
                 image.MaxWidth = e.NewSize.Width;
                 var mediaPlayerElement = ViewHelper.FindVisualChild<MediaPlayerElement>(sender as DependencyObject);
                 mediaPlayerElement.MaxWidth = e.NewSize.Width;
-                mediaPlayerElement.MaxHeight = FlipView.ActualHeight * 0.5;
+                mediaPlayerElement.MaxHeight = FlipView.ActualHeight * 0.75;
             }
         }
 

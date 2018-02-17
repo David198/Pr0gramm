@@ -146,6 +146,7 @@
     <Compile Include="Helpers\DateTimeUtlis.cs" />
     <Compile Include="Services\NewVersionDisplayService.cs" />
     <Compile Include="Services\SettingsService.FeedViewer.cs" />
+    <Compile Include="Services\ToastNotificationsService.Download.cs" />
     <Compile Include="Views\Convertes\EnumToBooleanConverter.cs" />
     <Compile Include="Helpers\Json.cs" />
     <Compile Include="Helpers\NodeExtensions.cs" />

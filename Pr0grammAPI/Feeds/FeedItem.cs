@@ -35,6 +35,19 @@ namespace Pr0grammAPI.Feeds
 
         public Uri ImageSource => IsVideo ? new Uri(PROVIDEOURL+Image) : new Uri(PROIMAGEURL + Image);
 
+        public Uri FullSizeSource
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(FullSize))
+                    return ImageSource;
+                else
+                {
+                    return IsVideo ? new Uri(PROVIDEOURL + FullSize) : new Uri(PROIMAGEURL + FullSize);
+                }
+            }
+        }
+
         public bool IsVideo => Image.Split('.')[1].Equals("mp4");
 
         public Uri ThumbSource => new Uri(PROTHUMBURL+ Thumb);

@@ -19,7 +19,7 @@
     </ContentDialog.TitleTemplate>
     <ScrollViewer>
         <StackPanel>
-            <controls:MarkdownTextBlock x:Uid="NewVersion_Body" LinkClicked="MarkdownTextBlock_OnLinkClicked" TextWrapping="WrapWholeWords">
+            <controls:MarkdownTextBlock x:Uid="NewVersion_Body" LinkForeground="{StaticResource LinkColorBrush}" LinkClicked="MarkdownTextBlock_OnLinkClicked" TextWrapping="WrapWholeWords">
             </controls:MarkdownTextBlock>
         </StackPanel>
     </ScrollViewer>

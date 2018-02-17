@@ -11,7 +11,7 @@
     <ContentDialog.TitleTemplate>
         <DataTemplate>
             <StackPanel Orientation="Horizontal">
-                <Image Source="ms-appx:///Assets/Square150x150Logo.png" Width="40" Height="40" Margin="0" />
+                <Image Source="ms-appx:///Assets/StoreLogo.png" Width="40" Height="40" Margin="0" />
                 <TextBlock x:Uid="AfterUpdate_Title" Margin="10,5,0,0" />
             </StackPanel>
         </DataTemplate>

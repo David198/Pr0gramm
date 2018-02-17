@@ -213,13 +213,16 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   <data name="AfterUpdate_Body.Text" xml:space="preserve">
     <value>
 Version 1.2.0.0
+
 - ShareButton für Posts
 - Score wird nun für 1 Stunde ausgeblendet
 - Theme passt sich nun Windows Akzent Farbe an.
 - Extra Spalte für Kommentare verfügbar. Zu finden über Einstellungen.
 - Benachrichtungen bei neuer Version.
+- Video Download nun verfügbar.
 
 Version: 1.0.1.0
+
 -Tags suchen
 
 Version 1.0.0.0
@@ -354,5 +357,17 @@ Version 1.0.0.0
   </data>
   <data name="NewVersion_Body.Text" xml:space="preserve">
     <value>Es ist eine neue Version verfügbar. "https://rink.hockeyapp.net/apps/d2ef27ea7e7342b3befa7922cacd4c47"</value>
+  </data>
+  <data name="DownloadFailed_Text" xml:space="preserve">
+    <value>Es ist ein Fehler beim Download aufgetreten.</value>
+  </data>
+  <data name="DownloadFailed_Title" xml:space="preserve">
+    <value>Fehler beim Download</value>
+  </data>
+  <data name="DownloadSucceded_Text" xml:space="preserve">
+    <value>Ihr Download ist abgeschlossen.</value>
+  </data>
+  <data name="DownloadSucceded_Title" xml:space="preserve">
+    <value>Download fertig.</value>
   </data>
 </root>

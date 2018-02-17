@@ -233,7 +233,7 @@
                                         <AppBarButton Click="ShareButtonClick" x:Uid="SharePostButton"
                                                       Icon="Share" />
                                         <AppBarButton Click="DownloadImageClick"
-                                                      Visibility="{x:Bind IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
+                                                     
                                                       Label="Download" Icon="Download" />
                                     </StackPanel>
 
