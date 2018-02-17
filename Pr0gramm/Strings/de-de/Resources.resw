@@ -202,14 +202,6 @@
   </data>
   <data name="FirstRun_Body.Text" xml:space="preserve">
     <value>Hallo und herzlich Willkommen bei der neuen inoffiziellen Pr0gramm UWP App.
-Bisher implementierte Features:
-
-- Top Feed anzeigen
-- New Feed anzeigen
-- Tags anzeigen
-- Kommentare anzeigen
-- Bilder herunterladen
--Theme switch
 
 Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedback Funktion die sich auf der Download-Page befindet.</value>
     <comment>First use prompt message body</comment>
@@ -220,7 +212,24 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   </data>
   <data name="AfterUpdate_Body.Text" xml:space="preserve">
     <value>
-</value>
+Version 1.2.0.0
+- ShareButton für Posts
+- Score wird nun für 1 Stunde ausgeblendet
+- Theme passt sich nun Windows Akzent Farbe an.
+- Extra Spalte für Kommentare verfügbar. Zu finden über Einstellungen.
+- Benachrichtungen bei neuer Version.
+
+Version: 1.0.1.0
+-Tags suchen
+
+Version 1.0.0.0
+
+- Top Feed anzeigen
+- New Feed anzeigen
+- Tags anzeigen
+- Kommentare anzeigen
+- Bilder herunterladen
+- Theme switch</value>
     <comment>What's new prompt message body</comment>
   </data>
   <data name="AfterUpdate_Title.Text" xml:space="preserve">
@@ -339,5 +348,11 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   </data>
   <data name="ExtraColumnToggleSwitch.OnContent" xml:space="preserve">
     <value>Ja</value>
+  </data>
+  <data name="NewVersion.Text" xml:space="preserve">
+    <value>Neue Version verfügbar!</value>
+  </data>
+  <data name="NewVersion_Body.Text" xml:space="preserve">
+    <value>Es ist eine neue Version verfügbar. "https://rink.hockeyapp.net/apps/d2ef27ea7e7342b3befa7922cacd4c47"</value>
   </data>
 </root>

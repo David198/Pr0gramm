@@ -1,25 +1,26 @@
 ﻿<ContentDialog
-    x:Class="Pr0gramm.Views.WhatsNewDialog"
+    x:Class="Pr0gramm.Views.NewVersionDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Pr0gramm.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
-    d:DesignHeight="345"
-    d:DesignWidth="550"
+    Title="TITLE"
     PrimaryButtonText="Ok">
     <ContentDialog.TitleTemplate>
         <DataTemplate>
             <StackPanel Orientation="Horizontal">
-                <Image Source="ms-appx:///Assets/Square150x150Logo.png" Width="40" Height="40" Margin="0" />
-                <TextBlock x:Uid="AfterUpdate_Title" Margin="10,5,0,0" />
+                <Image Source="ms-appx:///Assets/StoreLogo.png" Width="40" Height="40" Margin="0" />
+                <TextBlock x:Uid="NewVersion" Text="Welcome" Margin="10,5,0,0" />
             </StackPanel>
         </DataTemplate>
     </ContentDialog.TitleTemplate>
     <ScrollViewer>
         <StackPanel>
-            <TextBlock x:Uid="AfterUpdate_Body" TextWrapping="WrapWholeWords" />
+            <controls:MarkdownTextBlock x:Uid="NewVersion_Body" LinkClicked="MarkdownTextBlock_OnLinkClicked" TextWrapping="WrapWholeWords">
+            </controls:MarkdownTextBlock>
         </StackPanel>
     </ScrollViewer>
 </ContentDialog>
-

@@ -1,4 +1,6 @@
-﻿using Windows.UI.Xaml.Controls;
+﻿using System;
+using Windows.System;
+using Windows.UI.Xaml.Controls;
 
 namespace Pr0gramm.Views
 {
@@ -9,5 +11,6 @@ namespace Pr0gramm.Views
             // TODO WTS: Update the contents of this dialog every time you release a new version of the app
             InitializeComponent();
         }
+
     }
 }

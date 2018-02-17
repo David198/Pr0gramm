@@ -100,9 +100,9 @@ namespace Pr0gramm.Services
 
         private async Task StartupAsync()
         {
+            await NewVersionDisplayService.ShowIfAppropriateAsync();
             await WhatsNewDisplayService.ShowIfAppropriateAsync();
             await FirstRunDisplayService.ShowIfAppropriateAsync();
-            // ThemeSelectorService.SetRequestedTheme();
             await Task.CompletedTask;
         }
 

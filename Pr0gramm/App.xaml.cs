@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Caliburn.Micro;
 using Microsoft.HockeyApp;
 using Pr0gramm.Helpers;
@@ -10,7 +11,9 @@ using Pr0grammAPI;
 using Pr0grammAPI.Interfaces;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.Data.Html;
 using Windows.UI.Xaml;
+using RestSharp;
 
 namespace Pr0gramm
 {
@@ -26,12 +29,17 @@ namespace Pr0gramm
             HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
               new TelemetryConfiguration {EnableDiagnostics = true});
 #endif
+
+         
+
             InitializeComponent();
             EnteredBackground += App_EnteredBackground;
             Initialize();
             // Deferred execution until used. Check https://msdn.microsoft.com/library/dd642331(v=vs.110).aspx for further info on Lazy<T> class.
             _activationService = new Lazy<ActivationService>(CreateActivationService);
         }
+
+
 
         private ActivationService ActivationService => _activationService.Value;
 

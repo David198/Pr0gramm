@@ -144,6 +144,7 @@
     <Compile Include="EventHandlers\UserLoggedInEvent.cs" />
     <Compile Include="Helpers\CameraOrientationExtensions.cs" />
     <Compile Include="Helpers\DateTimeUtlis.cs" />
+    <Compile Include="Services\NewVersionDisplayService.cs" />
     <Compile Include="Services\SettingsService.FeedViewer.cs" />
     <Compile Include="Views\Convertes\EnumToBooleanConverter.cs" />
     <Compile Include="Helpers\Json.cs" />
@@ -208,6 +209,9 @@
     </Compile>
     <Compile Include="Views\NewPage.xaml.cs">
       <DependentUpon>NewPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\NewVersionDialog.xaml.cs">
+      <DependentUpon>NewVersionDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TopPage.xaml.cs">
       <DependentUpon>TopPage.xaml</DependentUpon>
@@ -308,6 +312,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\NewPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\NewVersionDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
