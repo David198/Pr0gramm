@@ -57,13 +57,13 @@
                                                     LinkForeground="{StaticResource SystemControlHyperlinkTextBrush}"
                                                     VerticalAlignment="Center"
                                                     micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
-                                                    Margin="{StaticResource SmallLeftMargin}" />
+                                                    Margin="{StaticResource SmallAllMargin}" />
                         <StackPanel Orientation="Horizontal"
                                     Margin="{StaticResource MediumAllMargin}">
                             <Border Margin="{StaticResource MediumLeftRightMargin}"  Background="{ThemeResource SystemControlHighlightAccentBrush}" CornerRadius="3">
                                 <TextBlock HorizontalTextAlignment="Center"
                                            Visibility="{x:Bind IsCreatedByOP, Converter={StaticResource BoolToVisConverter}}"
-                                            VerticalAlignment="Center" x:Phase="5" HorizontalAlignment="Left"
+                                            VerticalAlignment="Center" HorizontalAlignment="Left"
                                          Margin="{StaticResource SmallLeftRightMargin}">OP</TextBlock>
                             </Border>
                             <HyperlinkButton Foreground="{ThemeResource SystemControlHyperlinkTextBrush}"
@@ -145,18 +145,18 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition
-                                Width="{Binding ElementName=MainGrid, Path=DataContext.FlipViewColumnWidth}" />
-                            <ColumnDefinition
-                                Width="{Binding ElementName=MainGrid, Path=DataContext.ExtraColumnGridSplitterWidth}" />
-                            <ColumnDefinition
-                                Width="{Binding ElementName=MainGrid, Path=DataContext.ExtraColumnGridWidth}" />
+                                Width="{Binding ElementName=MainGrid, Path=DataContext.FlipViewMainColumnWidth, Mode=TwoWay}" />
+                            <ColumnDefinition x:Name="ExtraColumnGridSplitter"
+                                Width="{Binding ElementName=MainGrid, Path=DataContext.FlipViewExtraColumnGridSplitterWidth,Mode=TwoWay}" />
+                            <ColumnDefinition x:Name="ExtraColumn"
+                                Width="{Binding ElementName=MainGrid, Path=DataContext.FlipViewExtraColumnWidth, Mode=TwoWay}" />
                         </Grid.ColumnDefinitions>
                         <ScrollViewer x:Name="MainScrollViewer" HorizontalScrollMode="Disabled">
-                            <StackPanel>
+                            <StackPanel >
                                 <ScrollViewer ZoomMode="Enabled" MinZoomFactor="1" ZoomSnapPointsType="MandatorySingle"
                                               SizeChanged="ScrollViewerSizeChanged"
                                               VerticalScrollBarVisibility="Hidden" HorizontalScrollMode="Enabled"
-                                              VerticalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto">
+                                              VerticalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto" >
                                     <Grid>
                                         <controls:ImageEx
                                             Visibility="{x:Bind IsVideo, Converter={StaticResource BooleanToVisibilityConverterInverse}}"
@@ -281,8 +281,8 @@
                                 </Grid>
                             </StackPanel>
                         </ScrollViewer>
-                        <controls:GridSplitter Grid.Column="1" Width="15" FontSize="13"
-                                               Background="{StaticResource ApplicationPageBackgroundThemeBrush}"
+                        <controls:GridSplitter Grid.Column="1"  FontSize="13"
+                                               Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                                                ResizeDirection="Columns"
                                                ManipulationCompleted="ExtraCommentColumnGridSplitterManipulationCompleted">
                             <controls:GridSplitter.Element>
@@ -293,7 +293,7 @@
                                            FontFamily="Segoe MDL2 Assets" />
                             </controls:GridSplitter.Element>
                         </controls:GridSplitter>
-                        <Grid Grid.Column="2">
+                        <Grid Grid.Column="2" >
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />

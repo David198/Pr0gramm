@@ -17,6 +17,7 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -60,10 +61,31 @@ namespace Pr0gramm.Controls
         private MediaPlayer _mediaPlayer;
         private readonly SettingsService _settingsService;
         private ScrollViewer _flipViewScrollViewer;
+        private GridLength _flipViewMainColumnWidth;
+        private GridLength _flipViewExtraColumnWidth;
 
-        public GridLength ExtraColumnGridSplitterWidth { get; set; }
-        public GridLength ExtraColumnGridWidth { get; set; }
-        public GridLength FlipViewColumnWidth { get; set; }
+        public GridLength FlipViewExtraColumnGridSplitterWidth { get; set; }
+
+        public GridLength FlipViewExtraColumnWidth
+        {
+            get { return _flipViewExtraColumnWidth; }
+            set
+            {
+                _flipViewExtraColumnWidth = value;
+                OnPropertyChanged(nameof(FlipViewExtraColumnWidth));
+            }
+        }
+
+        public GridLength FlipViewMainColumnWidth
+        {
+            get { return _flipViewMainColumnWidth; }
+            set
+            {
+                _flipViewMainColumnWidth = value; 
+                OnPropertyChanged(nameof(FlipViewMainColumnWidth));
+            }
+        }
+
         public bool ExtraColumnIsActive { get; set; }
 
         public BindableCollection<FeedItemViewModel> FeedItems
@@ -111,21 +133,22 @@ namespace Pr0gramm.Controls
 
         private void SetExtraCommentColumn()
         {
+         
             ExtraColumnIsActive = _settingsService.FeedViewerExtraColumnVisible;
-           
             if (ExtraColumnIsActive)
             {
-                FlipViewColumnWidth = new GridLength(_settingsService.FeedViewerExtraLeftGridColumnWidth,
+                FlipViewMainColumnWidth = new GridLength(_settingsService.FeedViewerExtraLeftGridColumnWidth,
                     GridUnitType.Star);
-                ExtraColumnGridSplitterWidth = new GridLength(15, GridUnitType.Pixel);
-                ExtraColumnGridWidth = new GridLength(_settingsService.FeedViewerExtraRightGridColumnWidth,
+                FlipViewExtraColumnGridSplitterWidth = new GridLength(15, GridUnitType.Pixel);
+                FlipViewExtraColumnWidth = new GridLength(_settingsService.FeedViewerExtraRightGridColumnWidth,
                     GridUnitType.Star);
+                FlipView.UpdateLayout();
             }
             else
             {
-                FlipViewColumnWidth = new GridLength(1, GridUnitType.Star);
-                ExtraColumnGridSplitterWidth = new GridLength(0, GridUnitType.Pixel);
-                ExtraColumnGridWidth = new GridLength(0, GridUnitType.Pixel);
+                FlipViewMainColumnWidth = new GridLength(1, GridUnitType.Star);
+                FlipViewExtraColumnGridSplitterWidth = new GridLength(0, GridUnitType.Pixel);
+                FlipViewExtraColumnWidth = new GridLength(0, GridUnitType.Pixel);
             }
         }
 
@@ -293,18 +316,21 @@ namespace Pr0gramm.Controls
                 2);
             float leftColumnWidht = 1 - rightColumnWidth;
             _settingsService.SaveFeedViewerColumnWidthFromSettingsAsync(leftColumnWidht, rightColumnWidth);
+          
         }
 
-        private void ExtraCommentColumnGridSplitterManipulationCompleted(object sender,
+        private  void ExtraCommentColumnGridSplitterManipulationCompleted(object sender,
             ManipulationCompletedRoutedEventArgs e)
         {
-            var scrollViewer = FlipView.FindDescendantByName("MainScrollViewer");
+            var scrollViewer = FlipView.ContainerFromItem(SelectedFeedItem).FindDescendantByName("MainScrollViewer");
             if (scrollViewer != null)
             {
                 float leftColumnWidth =
                     (float) Math.Round((float) (scrollViewer.ActualWidth * 1 / FlipView.ActualWidth), 2);
                 float rightColumnWidth = 1 - leftColumnWidth;
-                _settingsService.SaveFeedViewerExtraColumnWidthFromSettingsAsync(leftColumnWidth, rightColumnWidth);
+               _settingsService.SaveFeedViewerExtraColumnWidthFromSettingsAsync(leftColumnWidth, rightColumnWidth);
+                FlipViewMainColumnWidth = new GridLength(leftColumnWidth,GridUnitType.Star);
+                FlipViewExtraColumnWidth = new GridLength(rightColumnWidth, GridUnitType.Star);
             }
         }
 

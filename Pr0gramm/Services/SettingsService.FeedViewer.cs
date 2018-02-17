@@ -54,7 +54,7 @@ namespace Pr0gramm.Services
             }
 
             string tempFeedViewerExtraColumnString = await ApplicationData.Current.LocalSettings.ReadAsync<string>(FeedViewerExtraColumVisibleKey);
-            if (!string.IsNullOrEmpty(tempFeedViewerExtraLeftGridColumnWidthString))
+            if (!string.IsNullOrEmpty(tempFeedViewerExtraColumnString))
             {
                 if (bool.TryParse(tempFeedViewerExtraColumnString, out bool feedViewerExtraColumn))
                     FeedViewerExtraColumnVisible = feedViewerExtraColumn;
