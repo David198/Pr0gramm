@@ -8,8 +8,18 @@
 
     xmlns:controls="using:Pr0gramm.Controls"
     xmlns:micro="using:Caliburn.Micro"
+    xmlns:controls1="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d">
+    <Grid>
     <controls:FeedViewer FeedItems="{x:Bind ViewModel.FeedItems, Mode=TwoWay}"
                          SelectedFeedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}" IsMuted="{x:Bind ViewModel.IsMuted,Mode=TwoWay}"
                          micro:Message.Attach="[Event LoadNewItems] = [Action LoadOlderItems()]" />
+        <controls1:Loading HorizontalContentAlignment="Center" IsLoading="{x:Bind ViewModel.IsBusy,Mode=TwoWay}"
+                          VerticalContentAlignment="Center" 
+                          Background="Black" Opacity="0.7">
+            <StackPanel Orientation="Horizontal" Padding="12">
+                <ProgressRing IsActive="True"  MinWidth="50" MinHeight="50" Foreground="{ThemeResource SystemControlHighlightAccentBrush }" />
+            </StackPanel>
+        </controls1:Loading>
+    </Grid>
 </Page>

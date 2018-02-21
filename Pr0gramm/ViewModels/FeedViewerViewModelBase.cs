@@ -32,6 +32,7 @@ namespace Pr0gramm.ViewModels
 
         protected string ActualSearchTags;
         private bool _isMuted;
+        private bool _isBusy;
 
         internal FeedViewerViewModelBase(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
             ToastNotificationsService toastNotificationsService, SettingsService settingsService)
@@ -60,6 +61,17 @@ namespace Pr0gramm.ViewModels
             set
             {
                 Set(ref _selectedItem, value);
+            }
+        }
+
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                if (value == _isBusy) return;
+                _isBusy = value;
+                NotifyOfPropertyChange(() => IsBusy);
             }
         }
 
@@ -94,6 +106,7 @@ namespace Pr0gramm.ViewModels
         {
             try
             {
+                IsBusy = true;
                 var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
                 InitializeFeedItemViewModelsAsync(feed);
                 
@@ -101,11 +114,13 @@ namespace Pr0gramm.ViewModels
             catch (ApplicationException)
             {
                 ToastNotificationsService.ShowToastNotificationWebSocketExeception();
+                IsBusy = false;
             }
         }
 
         public async void LoadOlderItems()
         {
+            IsBusy = true;
             if (!_boolLoadingNewItems)
             {
                 _boolLoadingNewItems = true;
@@ -124,6 +139,7 @@ namespace Pr0gramm.ViewModels
                     {
                         ToastNotificationsService.ShowToastNotificationWebSocketExeception();
                         _boolLoadingNewItems = false;
+                        IsBusy = false;
                     }
                 }
             }
@@ -143,10 +159,28 @@ namespace Pr0gramm.ViewModels
                 newList.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService));
             });
             FeedItems.AddRange(newList);
+            IsBusy = false;
             for (int i = 0; i < newList.Count; i++)
             {
                 await LoadComments(newList[i]);
             }
+        }
+
+        public async void Handle(SearchFeedItemsEvent message)
+        {
+            FeedItems.Clear();
+            IsBusy = true;
+            ActualSearchTags = message.SearchTags;
+            try
+            {
+                var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
+                InitializeFeedItemViewModelsAsync(feed);
+            }
+            catch (ApplicationException)
+            {
+                IsBusy = false;
+            }
+
         }
 
         public void ShareSelectedItem()
@@ -208,12 +242,6 @@ namespace Pr0gramm.ViewModels
             await Launcher.LaunchUriAsync(uri);
         }
 
-        public async void Handle(SearchFeedItemsEvent message)
-        {
-            FeedItems.Clear();
-            ActualSearchTags = message.SearchTags;
-            var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
-            InitializeFeedItemViewModelsAsync(feed);
-        }
+     
     }
 }
