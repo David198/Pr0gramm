@@ -203,7 +203,7 @@
   <data name="FirstRun_Body.Text" xml:space="preserve">
     <value>Hallo und herzlich Willkommen bei der neuen inoffiziellen Pr0gramm UWP App.
 
-Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedback Funktion die sich auf der Download-Page befindet.</value>
+Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedback Funktion die sich auf der Download-Page befindet. https://rink.hockeyapp.net/apps/d2ef27ea7e7342b3befa7922cacd4c47/feedback/new</value>
     <comment>First use prompt message body</comment>
   </data>
   <data name="FirstRun_Title.Text" xml:space="preserve">
@@ -212,7 +212,7 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   </data>
   <data name="AfterUpdate_Body.Text" xml:space="preserve">
     <value>
-Version 1.2.0.0
+Version 1.0.2.0
 
 - ShareButton für Posts
 - Score wird nun für 1 Stunde ausgeblendet

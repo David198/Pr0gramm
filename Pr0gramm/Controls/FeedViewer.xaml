@@ -124,7 +124,7 @@
             <ColumnDefinition Width="15" />
             <ColumnDefinition x:Name="FeedItemColumn" Width="0.4*" MinWidth="375" />
         </Grid.ColumnDefinitions>
-        <controls:AdaptiveGridView x:Name="FeedItemGridView" Grid.Column="0"
+        <controls:AdaptiveGridView x:Name="FeedItemGridView" Grid.Column="0"  SelectionChanged="FeedItemGridView_OnSelectionChanged"
                                    ItemsSource="{x:Bind FeedItems}"
                                    SelectedItem="{x:Bind SelectedFeedItem, Mode=TwoWay}"
                                    OneRowModeEnabled="False"
@@ -138,7 +138,7 @@
                                ManipulationCompleted="GridSplitter_ManipulationCompleted"
                                Style="{StaticResource  FeedViewerGridSplitterStyle}" />
 
-        <FlipView Grid.Column="2" ItemsSource="{x:Bind FeedItems}" x:Name="FlipView"
+        <FlipView Grid.Column="2" ItemsSource="{x:Bind FeedItems}" x:Name="FlipView" 
                   SelectedItem="{x:Bind SelectedFeedItem, Mode=TwoWay}">
             <FlipView.ItemTemplate>
                 <DataTemplate x:DataType="models:FeedItemViewModel">
@@ -230,11 +230,9 @@
                                     </TextBlock>
                                     <StackPanel Orientation="Horizontal" controls:DockPanel.Dock="Right"
                                                 HorizontalAlignment="Right">
-                                        <AppBarButton Click="ShareButtonClick" x:Uid="SharePostButton"
+                                        <AppBarButton  x:Uid="SharePostButton"  micro:Message.Attach="[Event Click] = [Action ShareSelectedItem()]"
                                                       Icon="Share" />
-                                        <AppBarButton Click="DownloadImageClick"
-                                                     
-                                                      Label="Download" Icon="Download" />
+                                        <AppBarButton micro:Message.Attach="[Event Click] = [Action DownloadSelectedItem()]" Label="Download" Icon="Download" />
                                     </StackPanel>
 
                                 </controls:DockPanel>

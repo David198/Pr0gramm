@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     d:DesignHeight="345"
     d:DesignWidth="550"
@@ -18,8 +19,8 @@
     </ContentDialog.TitleTemplate>
     <ScrollViewer>
         <StackPanel>
-            <TextBlock x:Uid="FirstRun_Body" TextWrapping="WrapWholeWords">
-            </TextBlock>
+            <controls:MarkdownTextBlock x:Uid="FirstRun_Body" LinkForeground="{StaticResource LinkColorBrush}" LinkClicked="MarkdownTextBlock_OnLinkClicked" TextWrapping="WrapWholeWords">
+            </controls:MarkdownTextBlock>
         </StackPanel>
     </ScrollViewer>
 </ContentDialog>

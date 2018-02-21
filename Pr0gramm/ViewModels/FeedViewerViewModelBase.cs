@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Networking.BackgroundTransfer;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -10,6 +14,7 @@ using Caliburn.Micro;
 using Microsoft.HockeyApp;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Pr0gramm.EventHandlers;
+using Pr0gramm.Helpers;
 using Pr0gramm.Models;
 using Pr0gramm.Services;
 using Pr0grammAPI.Feeds;
@@ -17,7 +22,7 @@ using Pr0grammAPI.Interfaces;
 
 namespace Pr0gramm.ViewModels
 {
-    public class FeedViewerViewModelBase : Screen, IHandle<RefreshEvent>, IHandle<SearchFeedItemsEvent>
+    public class FeedViewerViewModelBase : Screen, IHandle<RefreshEvent>, IHandle<SearchFeedItemsEvent>, IHandle<MuteEvent>
     {
         protected readonly ToastNotificationsService ToastNotificationsService;
         protected readonly IEventAggregator EventAggregator;
@@ -26,18 +31,28 @@ namespace Pr0gramm.ViewModels
         protected IProgrammApi ProgrammApi;
 
         protected string ActualSearchTags;
+        private bool _isMuted;
 
         internal FeedViewerViewModelBase(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
-            ToastNotificationsService toastNotificationsService)
+            ToastNotificationsService toastNotificationsService, SettingsService settingsService)
         {
             ProgrammApi = programmProgrammApi;
             EventAggregator = eventAggregator;
             ToastNotificationsService = toastNotificationsService;
             ShowTop = true;
+            EventAggregator.Subscribe(this);
+            FeedItems = new BindableCollection<FeedItemViewModel>();
+            IsMuted = settingsService.IsMuted;
         }
 
         public bool ShowTop { get; set; }
         public BindableCollection<FeedItemViewModel> FeedItems { get; set; }
+
+        public bool IsMuted
+        {
+            get { return _isMuted; }
+            set => Set(ref _isMuted, value);
+        }
 
         public FeedItemViewModel SelectedItem
         {
@@ -45,21 +60,15 @@ namespace Pr0gramm.ViewModels
             set
             {
                 Set(ref _selectedItem, value);
-                if (value != null)
-                {
-                    LoadComments(value);
-                    var index = FeedItems.IndexOf(value);
-                    if (index < FeedItems.Count - 3)
-                    {
-                        LoadComments(FeedItems[index + 1]);
-                        LoadComments(FeedItems[index + 2]);
-                        LoadComments(FeedItems[index + 3]);
-                    }    
-                }        
             }
         }
 
-        private async void LoadComments(FeedItemViewModel itemViewModel)
+        public void Handle(MuteEvent message)
+        {
+            IsMuted = message.IsMuted;
+        }
+
+        private async Task LoadComments(FeedItemViewModel itemViewModel)
         {
             await itemViewModel?.LoadCommentsAndTags();
         }
@@ -73,14 +82,12 @@ namespace Pr0gramm.ViewModels
             }
         }
 
-        protected override void OnInitialize()
+
+        protected override void OnViewLoaded(object view)
         {
-            base.OnInitialize();
-            EventAggregator.Subscribe(this);
-            FeedItems = new BindableCollection<FeedItemViewModel>();
+            base.OnViewLoaded(view);
             LoadFeedItems();
         }
-
 
 
         private async void LoadFeedItems()
@@ -88,7 +95,8 @@ namespace Pr0gramm.ViewModels
             try
             {
                 var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
-                InitializeFeedItemViewModels(feed);
+                InitializeFeedItemViewModelsAsync(feed);
+                
             }
             catch (ApplicationException)
             {
@@ -109,7 +117,7 @@ namespace Pr0gramm.ViewModels
                     try
                     {
                         var feed = await ProgrammApi.GetOlderFeed(id, FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
-                        InitializeFeedItemViewModels(feed);
+                        InitializeFeedItemViewModelsAsync(feed);
                         _boolLoadingNewItems = false;
                     }
                     catch (ApplicationException)
@@ -127,34 +135,85 @@ namespace Pr0gramm.ViewModels
             EventAggregator.PublishOnUIThread(new TagSearchEvent(tag.Tag));
         }
 
-        private void InitializeFeedItemViewModels(Feed feed)
+        private async void InitializeFeedItemViewModelsAsync(Feed feed)
         {
+            var newList = new List<FeedItemViewModel>();
             feed.Items.ForEach(item =>
             {
-                try
-                {
-                    FeedItems.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService));
-                }
-                catch (Exception e)
-                {
-                    HockeyClient.Current.TrackException(e);
-                }
- 
+                newList.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService));
             });
+            FeedItems.AddRange(newList);
+            for (int i = 0; i < newList.Count; i++)
+            {
+                await LoadComments(newList[i]);
+            }
+        }
+
+        public void ShareSelectedItem()
+        {
+            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
+            if (DataTransferManager.IsSupported())
+            {
+                dataTransferManager.DataRequested += DataTransferManager_DataRequested;
+                DataTransferManager.ShowShareUI();
+            }
+        }
+
+        public async void DownloadSelectedItem()
+        {
+            var savePicker = new FileSavePicker { SuggestedStartLocation = PickerLocationId.PicturesLibrary };
+            if (!SelectedItem.IsVideo)
+            {
+                savePicker.FileTypeChoices.Add("Image", new List<string>() { ".jpg" });
+                savePicker.SuggestedFileName = "NewImage";
+            }
+            else
+            {
+                savePicker.FileTypeChoices.Add("Video", new List<string>() { ".mp4" });
+                savePicker.SuggestedFileName = "NewVideo";
+            }
+            var savefile = await savePicker.PickSaveFileAsync();
+            if (savefile == null)
+                return;
+            await SaveFileAsync(SelectedItem.FullSizeSource, savefile);
+        }
+
+        private async Task SaveFileAsync(Uri fileUri, StorageFile file)
+        {
+            try
+            {
+                var backgroundDownloader = new BackgroundDownloader();
+                var downloadOperation = backgroundDownloader.CreateDownload(fileUri, file);
+                await downloadOperation.StartAsync();
+                ToastNotificationsService.ShowToastNotificationDownloadSucceded();
+            }
+            catch (Exception)
+            {
+                ToastNotificationsService.ShowToastNotificationDownloadFailed();
+            }
+        }
+
+        private void DataTransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
+        {
+            DataRequest request = args.Request;
+            request.Data.RequestedOperation = DataPackageOperation.Link;
+            request.Data.Properties.Title = "SharePostTitel".GetLocalized();
+            request.Data.Properties.Description = "SharePostDescription".GetLocalized();
+            request.Data.SetWebLink(SelectedItem.ShareLink);
         }
 
         public async void OpenLink(LinkClickedEventArgs e)
         {
             var uri = new Uri(e.Link);
-             await Launcher.LaunchUriAsync(uri);
+            await Launcher.LaunchUriAsync(uri);
         }
 
-        public  async void Handle(SearchFeedItemsEvent message)
+        public async void Handle(SearchFeedItemsEvent message)
         {
             FeedItems.Clear();
             ActualSearchTags = message.SearchTags;
             var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
-            InitializeFeedItemViewModels(feed);
+            InitializeFeedItemViewModelsAsync(feed);
         }
     }
 }

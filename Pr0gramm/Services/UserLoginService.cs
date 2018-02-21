@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Windows.Security.Credentials;
 using Caliburn.Micro;
 using Microsoft.Identity.Client;
+using Pr0gramm.EventHandlers;
 using Pr0gramm.Views;
 using Pr0grammAPI.Interfaces;
 
@@ -22,6 +23,7 @@ namespace Pr0gramm.Services
             _iEventAggregator = iEventAggregator;
             _iprogrammApi = iprogrammApi;
             _toastNotifications = toastNotifications;
+            TryLoginAutomatically();
         }
         private const string resourceName = "Pr0gramm";
         public  bool IsLoggedIn;
@@ -90,6 +92,29 @@ namespace Pr0gramm.Services
         {
             LoginDialog dlg = new LoginDialog(_iEventAggregator, _iprogrammApi, this, _toastNotifications);
             await dlg.ShowAsync();
+        }
+
+        private async void TryLoginAutomatically()
+        {
+            var credentials = GetCredentialFromLocker();
+            if (credentials != null && !IsLoggedIn)
+            {
+                credentials.RetrievePassword();
+                try
+                {
+                    var user = await _iprogrammApi.Login(credentials.UserName, credentials.Password);
+                    if (user != null)
+                    {
+                        _iEventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
+                        IsLoggedIn = true;
+                    }
+                }
+                catch (Exception)
+                {
+                    _toastNotifications.ShowToastNotificationWebSocketExeception();
+                }
+
+            }
         }
     }
 }

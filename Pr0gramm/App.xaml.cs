@@ -26,8 +26,8 @@ namespace Pr0gramm
         public App()
         {
 #if !DEBUG
-            HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
-              new TelemetryConfiguration {EnableDiagnostics = true});
+            //HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
+            //  new TelemetryConfiguration {EnableDiagnostics = true});
 #endif
 
          

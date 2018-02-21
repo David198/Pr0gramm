@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.ApplicationModel.Store;
 using Windows.Foundation;
 using Windows.Graphics.Imaging;
 using Windows.Media.Core;
@@ -41,11 +43,12 @@ using RestSharp;
 
 namespace Pr0gramm.Controls
 {
-    public sealed partial class FeedViewer : UserControl, INotifyPropertyChanged, IHandle<MuteEvent>
+    public sealed partial class FeedViewer : UserControl, INotifyPropertyChanged
     {
         public static readonly DependencyProperty FeedItemsProperty = DependencyProperty.Register(
             "FeedItems", typeof(BindableCollection<FeedItemViewModel>), typeof(FeedViewer),
             new PropertyMetadata(default(BindableCollection<FeedItemViewModel>)));
+
 
         public static readonly DependencyProperty SelectedFeedItemProperty = DependencyProperty.Register(
             "PropertyType", typeof(FeedItemViewModel), typeof(FeedViewer),
@@ -54,20 +57,15 @@ namespace Pr0gramm.Controls
         public FeedViewer()
         {
             InitializeComponent();
-            IoC.Get<IEventAggregator>().Subscribe(this);
             _settingsService = IoC.Get<SettingsService>();
-            _toastNotificationService = IoC.Get<ToastNotificationsService>();
             DataContext = this;
         }
 
 
-        private bool IsMuted { get; set; }
         private MediaPlayer _mediaPlayer;
         private readonly SettingsService _settingsService;
-        private ScrollViewer _flipViewScrollViewer;
         private GridLength _flipViewMainColumnWidth;
         private GridLength _flipViewExtraColumnWidth;
-        private ToastNotificationsService _toastNotificationService;
 
         public GridLength FlipViewExtraColumnGridSplitterWidth { get; set; }
 
@@ -78,6 +76,20 @@ namespace Pr0gramm.Controls
             {
                 _flipViewExtraColumnWidth = value;
                 OnPropertyChanged(nameof(FlipViewExtraColumnWidth));
+            }
+        }
+
+        public static readonly DependencyProperty IsMutedProperty = DependencyProperty.Register(
+            "IsMuted", typeof(bool), typeof(FeedViewer), new PropertyMetadata(default(bool)));
+
+        public bool IsMuted
+        {
+            get { return (bool) GetValue(IsMutedProperty); }
+            set
+            {
+                    SetValue(IsMutedProperty, value);
+                if (_mediaPlayer != null && _mediaPlayer.CurrentState!=MediaPlayerState.Closed)
+                    _mediaPlayer.IsMuted = value;
             }
         }
 
@@ -104,11 +116,9 @@ namespace Pr0gramm.Controls
             get => (FeedItemViewModel) GetValue(SelectedFeedItemProperty);
             set
             {
-                SetValue(SelectedFeedItemProperty, value);
-                if (value != null)
+                if (value != SelectedFeedItem)
                 {
-                    SetVideoPlayBack(value);
-                    FeedItemGridView.ScrollIntoView(value);
+                    SetValue(SelectedFeedItemProperty, value);
                 }
             }
         }
@@ -122,6 +132,13 @@ namespace Pr0gramm.Controls
             RegisterFeedScrollViewUpdate();
             SetMainViewColumnWidth();
             SetExtraCommentColumn();
+            _mediaPlayer = new MediaPlayer
+            {
+                IsLoopingEnabled = true,
+                IsMuted = _settingsService.IsMuted,
+                AutoPlay = true,
+                AudioCategory = MediaPlayerAudioCategory.Media,
+            };
         }
 
         private void RegisterFeedScrollViewUpdate()
@@ -161,7 +178,7 @@ namespace Pr0gramm.Controls
         {
             var scrollViewer = (ScrollViewer) sender;
             var scrollViewerReachedBottom =
-                Math.Abs(scrollViewer.VerticalOffset - scrollViewer.ScrollableHeight) < 0.000000000001f;
+                Math.Abs(scrollViewer.VerticalOffset - scrollViewer.ScrollableHeight) < 0.05f;
             if (scrollViewerReachedBottom)
                 OnLoadNewItems(new EventArgs());
         }
@@ -171,123 +188,39 @@ namespace Pr0gramm.Controls
             LoadNewItems?.Invoke(this, e);
         }
 
-
         private void SetVideoPlayBack(FeedItemViewModel item)
         {
+            if (_mediaPlayer.PlaybackSession.CanPause)
+                _mediaPlayer.Pause();    
             if (item.IsVideo)
             {
-                StopOldMediaPlayer();
-                _mediaPlayer = new MediaPlayer
-                {
-                    IsLoopingEnabled = true,
-                    Source = MediaSource.CreateFromUri(item.ImageSource),
-                    IsMuted = _settingsService.IsMuted,
-                    AutoPlay = true,
-                    AudioCategory = MediaPlayerAudioCategory.Media,
-                };
+                _mediaPlayer.Source = MediaSource.CreateFromUri(item.ImageSource);
                 var flipViewItem = FlipView.ContainerFromItem(item);
-                if (flipViewItem == null) return;
+                if (flipViewItem == null)
+                {
+                    FlipView.UpdateLayout();
+                    flipViewItem = FlipView.ContainerFromItem(item);
+                    if (flipViewItem == null) return;
+                }
                 var mediaPlayerElement = ViewHelper.FindVisualChild<MediaPlayerElement>(flipViewItem);
                 if (mediaPlayerElement != null)
                 {
+                   
                     mediaPlayerElement.SetMediaPlayer(_mediaPlayer);
                     mediaPlayerElement.Stretch = Stretch.Uniform;
                 }
             }
-            else
-            {
-                StopOldMediaPlayer();
-            }
         }
-
-        private void StopOldMediaPlayer()
-        {
-            try
-            {
-                if (_mediaPlayer != null)
-                {
-                    _mediaPlayer.Pause();
-                    _mediaPlayer.Source = null;
-                }
-            }
-            catch (Exception e)
-            {
-                HockeyClient.Current.TrackException(e);
-            }
-            _mediaPlayer = null;
-        }
-
 
         private void FeedViewer_OnUnloaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (_mediaPlayer != null)
-                    _mediaPlayer.Dispose();
-            }
-            catch (Exception ex)
-            {
-                HockeyClient.Current.TrackException(ex);
-            }
+            _mediaPlayer?.Dispose();
         }
 
         [NotifyPropertyChangedInvocator]
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void Handle(MuteEvent message)
-        {
-            IsMuted = message.IsMuted;
-            try
-            {
-                if (_mediaPlayer != null)
-                    _mediaPlayer.IsMuted = IsMuted;
-            }
-            catch (Exception e)
-            {
-                HockeyClient.Current.TrackException(e);
-            }
-        }
-
-
-
-        private async void DownloadImageClick(object sender, RoutedEventArgs e)
-        {
-             var savePicker = new FileSavePicker {SuggestedStartLocation = PickerLocationId.PicturesLibrary};
-            if (!SelectedFeedItem.IsVideo)
-            {
-                savePicker.FileTypeChoices.Add("Image", new List<string>() {".jpg"});
-                savePicker.SuggestedFileName = "NewImage";
-            }
-            else
-            {
-                savePicker.FileTypeChoices.Add("Video", new List<string>() { ".mp4" });
-                savePicker.SuggestedFileName = "NewVideo";
-            }     
-            var savefile = await savePicker.PickSaveFileAsync();
-            if (savefile == null)
-                return;
-            await  SaveFileAsync(SelectedFeedItem.FullSizeSource, savefile);
-        }
-
-
-        private async Task SaveFileAsync(Uri fileUri, StorageFile file)
-        {
-            try
-            {
-                var backgroundDownloader = new BackgroundDownloader();
-                var downloadOperation = backgroundDownloader.CreateDownload(fileUri, file);
-                await downloadOperation.StartAsync();
-                _toastNotificationService.ShowToastNotificationDownloadSucceded();
-
-            }
-            catch (Exception exc)
-            {
-                _toastNotificationService.ShowToastNotificationDownloadFailed();
-                HockeyClient.Current.TrackException(exc);
-            }
         }
 
         private void ScrollViewerSizeChanged(object sender, SizeChangedEventArgs e)
@@ -302,25 +235,6 @@ namespace Pr0gramm.Controls
             }
         }
 
-        private void ShareButtonClick(object sender, RoutedEventArgs e)
-        {
-            DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
-            if (DataTransferManager.IsSupported())
-            {
-                dataTransferManager.DataRequested += DataTransferManager_DataRequested;
-                DataTransferManager.ShowShareUI();
-            }
-        }
-
-        private void DataTransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
-        {
-            DataRequest request = args.Request;
-            request.Data.RequestedOperation = DataPackageOperation.Link;
-            ;
-            request.Data.Properties.Title = "SharePostTitel".GetLocalized();
-            request.Data.Properties.Description = "SharePostDescription".GetLocalized();
-            request.Data.SetWebLink(SelectedFeedItem.ShareLink);
-        }
 
         private void GridSplitter_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
@@ -328,7 +242,6 @@ namespace Pr0gramm.Controls
                 2);
             float leftColumnWidht = 1 - rightColumnWidth;
             _settingsService.SaveFeedViewerColumnWidthFromSettingsAsync(leftColumnWidht, rightColumnWidth);
-          
         }
 
         private  void ExtraCommentColumnGridSplitterManipulationCompleted(object sender,
@@ -343,6 +256,15 @@ namespace Pr0gramm.Controls
                _settingsService.SaveFeedViewerExtraColumnWidthFromSettingsAsync(leftColumnWidth, rightColumnWidth);
                 FlipViewMainColumnWidth = new GridLength(leftColumnWidth,GridUnitType.Star);
                 FlipViewExtraColumnWidth = new GridLength(rightColumnWidth, GridUnitType.Star);
+            }
+        }
+    
+        private void FeedItemGridView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SelectedFeedItem != null)
+            {
+                SetVideoPlayBack(SelectedFeedItem);
+                FeedItemGridView.ScrollIntoView(SelectedFeedItem);
             }
         }
 
@@ -364,7 +286,5 @@ namespace Pr0gramm.Controls
         //    //    scaleX: 1.0f,
         //    //    scaleY: 1f,
         //    //    duration: 1500).StartAsync();
-
-        //}
     }
 }

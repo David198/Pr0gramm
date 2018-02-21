@@ -9,13 +9,10 @@ namespace Pr0gramm.ViewModels
 {
     public class TopViewModel : FeedViewerViewModelBase
     {
-        private readonly UserLoginService _userLoginService;
-
         public  TopViewModel(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
-            ToastNotificationsService toastNotificationsService, UserLoginService userLoginService)
-            : base(programmProgrammApi, eventAggregator, toastNotificationsService)
+            ToastNotificationsService toastNotificationsService, SettingsService settingsService)
+            : base(programmProgrammApi, eventAggregator, toastNotificationsService, settingsService)
         {
-            _userLoginService = userLoginService;
         }
 
         private async void InitializeTheme()
@@ -24,34 +21,12 @@ namespace Pr0gramm.ViewModels
             ThemeSelectorService.SetRequestedTheme();
         }
 
-        protected override async void OnInitialize()
+        protected override void OnInitialize()
         {
             base.OnInitialize();
-            await TryLoginAutomatically();
             InitializeTheme();
         }
 
-        private async Task TryLoginAutomatically()
-        {
-            var credentials = _userLoginService.GetCredentialFromLocker();
-            if (credentials != null && !_userLoginService.IsLoggedIn)
-            {
-                credentials.RetrievePassword();
-                try
-                {
-                    var user = await ProgrammApi.Login(credentials.UserName, credentials.Password);
-                    if (user != null)
-                    {
-                        EventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
-                        _userLoginService.IsLoggedIn = true;
-                    }
-                }
-                catch (Exception)
-                {
-                   ToastNotificationsService.ShowToastNotificationWebSocketExeception();
-                }
-
-            }
-        }
+      
     }
 }

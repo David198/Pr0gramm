@@ -8,6 +8,7 @@
 
     <DataTemplate x:Key="ThumbImageTemplate" x:DataType="models:FeedItemViewModel">
         <Grid>
+           
             <Image
             Stretch="Uniform"
             Source="{Binding ThumbSource}"
@@ -16,10 +17,11 @@
                         Visibility="{Binding IsVideo, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
             <SymbolIcon Symbol="Volume" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="{StaticResource SmallAllMargin}"   Foreground="{ThemeResource SystemControlHighlightAccentBrush}"
                         Visibility="{Binding Audio, Converter={StaticResource BoolToVisConverter}}"></SymbolIcon>
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="0.5"  Background="Black" Visibility="{Binding IsRepost, Converter={StaticResource BoolToVisConverter}}"  >
+            </Border>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"  Visibility="{Binding IsRepost, Converter={StaticResource BoolToVisConverter}}" Foreground="White">Repost</TextBlock>
         </Grid>
     </DataTemplate>
-
-  
 
 </ResourceDictionary>
 

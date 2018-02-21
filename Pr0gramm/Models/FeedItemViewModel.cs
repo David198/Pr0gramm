@@ -44,7 +44,7 @@ namespace Pr0gramm.Models
             {
                 var link = "https://pr0gramm.com/";
                 if (Promoted != 0)
-                    link = link + "top/" + Promoted;
+                    link = link + "top/" + Id;
                 else
                 {
                     link = link + "new/" + Id;
@@ -63,6 +63,11 @@ namespace Pr0gramm.Models
             }
         }
 
+        public bool IsRepost
+        {
+            get { return Tags.Any(tag => tag.Tag.ToLower().Equals("repost")); }
+        }
+
         public string CreatedString => DateTimeUtlis.MakeCreatedString(Created);
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -72,37 +77,34 @@ namespace Pr0gramm.Models
             if (_commentsAndTagsLoaded)
                 return;
             _commentsAndTagsLoaded = true;
-
-            CoreDispatcher dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
-            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            try
             {
-                try
+                CommentViewModels.Clear();
+                Tags.Clear();
+                var feedItemCommentItem = await _api.GetFeedItemComments(Id);
+                var tempList = new List<Comment>();
+                var rootNodes = Node<Comment>.CreateTree(feedItemCommentItem.Comments, l => l.Id, l => l.Parent);
+                rootNodes = rootNodes.OrderByDescending(o => o.Value.Confidence);
+                foreach (var node in rootNodes)
+                    FlatHierarchy(node, tempList);
+                var temptCommentViewModel = new List<CommentViewModel>();
+                tempList.ForEach(comment =>
                 {
-                    CommentViewModels.Clear();
-                    Tags.Clear();
-                    var feedItemCommentItem = await _api.GetFeedItemComments(Id);
-                    var tempList = new List<Comment>();
-                    var rootNodes = Node<Comment>.CreateTree(feedItemCommentItem.Comments, l => l.Id, l => l.Parent);
-                    rootNodes = rootNodes.OrderByDescending(o => o.Value.Confidence);
-                    foreach (var node in rootNodes)
-                        FlatHierarchy(node, tempList);
-                    var temptCommentViewModel = new List<CommentViewModel>();
-                    tempList.ForEach(comment =>
-                    {
-                        var commentViewModel = new CommentViewModel(comment, this);
-                        commentViewModel.CalculateCommentDepth(tempList);
-                        temptCommentViewModel.Add(commentViewModel);
-                    });
+                    var commentViewModel = new CommentViewModel(comment, this);
+                    commentViewModel.CalculateCommentDepth(tempList);
+                    temptCommentViewModel.Add(commentViewModel);
+                });
 
-                    CommentViewModels.AddRange(temptCommentViewModel);
-                    feedItemCommentItem.Tags.OrderByDescending(tag => tag.Confidence).ToList()
-                        .ForEach(item => Tags.Add(new TagViewModel(item)));
-                }
-                catch (ApplicationException)
-                {
-                    _toastNotificationsService.ShowToastNotificationWebSocketExeception();
-                }
-            });
+                CommentViewModels.AddRange(temptCommentViewModel);
+                feedItemCommentItem.Tags.OrderByDescending(tag => tag.Confidence).ToList()
+                    .ForEach(item => Tags.Add(new TagViewModel(item)));
+                OnPropertyChanged(nameof(IsRepost));
+            }
+            catch (ApplicationException)
+            {
+                _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                _commentsAndTagsLoaded = false;
+            }
         }
 
         public void FlatHierarchy(Node<Comment> node, List<Comment> tempList)

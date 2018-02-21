@@ -8,7 +8,7 @@
     xmlns:controls="using:Pr0gramm.Controls"
     xmlns:micro="using:Caliburn.Micro"
     mc:Ignorable="d">
-    <controls:FeedViewer x:Name="FeedViewer" FeedItems="{x:Bind ViewModel.FeedItems}"
+    <controls:FeedViewer x:Name="FeedViewer" FeedItems="{x:Bind ViewModel.FeedItems}" IsMuted="{x:Bind ViewModel.IsMuted,Mode=TwoWay}"
                          SelectedFeedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
                          micro:Message.Attach="[Event LoadNewItems] = [Action LoadOlderItems()]" />
 </Page>
