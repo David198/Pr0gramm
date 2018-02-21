@@ -120,9 +120,9 @@ namespace Pr0gramm.Services
 
         private void OnFrameNavigated(object sender, NavigationEventArgs e)
         {
-            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = NavigationService.CanGoBack
-                ? AppViewBackButtonVisibility.Visible
-                : AppViewBackButtonVisibility.Collapsed;
+            //SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = NavigationService.CanGoBack
+            //    ? AppViewBackButtonVisibility.Visible
+            //    : AppViewBackButtonVisibility.Collapsed;
         }
     }
 }

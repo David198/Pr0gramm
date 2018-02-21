@@ -162,7 +162,7 @@
     <value>Einstellungen</value>
   </data>
   <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Choose Theme</value>
+    <value>Theme auswählen</value>
   </data>
   <data name="Settings_Theme_Dark.Content" xml:space="preserve">
     <value>Dark</value>
@@ -186,7 +186,7 @@
     <value>https://YourPrivacyUrlGoesHere/</value>
   </data>
   <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personalisierung</value>
+    <value>Visuell</value>
   </data>
   <data name="ExceptionEnumToBooleanConverterValueMustBeAnEnum" xml:space="preserve">
     <value>value must be an Enum!</value>
@@ -369,5 +369,20 @@ Version 1.0.0.0
   </data>
   <data name="DownloadSucceded_Title" xml:space="preserve">
     <value>Download fertig.</value>
+  </data>
+  <data name="Settings_Behaviour.Text" xml:space="preserve">
+    <value>Verhalten</value>
+  </data>
+  <data name="Settings_Changelog.Content" xml:space="preserve">
+    <value>Changelog</value>
+  </data>
+  <data name="Settings_ChangelogExpl.Text" xml:space="preserve">
+    <value>Lasse dir den Changelog anzeigen.</value>
+  </data>
+  <data name="Settings_Various.Text" xml:space="preserve">
+    <value>Verschiedenes</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
   </data>
 </root>

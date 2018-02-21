@@ -21,7 +21,12 @@
 
     <Grid>
         <Grid Margin="{StaticResource MediumLeftRightMargin}">
-            <StackPanel>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Margin="{StaticResource MediumLeftRightMargin}">
                 <TextBlock
                     x:Uid="Settings_Personalization"
                     Style="{StaticResource SubtitleTextBlockStyle}" />
@@ -63,15 +68,15 @@
                             </RadioButton.Tag>
                         </RadioButton>
                     </StackPanel>
+                    <TextBlock
+                        x:Uid="Settings_Layout"
+                        Style="{StaticResource BodyTextStyle}" />
+
+                    <ToggleSwitch x:Uid="ExtraCommentColumnToggleSwitch" Margin="{StaticResource EightTopMargin}"
+                                  IsOn="{x:Bind Mode=TwoWay, Path=ViewModel.FeedViewerExtraCommentColumn}"
+                                  Header="Kommentare in extra Spalte anzeigen" HeaderTemplate="{StaticResource ToggleButtonHeaderTemplate}"/>
                 </StackPanel>
-                <ToggleSwitch x:Uid="ExtraCommentColumnToggleSwitch"
-                              IsOn="{x:Bind Mode=TwoWay, Path=ViewModel.FeedViewerExtraCommentColumn}"
-                              Header="Kommentare in extra Spalte anzeigen"
-                              Margin="{StaticResource MediumTopDownMargin}" />
-                <ToggleSwitch x:Uid="ExtraCommentColumnToggleSwitch"
-                              IsOn="{x:Bind Mode=TwoWay, Path=ViewModel.AlwaysStartSfw}"
-                              Header="Zeige 'SFW' beim Start"
-                              Margin="{StaticResource MediumTopDownMargin}" />
+              
                 <TextBlock
                     x:Uid="Settings_About"
                     Style="{StaticResource SubtitleTextBlockStyle}" />
@@ -79,6 +84,28 @@
                 <StackPanel Margin="{StaticResource EightTopMargin}">
                     <TextBlock
                         Text="{x:Bind Mode=OneWay, Path=ViewModel.VersionDescription}" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="{StaticResource MediumLeftRightMargin}">
+                <TextBlock
+                    x:Uid="Settings_Behaviour"
+                    Style="{StaticResource SubtitleTextBlockStyle}" />
+                <StackPanel Margin="{StaticResource SettingsSubheaderMargin}">
+                    <ToggleSwitch x:Uid="ExtraCommentColumnToggleSwitch"
+                                  IsOn="{x:Bind Mode=TwoWay, Path=ViewModel.AlwaysStartSfw}"
+                                  Header="Zeige 'SFW' beim Start"
+                                   HeaderTemplate="{StaticResource ToggleButtonHeaderTemplate}"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Margin="{StaticResource MediumLeftRightMargin}">
+                <TextBlock
+                    x:Uid="Settings_Various"
+                    Style="{StaticResource SubtitleTextBlockStyle}" />
+                <StackPanel Margin="{StaticResource SettingsSubheaderMargin}">
+                <TextBlock
+                    x:Uid="Settings_ChangelogExpl"
+                    Style="{StaticResource BodyTextStyle}" />
+                <Button x:Uid="Settings_Changelog" Margin="{StaticResource MediumTopDownMargin}"  Click="ButtonBase_OnClick"></Button>
                 </StackPanel>
             </StackPanel>
         </Grid>

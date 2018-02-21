@@ -51,7 +51,7 @@ namespace Pr0gramm.Controls
 
 
         public static readonly DependencyProperty SelectedFeedItemProperty = DependencyProperty.Register(
-            "PropertyType", typeof(FeedItemViewModel), typeof(FeedViewer),
+            "SelectedFeedItem", typeof(FeedItemViewModel), typeof(FeedViewer),
             new PropertyMetadata(default(FeedItemViewModel)));
 
         public FeedViewer()
