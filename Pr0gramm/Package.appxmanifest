@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:genTemplate="http://schemas.microsoft.com/appx/developer/windowsTemplateStudio" IgnorableNamespaces="uap mp genTemplate">
-  <Identity Name="53749David198.12054170C9BA1" Publisher="CN=025AB3D0-39C8-411C-AF72-BF845822EE68" Version="1.0.2.0" />
+  <Identity Name="53749David198.12054170C9BA1" Publisher="CN=025AB3D0-39C8-411C-AF72-BF845822EE68" Version="1.0.3.0" />
   <mp:PhoneIdentity PhoneProductId="1b972cfe-8420-43c2-9b21-464aff72d804" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Pr0gramm-Viewer</DisplayName>

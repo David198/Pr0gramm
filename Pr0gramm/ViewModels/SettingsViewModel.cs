@@ -1,7 +1,10 @@
-﻿using Windows.ApplicationModel;
+﻿using System;
+using Windows.ApplicationModel;
+using Windows.System;
 using Windows.UI.Xaml;
 using Caliburn.Micro;
 using Pr0gramm.Services;
+using Pr0gramm.Views;
 
 namespace Pr0gramm.ViewModels
 {
@@ -61,6 +64,18 @@ namespace Pr0gramm.ViewModels
         {
             await ThemeSelectorService.SetThemeAsync(theme);
             ElementTheme = theme;
+        }
+
+        public async void ShowChangeLog()
+        {
+            WhatsNewDialog dlg = new WhatsNewDialog();
+            await dlg.ShowAsync();
+        }
+
+        public async void OpenFeedBack()
+        {
+            var uri = new Uri("https://rink.hockeyapp.net/apps/d2ef27ea7e7342b3befa7922cacd4c47/feedback/new");
+            await Launcher.LaunchUriAsync(uri);
         }
 
         protected override void OnInitialize()

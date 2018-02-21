@@ -22,9 +22,9 @@
     <Grid>
         <Grid Margin="{StaticResource MediumLeftRightMargin}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"></ColumnDefinition>
-                <ColumnDefinition Width="300"></ColumnDefinition>
-                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="300" />
             </Grid.ColumnDefinitions>
             <StackPanel Margin="{StaticResource MediumLeftRightMargin}">
                 <TextBlock
@@ -74,9 +74,10 @@
 
                     <ToggleSwitch x:Uid="ExtraCommentColumnToggleSwitch" Margin="{StaticResource EightTopMargin}"
                                   IsOn="{x:Bind Mode=TwoWay, Path=ViewModel.FeedViewerExtraCommentColumn}"
-                                  Header="Kommentare in extra Spalte anzeigen" HeaderTemplate="{StaticResource ToggleButtonHeaderTemplate}"/>
+                                  Header="Kommentare in extra Spalte anzeigen"
+                                  HeaderTemplate="{StaticResource ToggleButtonHeaderTemplate}" />
                 </StackPanel>
-              
+
                 <TextBlock
                     x:Uid="Settings_About"
                     Style="{StaticResource SubtitleTextBlockStyle}" />
@@ -94,7 +95,7 @@
                     <ToggleSwitch x:Uid="ExtraCommentColumnToggleSwitch"
                                   IsOn="{x:Bind Mode=TwoWay, Path=ViewModel.AlwaysStartSfw}"
                                   Header="Zeige 'SFW' beim Start"
-                                   HeaderTemplate="{StaticResource ToggleButtonHeaderTemplate}"/>
+                                  HeaderTemplate="{StaticResource ToggleButtonHeaderTemplate}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel Grid.Column="2" Margin="{StaticResource MediumLeftRightMargin}">
@@ -102,12 +103,49 @@
                     x:Uid="Settings_Various"
                     Style="{StaticResource SubtitleTextBlockStyle}" />
                 <StackPanel Margin="{StaticResource SettingsSubheaderMargin}">
-                <TextBlock
-                    x:Uid="Settings_ChangelogExpl"
-                    Style="{StaticResource BodyTextStyle}" />
-                <Button x:Uid="Settings_Changelog" Margin="{StaticResource MediumTopDownMargin}"  Click="ButtonBase_OnClick"></Button>
+                    <TextBlock
+                        x:Uid="Settings_ChangelogExpl"
+                        Style="{StaticResource BodyTextStyle}" />
+                    <Button x:Uid="Settings_Changelog" Margin="{StaticResource MediumTopDownMargin}"
+                            cm:Message.Attach="ShowChangeLog" />
+                    <TextBlock
+                        x:Uid="Settings_FeedbackExpl"
+                        Style="{StaticResource BodyTextStyle}" />
+                    <Button x:Uid="Settings_Feedback" Margin="{StaticResource MediumTopDownMargin}"
+                            cm:Message.Attach="OpenFeedBack" />
                 </StackPanel>
             </StackPanel>
         </Grid>
     </Grid>
 </Page>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

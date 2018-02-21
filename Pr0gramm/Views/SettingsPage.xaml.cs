@@ -1,5 +1,4 @@
-﻿using System;
-using Windows.UI.Xaml;
+﻿
 using Windows.UI.Xaml.Controls;
 using Pr0gramm.ViewModels;
 
@@ -15,12 +14,5 @@ namespace Pr0gramm.Views
         }
 
         private SettingsViewModel ViewModel => DataContext as SettingsViewModel;
-
-        private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            WhatsNewDialog dlg = new WhatsNewDialog();
-            await dlg.ShowAsync();
-        }
-
     }
 }
