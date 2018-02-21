@@ -16,6 +16,7 @@ namespace Pr0grammAPI.Feeds
         private const string PROTHUMBURL = "http://thumb.pr0gramm.com/";
         private const string PROIMAGEURL = "http://img.pr0gramm.com/";
         private const string PROVIDEOURL = "http://vid.pr0gramm.com/";
+        private const string PROIMAGEFULL = "https://full.pr0gramm.com/";
 
         public int Id { get; set; }
         public int Promoted { get; set; }
@@ -43,7 +44,7 @@ namespace Pr0grammAPI.Feeds
                     return ImageSource;
                 else
                 {
-                    return IsVideo ? new Uri(PROVIDEOURL + FullSize) : new Uri(PROIMAGEURL + FullSize);
+                    return IsVideo ? new Uri(PROVIDEOURL + FullSize) : new Uri(PROIMAGEFULL + FullSize);
                 }
             }
         }
