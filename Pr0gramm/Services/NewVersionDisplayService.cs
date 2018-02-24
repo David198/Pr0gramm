@@ -23,9 +23,10 @@ namespace Pr0gramm.Services
                 var responseContent = HtmlUtilities.ConvertToText(response.Content);
                 var index = responseContent.IndexOf("Version", StringComparison.Ordinal);
                 var newestVersion = responseContent.Substring(index + 8, 7);
-
-                var currentVersion = PackageVersionToReadableString(Package.Current.Id.Version);
-                if (!currentVersion.Equals(newestVersion))
+                Version newVersion = new Version(newestVersion);
+                Version currentVersion = new Version(PackageVersionToReadableString(Package.Current.Id.Version));
+                var result = newVersion.CompareTo(currentVersion);
+                if (result>0)
                 {
                     NewVersionDialog dlg = new NewVersionDialog();
                     await dlg.ShowAsync();
