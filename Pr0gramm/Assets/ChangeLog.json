@@ -1,0 +1,89 @@
+[
+  {
+    "version": "1.0.3.0",
+    "changes": [
+      {
+        "type": "Änderung",
+        "change": "Settings Seite überarbeitet."
+      },
+      {
+        "type": "Fix",
+        "change": "Bug behoben beim Video abspielen und der Funktion Mute."
+      },
+      {
+        "type": "Änderung",
+        "change": "Kleine Änderung am Design."
+      }, {
+        "type": "Neu",
+        "change": "Repostanzeige."
+      }
+    ]
+  },
+  {
+    "version": "1.0.2.0",
+    "changes": [
+      {
+        "type": "Neu",
+        "change": "Share Button für Posts."
+      },
+      {
+        "type": "Neu",
+        "change": "Score wird nun für 1 Stunde ausgeblendet."
+      },
+      {
+        "type": "Neu",
+        "change": "Theme passt sich nun Windows Akzent Farbe an."
+      },
+      {
+        "type": "Neu",
+        "change": "Extra Spalte für Kommentare verfügbar. Zu finden über Einstellungen."
+      },
+      {
+        "type": "Neu",
+        "change": "Benachrichtungen bei neuer Version"
+      },
+      {
+        "type": "Neu",
+        "change": "Video Download verfügbar."
+      }
+    ]
+  },
+  {
+    "version": "1.0.1.0",
+    "changes": [
+      {
+        "type": "Neu",
+        "change": "Tags suchen."
+      },
+    ]
+  },
+  {
+    "version": "1.0.0.0",
+    "changes": [
+      {
+        "type": "Neu",
+        "change": "Top Feed anzeigen."
+      },
+      {
+        "type": "Neu",
+        "change": "New Feed anzeigen."
+      },
+      {
+        "type": "Neu",
+        "change": "Tags anzeigen."
+      },
+      {
+        "type": "Neu",
+        "change": "Kommentare anzeigen."
+      },
+      {
+        "type": "Neu",
+        "change": "Bilder herunterladen."
+      },
+      {
+        "type": "Neu",
+        "change": "Theme switch."
+      }
+    ]
+  }
+]

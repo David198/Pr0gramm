@@ -212,6 +212,13 @@ Falls euch Bugs oder neue Ideen für Features einfallen, nutzt gerne die Feedbac
   </data>
   <data name="AfterUpdate_Body.Text" xml:space="preserve">
     <value>
+Version 1.0.3.0
+
+- Settings überarbeitet
+- Bug behoben beim Video abspielen und der Funktion Mute.
+- Kleine Änderungen am Design
+- Repostanzeige
+
 Version 1.0.2.0
 
 - ShareButton für Posts

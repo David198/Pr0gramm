@@ -144,6 +144,7 @@
     <Compile Include="EventHandlers\UserLoggedInEvent.cs" />
     <Compile Include="Helpers\CameraOrientationExtensions.cs" />
     <Compile Include="Helpers\DateTimeUtlis.cs" />
+    <Compile Include="Models\ChangeLog.cs" />
     <Compile Include="Services\NewVersionDisplayService.cs" />
     <Compile Include="Services\SettingsService.FeedViewer.cs" />
     <Compile Include="Services\ToastNotificationsService.Download.cs" />
@@ -353,6 +354,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\placeHolderImage.jpg" />
+    <Content Include="Assets\ChangeLog.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml">
       <SubType>Designer</SubType>

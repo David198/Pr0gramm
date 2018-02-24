@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Pr0gramm.Models"
     mc:Ignorable="d"
     d:DesignHeight="345"
     d:DesignWidth="550"
@@ -16,10 +17,37 @@
             </StackPanel>
         </DataTemplate>
     </ContentDialog.TitleTemplate>
-    <ScrollViewer>
+    <ItemsControl ItemsSource="{Binding ChangeLogItems}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="models:ChangeLogItem">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource BodyTextStyle}" Text="{x:Bind Version}"
+                               Margin="{StaticResource MediumTopDownMargin}" />
+                    <ItemsControl ItemsSource="{x:Bind Changes}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:Changes">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="75"></ColumnDefinition>
+                                        <ColumnDefinition ></ColumnDefinition>
+                                    </Grid.ColumnDefinitions> 
+                                    <TextBlock Text="{x:Bind Type}" Margin="{StaticResource SmallBottomMargin}" FontWeight="ExtraBold" />
+                                    <TextBlock Text="{x:Bind Change}" Grid.Column="1" TextTrimming="CharacterEllipsis" TextWrapping="Wrap"
+                                               Margin="{StaticResource MediumLeftMargin}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+    <!--<ScrollViewer>
         <StackPanel>
             <TextBlock x:Uid="AfterUpdate_Body" TextWrapping="WrapWholeWords" />
         </StackPanel>
-    </ScrollViewer>
+    </ScrollViewer>-->
 </ContentDialog>
+
+
 

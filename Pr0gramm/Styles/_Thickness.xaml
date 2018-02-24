@@ -21,6 +21,7 @@
     <Thickness x:Key="SmallAllMargin">5, 5, 5, 5</Thickness>
 
     <Thickness x:Key="SmallLeftMargin">5, 0, 0, 0</Thickness>
+    <Thickness x:Key="SmallBottomMargin">0 0 0 5</Thickness>
     <Thickness x:Key="SmallLeftRightMargin">5, 0, 5, 0</Thickness>
     <Thickness x:Key="EightTopMargin">0, 8, 0, 0</Thickness>
 </ResourceDictionary>
