@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace Pr0grammAPI.User
 {
-   public class User
+    public class User
     {
-        public int InboxCount { get; set; }
-        public string Log { get; set; }
-        public int LogLength { get; set; }
+        public int Admin { get; set; }
+        public int Banned { get; set; }
+        public int Id { get; set; }
+        public int Mark { get; set; }
+        public string Name { get; set; }
+        public DateTime Registered { get; set; }
         public int Score { get; set; }
     }
 }

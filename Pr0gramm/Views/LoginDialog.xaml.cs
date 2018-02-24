@@ -16,6 +16,7 @@ using Caliburn.Micro;
 using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
 using Pr0gramm.Services;
+using Pr0grammAPI.Exceptions;
 using Pr0grammAPI.Interfaces;
 
 // The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -28,9 +29,10 @@ namespace Pr0gramm.Views
         private readonly IProgrammApi _iprogrammApi;
         private readonly UserLoginService _userLoginService;
         private readonly ToastNotificationsService _toastNotificationsService;
-        private bool userIsLogginIn;
+        private bool _userIsLogginIn;
 
-        public LoginDialog(IEventAggregator IeventAggregator, IProgrammApi IprogrammApi, UserLoginService userLoginService, ToastNotificationsService toastNotificationsService)
+        public LoginDialog(IEventAggregator IeventAggregator, IProgrammApi IprogrammApi,
+            UserLoginService userLoginService, ToastNotificationsService toastNotificationsService)
         {
             _ieventAggregator = IeventAggregator;
             _iprogrammApi = IprogrammApi;
@@ -49,36 +51,43 @@ namespace Pr0gramm.Views
             }
             else
             {
-                userIsLogginIn = true;
-                var user = await _iprogrammApi.Login(UserName.Text, PasswordBox.Password);
-                if (user != null)
+                _userIsLogginIn = true;
+                try
                 {
-                    try
+                    if (await _iprogrammApi.Login(UserName.Text, PasswordBox.Password))
                     {
-                        _userLoginService.SaveUserLogin(UserName.Text, PasswordBox.Password);
-                        _ieventAggregator.PublishOnUIThread(new UserLoggedInEvent(UserName.Text));
-                        ErrorText.Visibility = Visibility.Collapsed;
-                        userIsLogginIn = false;
-                        this.Hide();
+                            _userLoginService.SaveUserLogin(UserName.Text, PasswordBox.Password);
+                            _ieventAggregator.PublishOnUIThread(new UserLoggedInEvent(UserName.Text));
+                            ErrorText.Visibility = Visibility.Collapsed;
+                            _userIsLogginIn = false;
+                            Hide();
+                       
                     }
-                    catch (Exception e)
+                    else
                     {
-                        _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                        _userIsLogginIn = false;
+                        ErrorText.Visibility = Visibility.Visible;
+                        ErrorText.Text = "ErrorTextLogin".GetLocalized();
                     }
-
                 }
-                else
+                catch (ApplicationException)
                 {
-                    userIsLogginIn = false;
+                    _toastNotificationsService.ShowToastNotificationWebSocketExeception();
+                }
+                catch (BannedException)
+                {
+                    _toastNotificationsService.ShowToastNotificationUserBannedExeception();
+                    _userIsLogginIn = false;
                     ErrorText.Visibility = Visibility.Visible;
-                    ErrorText.Text = "ErrorTextLogin".GetLocalized();
+                    ErrorText.Text = "ErrorUserBanned".GetLocalized();
                 }
             }
         }
 
         private void LoginDialog_OnClosing(ContentDialog sender, ContentDialogClosingEventArgs args)
         {
-            if (args.Result == ContentDialogResult.Primary && ErrorText.Visibility.Equals(Visibility.Visible) || userIsLogginIn)
+            if (args.Result == ContentDialogResult.Primary && ErrorText.Visibility.Equals(Visibility.Visible) ||
+                _userIsLogginIn)
                 args.Cancel = true;
         }
     }

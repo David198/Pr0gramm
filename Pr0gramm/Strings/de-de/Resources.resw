@@ -388,4 +388,13 @@ Version 1.0.0.0
   <data name="Settings_FeedbackExpl.Text" xml:space="preserve">
     <value>Öffne die Feebackseite</value>
   </data>
+  <data name="ErrorUserBanned" xml:space="preserve">
+    <value>Du wurdest gebannt! Probiere es später noch einmal.</value>
+  </data>
+  <data name="UserBanned_Exception_Text" xml:space="preserve">
+    <value>Du wurdest gebannt! Probiere es später noch einmal.</value>
+  </data>
+  <data name="UserBanned_Exception_Title" xml:space="preserve">
+    <value>Gebannt</value>
+  </data>
 </root>

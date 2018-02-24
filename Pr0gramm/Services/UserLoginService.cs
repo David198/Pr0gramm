@@ -8,7 +8,9 @@ using Caliburn.Micro;
 using Microsoft.Identity.Client;
 using Pr0gramm.EventHandlers;
 using Pr0gramm.Views;
+using Pr0grammAPI.Exceptions;
 using Pr0grammAPI.Interfaces;
+using Pr0grammAPI.User;
 
 namespace Pr0gramm.Services
 {
@@ -17,7 +19,7 @@ namespace Pr0gramm.Services
         private readonly IEventAggregator _iEventAggregator;
         private readonly IProgrammApi _iprogrammApi;
         private readonly ToastNotificationsService _toastNotifications;
-
+        public ProfileInfo UserProfileInfo { get; set; }
         public UserLoginService(IEventAggregator iEventAggregator, IProgrammApi iprogrammApi,ToastNotificationsService toastNotifications)
         {
             _iEventAggregator = iEventAggregator;
@@ -27,18 +29,18 @@ namespace Pr0gramm.Services
         }
         private const string resourceName = "Pr0gramm";
         public  bool IsLoggedIn;
-        public  void  SaveUserLogin(string username, string password)
+        public void SaveUserLogin(string username, string password)
         {
-            var vault = new Windows.Security.Credentials.PasswordVault();
-            vault.Add(new Windows.Security.Credentials.PasswordCredential(
+            var vault = new PasswordVault();
+            vault.Add(new PasswordCredential(
                 resourceName, username, password));
         }
 
-        public  PasswordCredential GetCredentialFromLocker()
+        public PasswordCredential GetCredentialFromLocker()
         {
-            Windows.Security.Credentials.PasswordCredential credential = null;
+            PasswordCredential credential = null;
 
-            var vault = new Windows.Security.Credentials.PasswordVault();
+            var vault = new PasswordVault();
             try
             {
                 var credentialList = vault.FindAllByResource(resourceName);
@@ -52,19 +54,17 @@ namespace Pr0gramm.Services
               
                 return credential;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
-           
-         
         }
 
-        public  bool DeleteUser(string username)
+        public bool DeleteUser(string username)
         {
-            Windows.Security.Credentials.PasswordCredential credential = null;
+            PasswordCredential credential = null;
 
-            var vault = new Windows.Security.Credentials.PasswordVault();
+            var vault = new PasswordVault();
             try
             {
                 var credentialList = vault.FindAllByResource(resourceName);
@@ -74,12 +74,12 @@ namespace Pr0gramm.Services
                     {
                         credential = credentialList[0];
                     }
+                    credential.RetrievePassword();
+                    vault.Remove(new PasswordCredential(
+                        resourceName, username, credential.Password));
+                    IsLoggedIn = false;
+             
                 }
-
-                credential.RetrievePassword();
-                vault.Remove(new Windows.Security.Credentials.PasswordCredential(
-                    resourceName, username, credential.Password));
-                IsLoggedIn = false;
                 return true;
             }
             catch (Exception e)
@@ -102,19 +102,40 @@ namespace Pr0gramm.Services
                 credentials.RetrievePassword();
                 try
                 {
-                    var user = await _iprogrammApi.Login(credentials.UserName, credentials.Password);
-                    if (user != null)
+                    if (await _iprogrammApi.Login(credentials.UserName, credentials.Password))
                     {
-                        _iEventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
-                        IsLoggedIn = true;
+                       _iEventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
+                        IsLoggedIn = true; 
                     }
                 }
-                catch (Exception)
+                catch (ApplicationException)
                 {
                     _toastNotifications.ShowToastNotificationWebSocketExeception();
                 }
+                catch (BannedException)
+                {
+                   _toastNotifications.ShowToastNotificationUserBannedExeception();
+                }
 
             }
+        }
+
+        public async Task RetrieveUserInfo(string name)
+        {
+            try
+            {
+                UserProfileInfo = await _iprogrammApi.GetUserProfileInfo(name, FlagSelectorService.ActualFlag);
+            }
+            catch (ApplicationException)
+            {
+                _toastNotifications.ShowToastNotificationWebSocketExeception();
+            }
+            catch (BannedException)
+            {
+                _toastNotifications.ShowToastNotificationUserBannedExeception();
+                DeleteUser(name);
+            }
+
         }
     }
 }

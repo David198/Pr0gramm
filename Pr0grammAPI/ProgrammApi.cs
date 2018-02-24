@@ -10,8 +10,10 @@ using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
+using Pr0grammAPI.Exceptions;
 using Pr0grammAPI.Feeds;
 using Pr0grammAPI.Interfaces;
+using Pr0grammAPI.User;
 using RestSharp;
 using RestSharp.Authenticators;
 
@@ -34,6 +36,7 @@ namespace Pr0grammAPI
         private const string PROCOMMENTGET = "/api/items/info";
         private const string PROLOGIN = "/api/user/login";
         private const string PROUSERSYNC = "/api/user/sync";
+        private const string PROUSERINFO = "/api/profile/info";
 
         #endregion
 
@@ -52,6 +55,13 @@ namespace Pr0grammAPI
                 const string message = "Error retrieving response.  Check inner details for more info.";
                 var programmException = new ApplicationException(message, response.ErrorException);
                 throw programmException;
+            }
+            if (response.Cookies.Count > 0)
+            {
+                foreach (var cookie in response.Cookies)
+                {
+                    client.CookieContainer.Add(new Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
+                }
             }
             return response.Data;
         }
@@ -87,45 +97,39 @@ namespace Pr0grammAPI
             return await Execute<FeedItemCommentItem>(request);
         }
 
-        public async Task<User.User> Login(string accountSid, string password)
+        public async Task<bool> Login(string name, string password)
         {
             var request = new RestRequest(Method.POST) {Resource = PROLOGIN};
             client.CookieContainer = new CookieContainer();
-            client.Authenticator = new SimpleAuthenticator("name", accountSid, "password", password);
-            var loginInfo = await Login<User.UserLoginInfo>(request);
+            request.AddParameter("name", name);
+            request.AddParameter("password", password);
+            var loginInfo = await Execute<UserLoginInfo>(request);
             if (loginInfo.Success)
             {
-                var userInfoRequest = new RestRequest(Method.GET) {Resource = PROUSERSYNC};
-                userInfoRequest.AddParameter("offset", 577);
-                client.Authenticator = null;
-                return await Login<User.User>(userInfoRequest);
+                return true;
             }
-            else
+            if (loginInfo.Ban)
             {
-                return null;
+                throw new BannedException();
             }
+            return false;
         }
 
-        private async Task<T> Login<T>(RestRequest request) where T : new()
+        public async Task<ProfileInfo> GetUserProfileInfo(string name, FeedFlags flags)
         {
-            client.Proxy = new WebProxy("127.0.0.1", 8888);
+            var userInfoRequest = new RestRequest(Method.GET) { Resource = PROUSERINFO };
+            userInfoRequest.AddParameter("name", name);
+            userInfoRequest.AddParameter("flags", (int) flags);
+            var userLoginInfo = await Execute<ProfileInfo>(userInfoRequest);
+            return userLoginInfo;
+        }
 
-            var response = await client.ExecuteTaskAsync<T>(request);
-
-            if (response.ErrorException != null)
-            {
-                const string message = "Error retrieving response.  Check inner details for more info.";
-                var programmException = new ApplicationException(message, response.ErrorException);
-                throw programmException;
-            }
-            if (response.Cookies.Count > 0)
-            {
-                foreach (var cookie in response.Cookies)
-                {
-                    client.CookieContainer.Add(new Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
-                }
-            }
-            return response.Data;
+        public async Task<UserSyncInfo> UserSync()
+        {
+            var userInfoRequest = new RestRequest(Method.GET) { Resource = PROUSERSYNC };
+            userInfoRequest.AddParameter("offset", 577);
+            var userSyncInfo = await Execute<UserSyncInfo>(userInfoRequest);
+            return userSyncInfo;
         }
     }
 }
