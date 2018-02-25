@@ -105,6 +105,9 @@
     <PackageReference Include="HockeySDK.UWP">
       <Version>4.1.6</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Data.SQLite">
+      <Version>2.0.0</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.0.7</Version>
     </PackageReference>
@@ -144,10 +147,15 @@
     <Compile Include="EventHandlers\UserLoggedInEvent.cs" />
     <Compile Include="Helpers\CameraOrientationExtensions.cs" />
     <Compile Include="Helpers\DateTimeUtlis.cs" />
+    <Compile Include="Models\CachedVote.cs" />
     <Compile Include="Models\ChangeLog.cs" />
+    <Compile Include="Models\Enums\CacheVoteType.cs" />
+    <Compile Include="Models\Enums\Vote.cs" />
+    <Compile Include="Services\CacheVoteService.cs" />
     <Compile Include="Services\NewVersionDisplayService.cs" />
     <Compile Include="Services\SettingsService.FeedViewer.cs" />
     <Compile Include="Services\ToastNotificationsService.Download.cs" />
+    <Compile Include="Services\UserSyncService.cs" />
     <Compile Include="Views\Convertes\EnumToBooleanConverter.cs" />
     <Compile Include="Helpers\Json.cs" />
     <Compile Include="Helpers\NodeExtensions.cs" />

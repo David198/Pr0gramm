@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pr0grammAPI.User
+namespace Pr0gramm.Models.Enums
 {
-    class Login
+    public enum CacheVoteType
     {
+        Item,
+        Comment,
+        Tag
     }
 }

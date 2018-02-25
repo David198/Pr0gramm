@@ -120,7 +120,6 @@
     <Compile Include="User\Badges.cs" />
     <Compile Include="User\Comment.cs" />
     <Compile Include="User\Likes.cs" />
-    <Compile Include="User\Login.cs" />
     <Compile Include="User\ProfileInfo.cs" />
     <Compile Include="User\Uploads.cs" />
     <Compile Include="User\User.cs" />

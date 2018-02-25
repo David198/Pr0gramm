@@ -14,6 +14,6 @@ namespace Pr0grammAPI.Interfaces
         Task<FeedItemCommentItem> GetFeedItemComments(int id);
         Task<bool> Login(string accountSid, string password);
         Task<ProfileInfo> GetUserProfileInfo(string name, FeedFlags flags);
-        Task<UserSyncInfo> UserSync();
+        Task<UserSyncInfo> UserSync(int offset);
     }
 }

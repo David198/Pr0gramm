@@ -9,7 +9,7 @@ namespace Pr0grammAPI.User
     public class UserLoginInfo
     {
         public bool Ban { get; set; }
-        public string cache { get; set; }
+        public string Cache { get; set; }
         public string Identifier { get; set; }
         public int Qc { get; set; }
         public int Rt { get; set; }

@@ -16,12 +16,14 @@ namespace Pr0gramm.Services
 {
     public class UserLoginService
     {
+        private readonly UserSyncService _userSyncService;
         private readonly IEventAggregator _iEventAggregator;
         private readonly IProgrammApi _iprogrammApi;
         private readonly ToastNotificationsService _toastNotifications;
         public ProfileInfo UserProfileInfo { get; set; }
-        public UserLoginService(IEventAggregator iEventAggregator, IProgrammApi iprogrammApi,ToastNotificationsService toastNotifications)
+        public UserLoginService(IEventAggregator iEventAggregator, IProgrammApi iprogrammApi,ToastNotificationsService toastNotifications, UserSyncService userSyncService)
         {
+            _userSyncService = userSyncService;
             _iEventAggregator = iEventAggregator;
             _iprogrammApi = iprogrammApi;
             _toastNotifications = toastNotifications;
@@ -77,6 +79,7 @@ namespace Pr0gramm.Services
                     credential.RetrievePassword();
                     vault.Remove(new PasswordCredential(
                         resourceName, username, credential.Password));
+                    _userSyncService.ResetOffset();
                     IsLoggedIn = false;
              
                 }
@@ -105,7 +108,8 @@ namespace Pr0gramm.Services
                     if (await _iprogrammApi.Login(credentials.UserName, credentials.Password))
                     {
                        _iEventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
-                        IsLoggedIn = true; 
+                        IsLoggedIn = true;
+                        await _userSyncService.Sync();
                     }
                 }
                 catch (ApplicationException)

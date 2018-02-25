@@ -43,7 +43,7 @@ namespace Pr0grammAPI
         private RestClient client = new RestClient(PR0URL);
 
 
-        private async Task<T> Execute<T>(RestRequest request) where T : new()
+        private async Task<T> ExecuteAsync<T>(RestRequest request,bool setCookies) where T : new()
         {
             #if DEBUG
             client.Proxy = new WebProxy("127.0.0.1", 8888);
@@ -56,7 +56,7 @@ namespace Pr0grammAPI
                 var programmException = new ApplicationException(message, response.ErrorException);
                 throw programmException;
             }
-            if (response.Cookies.Count > 0)
+            if (response.Cookies.Count > 0 && setCookies)
             {
                 foreach (var cookie in response.Cookies)
                 {
@@ -70,7 +70,7 @@ namespace Pr0grammAPI
         {
             var request = new RestRequest {Resource = PROITEMSGET};
             FinishRequest(flags, promoted, request, searchTags);
-            return await Execute<Feed>(request);
+            return await ExecuteAsync<Feed>(request,false);
         }
 
         public async Task<Feed> GetOlderFeed(int id, FeedFlags flags, bool promoted, string searchTags)
@@ -78,7 +78,7 @@ namespace Pr0grammAPI
             var request = new RestRequest {Resource = PROITEMSGET};
             request.AddParameter("older", id);
             FinishRequest(flags, promoted, request, searchTags);
-            return await Execute<Feed>(request);
+            return await ExecuteAsync<Feed>(request,false);
         }
 
         private static void FinishRequest(FeedFlags flags, bool promoted, RestRequest request, string searchwords)
@@ -94,7 +94,7 @@ namespace Pr0grammAPI
         {
             var request = new RestRequest {Resource = PROCOMMENTGET};
             request.AddParameter("itemId", id);
-            return await Execute<FeedItemCommentItem>(request);
+            return await ExecuteAsync<FeedItemCommentItem>(request,false);
         }
 
         public async Task<bool> Login(string name, string password)
@@ -103,7 +103,7 @@ namespace Pr0grammAPI
             client.CookieContainer = new CookieContainer();
             request.AddParameter("name", name);
             request.AddParameter("password", password);
-            var loginInfo = await Execute<UserLoginInfo>(request);
+            var loginInfo = await ExecuteAsync<UserLoginInfo>(request,true);
             if (loginInfo.Success)
             {
                 return true;
@@ -120,15 +120,15 @@ namespace Pr0grammAPI
             var userInfoRequest = new RestRequest(Method.GET) { Resource = PROUSERINFO };
             userInfoRequest.AddParameter("name", name);
             userInfoRequest.AddParameter("flags", (int) flags);
-            var userLoginInfo = await Execute<ProfileInfo>(userInfoRequest);
+            var userLoginInfo = await ExecuteAsync<ProfileInfo>(userInfoRequest,false);
             return userLoginInfo;
         }
 
-        public async Task<UserSyncInfo> UserSync()
+        public async Task<UserSyncInfo> UserSync(int offset)
         {
             var userInfoRequest = new RestRequest(Method.GET) { Resource = PROUSERSYNC };
-            userInfoRequest.AddParameter("offset", 577);
-            var userSyncInfo = await Execute<UserSyncInfo>(userInfoRequest);
+            userInfoRequest.AddParameter("offset", offset);
+            var userSyncInfo = await ExecuteAsync<UserSyncInfo>(userInfoRequest,false);
             return userSyncInfo;
         }
     }

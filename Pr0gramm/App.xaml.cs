@@ -26,8 +26,8 @@ namespace Pr0gramm
         public App()
         {
 #if !DEBUG
-            HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
-              new TelemetryConfiguration {EnableDiagnostics = true});
+            //HockeyClient.Current.Configure("d2ef27ea7e7342b3befa7922cacd4c47",
+              //new TelemetryConfiguration {EnableDiagnostics = true});
 #endif
 
          
@@ -69,6 +69,8 @@ namespace Pr0gramm
             _container = new WinRTContainer();
             _container.RegisterWinRTServices();
             _container.Singleton<SettingsService>();
+            _container.Singleton<UserSyncService>();
+            _container.Singleton<CacheVoteService>();
             _container.PerRequest<ToastNotificationsService>();
             _container.Singleton<UserLoginService>();
             _container.Singleton<IProgrammApi, ProgrammApi>();
