@@ -162,7 +162,7 @@ namespace Pr0gramm.ViewModels
             IsBusy = false;
             for (int i = 0; i < newList.Count; i++)
             {
-                await LoadComments(newList[i]);
+                LoadComments(newList[i]);
             }
         }
 
