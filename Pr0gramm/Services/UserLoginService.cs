@@ -80,8 +80,8 @@ namespace Pr0gramm.Services
                     vault.Remove(new PasswordCredential(
                         resourceName, username, credential.Password));
                     _userSyncService.ResetOffset();
-                    IsLoggedIn = false;
-             
+                    _userSyncService.StopSyncRoutine();
+                    IsLoggedIn = false;       
                 }
                 return true;
             }
@@ -93,8 +93,35 @@ namespace Pr0gramm.Services
 
         public  async void ShowUserLogin()
         {
-            LoginDialog dlg = new LoginDialog(_iEventAggregator, _iprogrammApi, this, _toastNotifications);
+            LoginDialog dlg = new LoginDialog(_iEventAggregator, this, _toastNotifications);
             await dlg.ShowAsync();
+        }
+
+        public async Task<bool> LoginUser(string name, string password, bool savePassword)
+        {
+            try
+            {
+                if (await _iprogrammApi.Login(name, password))
+                {
+                    _iEventAggregator.PublishOnUIThread(new UserLoggedInEvent(name));
+                    IsLoggedIn = true;
+                    if(savePassword)
+                        SaveUserLogin(name,password);
+                 
+                    _userSyncService.StartSyncRoutine();
+                    return true;
+                }
+            }
+            catch (ApplicationException)
+            {
+                _toastNotifications.ShowToastNotificationWebSocketExeception();
+            }
+            catch (BannedException)
+            {
+                _toastNotifications.ShowToastNotificationUserBannedExeception();
+            }
+
+            return false;
         }
 
         private async void TryLoginAutomatically()
@@ -105,22 +132,12 @@ namespace Pr0gramm.Services
                 credentials.RetrievePassword();
                 try
                 {
-                    if (await _iprogrammApi.Login(credentials.UserName, credentials.Password))
-                    {
-                       _iEventAggregator.PublishOnUIThread(new UserLoggedInEvent(credentials.UserName));
-                        IsLoggedIn = true;
-                        await _userSyncService.Sync();
-                    }
+                    await LoginUser(credentials.UserName, credentials.Password, false);
                 }
                 catch (ApplicationException)
                 {
                     _toastNotifications.ShowToastNotificationWebSocketExeception();
                 }
-                catch (BannedException)
-                {
-                   _toastNotifications.ShowToastNotificationUserBannedExeception();
-                }
-
             }
         }
 

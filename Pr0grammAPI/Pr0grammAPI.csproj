@@ -123,6 +123,7 @@
     <Compile Include="User\ProfileInfo.cs" />
     <Compile Include="User\Uploads.cs" />
     <Compile Include="User\User.cs" />
+    <Compile Include="User\UserCookie.cs" />
     <Compile Include="User\UserSyncInfo.cs" />
     <Compile Include="User\UserLoginInfo.cs" />
     <EmbeddedResource Include="Properties\Pr0grammAPI.rd.xml" />
@@ -137,6 +138,11 @@
     <PackageReference Include="RestSharp">
       <Version>106.2.1</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\.nuget\packages\newtonsoft.json\11.0.1\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

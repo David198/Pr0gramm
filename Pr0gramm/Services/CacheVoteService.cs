@@ -35,9 +35,10 @@ namespace Pr0gramm.Services
             using (SqliteConnection db = new SqliteConnection(DbName))
             {
                 db.Open();
-                String tableCommand ="DELETE FROM cached_vote";
+                String tableCommand = "DELETE FROM cached_vote";
                 SqliteCommand createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
+
             }
         }
 
@@ -72,9 +73,10 @@ namespace Pr0gramm.Services
                 {
                     cachedVote = new CachedVote(query.GetInt32(0), query.GetString(1), query.GetString(2));
                 }
+
                 db.Close();
-                return cachedVote;
             }
+            return cachedVote;
         }
 
 

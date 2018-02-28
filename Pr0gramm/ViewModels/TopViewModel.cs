@@ -10,8 +10,8 @@ namespace Pr0gramm.ViewModels
     public class TopViewModel : FeedViewerViewModelBase
     {
         public  TopViewModel(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
-            ToastNotificationsService toastNotificationsService, SettingsService settingsService)
-            : base(programmProgrammApi, eventAggregator, toastNotificationsService, settingsService)
+            ToastNotificationsService toastNotificationsService, SettingsService settingsService, CacheVoteService cacheVoteService)
+            : base(programmProgrammApi, eventAggregator, toastNotificationsService, settingsService, cacheVoteService)
         {
         }
 

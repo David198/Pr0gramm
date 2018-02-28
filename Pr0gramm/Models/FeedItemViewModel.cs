@@ -7,7 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Windows.UI.Core;
 using Caliburn.Micro;
+using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
+using Pr0gramm.Models.Enums;
 using Pr0gramm.Services;
 using Pr0grammAPI.Annotations;
 using Pr0grammAPI.Feeds;
@@ -18,19 +20,37 @@ namespace Pr0gramm.Models
     public class FeedItemViewModel : FeedItem, INotifyPropertyChanged
 
     {
-        private readonly IProgrammApi _api;
+        private readonly IProgrammApi _programmApi;
         private readonly ToastNotificationsService _toastNotificationsService;
+        private readonly CacheVoteService _cacheVoteService;
+        private readonly IEventAggregator _iEventAggregator;
         private bool _commentsAndTagsLoaded;
 
         public FeedItemViewModel(FeedItem feedItem, IProgrammApi api,
-            ToastNotificationsService toastNotificationsService) : base(feedItem)
+            ToastNotificationsService toastNotificationsService, CacheVoteService cacheVoteService,
+            IEventAggregator iEventAggregator) : base(feedItem)
         {
-            _api = api;
+            _programmApi = api;
             _toastNotificationsService = toastNotificationsService;
+            _cacheVoteService = cacheVoteService;
+            _iEventAggregator = iEventAggregator;
             CommentViewModels = new BindableCollection<CommentViewModel>();
             Tags = new BindableCollection<TagViewModel>();
+            _iEventAggregator.Subscribe(this);
+            VoteState = Vote.Neutral;
         }
 
+        private async Task InitializeVoteState()
+        {
+            var cachedVote = await _cacheVoteService.Find(CacheVoteType.Item, Id);
+            if (cachedVote != null)
+            {
+                VoteState = cachedVote.Vote;
+            }
+            OnPropertyChanged(nameof(VoteState));
+        }
+
+        public Vote VoteState { get; set; }
 
         public int ParentCount { get; set; }
 
@@ -49,7 +69,39 @@ namespace Pr0gramm.Models
                 {
                     link = link + "new/" + Id;
                 }
+
                 return new Uri(link);
+            }
+        }
+
+        public  void UpVote()
+        {
+            var oldState = VoteState;
+            VoteState = VoteState == Vote.Up ? Vote.Neutral : Vote.Up;
+            OnPropertyChanged(nameof(VoteState));
+            _cacheVoteService.SaveVote(CacheVoteType.Item, VoteState,Id);
+            AdjustScore(oldState, VoteState);
+            SaveToProApi();
+        }
+
+        public void DownVote()
+        {
+            var oldState = VoteState;
+            VoteState = VoteState == Vote.Down ? Vote.Neutral : Vote.Down;
+            OnPropertyChanged(nameof(VoteState));
+            _cacheVoteService.SaveVote(CacheVoteType.Item, VoteState, Id);
+            AdjustScore(oldState, VoteState);
+            SaveToProApi();
+        }
+
+        private void SaveToProApi()
+        {
+            try
+            {
+                _programmApi.VoteComment(Id, (int)VoteState);
+            }
+            catch (ApplicationException)
+            {
             }
         }
 
@@ -61,6 +113,41 @@ namespace Pr0gramm.Models
                     return true;
                 return false;
             }
+        }
+
+        public string Score
+        {
+            get
+            {
+                if (ScoreIsAwailable)
+                    return (Up - Down).ToString();
+                return "---";
+            }
+        }
+
+        private void AdjustScore(Vote oldState, Vote newState)
+        {
+            if (oldState == Vote.Neutral && newState == Vote.Up)
+                Up++;
+            if (oldState == Vote.Neutral && newState == Vote.Down)
+                Down++;
+            if (oldState == Vote.Up && newState == Vote.Neutral)
+                Up--;
+            if (oldState == Vote.Down && newState == Vote.Neutral)
+                Down--;
+            if (oldState == Vote.Up && newState == Vote.Down)
+            {
+                Up--;
+                Down++;
+            }
+            if (oldState == Vote.Down && newState == Vote.Up)
+            {
+                Up++;
+                Down--;
+            }
+            OnPropertyChanged(nameof(Up));
+            OnPropertyChanged(nameof(Down));
+            OnPropertyChanged(nameof(Score));
         }
 
         public bool IsRepost
@@ -81,7 +168,7 @@ namespace Pr0gramm.Models
             {
                 CommentViewModels.Clear();
                 Tags.Clear();
-                var feedItemCommentItem = await _api.GetFeedItemComments(Id);
+                var feedItemCommentItem = await _programmApi.GetFeedItemComments(Id);
                 var tempList = new List<Comment>();
                 var rootNodes = Node<Comment>.CreateTree(feedItemCommentItem.Comments, l => l.Id, l => l.Parent);
                 rootNodes = rootNodes.OrderByDescending(o => o.Value.Confidence);
@@ -90,14 +177,14 @@ namespace Pr0gramm.Models
                 var temptCommentViewModel = new List<CommentViewModel>();
                 tempList.ForEach(comment =>
                 {
-                    var commentViewModel = new CommentViewModel(comment, this);
+                    var commentViewModel = new CommentViewModel(comment, this,_cacheVoteService, _programmApi);
                     commentViewModel.CalculateCommentDepth(tempList);
                     temptCommentViewModel.Add(commentViewModel);
                 });
 
                 CommentViewModels.AddRange(temptCommentViewModel);
                 feedItemCommentItem.Tags.OrderByDescending(tag => tag.Confidence).ToList()
-                    .ForEach(item => Tags.Add(new TagViewModel(item)));
+                    .ForEach(item => Tags.Add(new TagViewModel(item, _iEventAggregator, _programmApi, _cacheVoteService)));
                 OnPropertyChanged(nameof(IsRepost));
             }
             catch (ApplicationException)
@@ -125,6 +212,20 @@ namespace Pr0gramm.Models
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public async Task LoadTagAndCommentVotesAsync()
+        {
+            await InitializeVoteState();
+            foreach (var tagView in Tags)
+            {
+                await tagView.InitializeVoteState();
+            }
+
+            foreach (var comment in CommentViewModels)
+            {
+               await comment.InitializeVoteState();
+            }
         }
     }
 }

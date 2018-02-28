@@ -26,16 +26,14 @@ namespace Pr0gramm.Views
     public sealed partial class LoginDialog : ContentDialog
     {
         private readonly IEventAggregator _ieventAggregator;
-        private readonly IProgrammApi _iprogrammApi;
         private readonly UserLoginService _userLoginService;
         private readonly ToastNotificationsService _toastNotificationsService;
         private bool _userIsLogginIn;
 
-        public LoginDialog(IEventAggregator IeventAggregator, IProgrammApi IprogrammApi,
+        public LoginDialog(IEventAggregator IeventAggregator,
             UserLoginService userLoginService, ToastNotificationsService toastNotificationsService)
         {
             _ieventAggregator = IeventAggregator;
-            _iprogrammApi = IprogrammApi;
             _userLoginService = userLoginService;
             _toastNotificationsService = toastNotificationsService;
             this.InitializeComponent();
@@ -54,10 +52,8 @@ namespace Pr0gramm.Views
                 _userIsLogginIn = true;
                 try
                 {
-                    if (await _iprogrammApi.Login(UserName.Text, PasswordBox.Password))
+                    if (await _userLoginService.LoginUser(UserName.Text, PasswordBox.Password,true))
                     {
-                            _userLoginService.SaveUserLogin(UserName.Text, PasswordBox.Password);
-                            _ieventAggregator.PublishOnUIThread(new UserLoggedInEvent(UserName.Text));
                             ErrorText.Visibility = Visibility.Collapsed;
                             _userIsLogginIn = false;
                             Hide();

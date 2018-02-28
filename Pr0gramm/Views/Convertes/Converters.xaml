@@ -10,7 +10,6 @@
     <local:ParentCommentMarginConverter x:Key="CommentMarginConverter" />
     <local:UserTextConverter x:Key="UserTextConverter" />
     <local:ImageSourceFromUriConverter x:Key="ImageSourceFromUriConverter"></local:ImageSourceFromUriConverter>
-    <local:ScoreConverter x:Key="FeedScoreConverter"></local:ScoreConverter>
     <local:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"></local:StringEmptyToVisibilityConverter>
 </ResourceDictionary>
 

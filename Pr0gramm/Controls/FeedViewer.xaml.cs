@@ -33,6 +33,7 @@ using Microsoft.Toolkit.Uwp.UI.Extensions;
 using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
 using Pr0gramm.Models;
+using Pr0gramm.Models.Enums;
 using Pr0gramm.Services;
 using Pr0gramm.Views;
 using Pr0gramm.Views.Convertes;
@@ -53,6 +54,10 @@ namespace Pr0gramm.Controls
         public static readonly DependencyProperty SelectedFeedItemProperty = DependencyProperty.Register(
             "SelectedFeedItem", typeof(FeedItemViewModel), typeof(FeedViewer),
             new PropertyMetadata(default(FeedItemViewModel)));
+
+
+        public static readonly DependencyProperty IsMutedProperty = DependencyProperty.Register(
+            "IsMuted", typeof(bool), typeof(FeedViewer), new PropertyMetadata(default(bool)));
 
         public FeedViewer()
         {
@@ -78,9 +83,6 @@ namespace Pr0gramm.Controls
                 OnPropertyChanged(nameof(FlipViewExtraColumnWidth));
             }
         }
-
-        public static readonly DependencyProperty IsMutedProperty = DependencyProperty.Register(
-            "IsMuted", typeof(bool), typeof(FeedViewer), new PropertyMetadata(default(bool)));
 
         public bool IsMuted
         {
@@ -188,10 +190,10 @@ namespace Pr0gramm.Controls
             LoadNewItems?.Invoke(this, e);
         }
 
-        private void SetVideoPlayBack(FeedItemViewModel item)
+        private async void SetVideoPlayBack(FeedItemViewModel item)
         {
             if (_mediaPlayer.PlaybackSession.CanPause)
-                _mediaPlayer.Pause();    
+                _mediaPlayer.Pause();
             if (item.IsVideo)
             {
                 _mediaPlayer.Source = MediaSource.CreateFromUri(item.ImageSource);
@@ -199,18 +201,22 @@ namespace Pr0gramm.Controls
                 if (flipViewItem == null)
                 {
                     FlipView.UpdateLayout();
-                    flipViewItem = FlipView.ContainerFromItem(item);
+                    await Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
+                    {
+                        flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
+                    });
                     if (flipViewItem == null) return;
                 }
                 var mediaPlayerElement = ViewHelper.FindVisualChild<MediaPlayerElement>(flipViewItem);
                 if (mediaPlayerElement != null)
                 {
-                   
+
                     mediaPlayerElement.SetMediaPlayer(_mediaPlayer);
                     mediaPlayerElement.Stretch = Stretch.Uniform;
                 }
             }
         }
+
 
         private void FeedViewer_OnUnloaded(object sender, RoutedEventArgs e)
         {
@@ -286,5 +292,6 @@ namespace Pr0gramm.Controls
         //    //    scaleX: 1.0f,
         //    //    scaleY: 1f,
         //    //    duration: 1500).StartAsync();
+
     }
 }

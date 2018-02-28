@@ -25,6 +25,7 @@ namespace Pr0gramm.ViewModels
     public class FeedViewerViewModelBase : Screen, IHandle<RefreshEvent>, IHandle<SearchFeedItemsEvent>, IHandle<MuteEvent>
     {
         protected readonly ToastNotificationsService ToastNotificationsService;
+        private readonly CacheVoteService _cacheVoteService;
         protected readonly IEventAggregator EventAggregator;
         private bool _boolLoadingNewItems;
         private FeedItemViewModel _selectedItem;
@@ -35,11 +36,12 @@ namespace Pr0gramm.ViewModels
         private bool _isBusy;
 
         internal FeedViewerViewModelBase(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
-            ToastNotificationsService toastNotificationsService, SettingsService settingsService)
+            ToastNotificationsService toastNotificationsService, SettingsService settingsService, CacheVoteService cacheVoteService)
         {
             ProgrammApi = programmProgrammApi;
             EventAggregator = eventAggregator;
             ToastNotificationsService = toastNotificationsService;
+            _cacheVoteService = cacheVoteService;
             ShowTop = true;
             EventAggregator.Subscribe(this);
             FeedItems = new BindableCollection<FeedItemViewModel>();
@@ -61,6 +63,7 @@ namespace Pr0gramm.ViewModels
             set
             {
                 Set(ref _selectedItem, value);
+                value?.LoadTagAndCommentVotesAsync();
             }
         }
 
@@ -93,7 +96,6 @@ namespace Pr0gramm.ViewModels
                 LoadFeedItems();
             }
         }
-
 
         protected override void OnViewLoaded(object view)
         {
@@ -151,12 +153,12 @@ namespace Pr0gramm.ViewModels
             EventAggregator.PublishOnUIThread(new TagSearchEvent(tag.Tag));
         }
 
-        private async void InitializeFeedItemViewModelsAsync(Feed feed)
+        private void InitializeFeedItemViewModelsAsync(Feed feed)
         {
             var newList = new List<FeedItemViewModel>();
             feed.Items.ForEach(item =>
             {
-                newList.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService));
+                newList.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService, _cacheVoteService, EventAggregator));
             });
             FeedItems.AddRange(newList);
             IsBusy = false;
@@ -234,6 +236,19 @@ namespace Pr0gramm.ViewModels
             request.Data.Properties.Title = "SharePostTitel".GetLocalized();
             request.Data.Properties.Description = "SharePostDescription".GetLocalized();
             request.Data.SetWebLink(SelectedItem.ShareLink);
+        }
+
+
+        // Dirty Hack... not solved yet in xaml. Normally should directly call the Upvote method in the FeedItemViewModel
+        public void UpVote()
+        {
+            SelectedItem.UpVote();
+        }
+
+        // Dirty Hack... not solved yet in xaml. Normally should directly call the DownVote method in the FeedItemViewModel
+        public void DownVote()
+        {
+            SelectedItem.DownVote();
         }
 
         public async void OpenLink(LinkClickedEventArgs e)

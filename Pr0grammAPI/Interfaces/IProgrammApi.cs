@@ -15,5 +15,8 @@ namespace Pr0grammAPI.Interfaces
         Task<bool> Login(string accountSid, string password);
         Task<ProfileInfo> GetUserProfileInfo(string name, FeedFlags flags);
         Task<UserSyncInfo> UserSync(int offset);
+        Task VoteItem(int id, int voteState);
+        Task VoteTag(int id, int voteState);
+        Task VoteComment(int id, int voteState);
     }
 }

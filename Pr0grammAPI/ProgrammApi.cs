@@ -7,9 +7,14 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
+using Windows.Foundation;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
+using Microsoft.HockeyApp;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Pr0grammAPI.Exceptions;
 using Pr0grammAPI.Feeds;
 using Pr0grammAPI.Interfaces;
@@ -37,7 +42,13 @@ namespace Pr0grammAPI
         private const string PROLOGIN = "/api/user/login";
         private const string PROUSERSYNC = "/api/user/sync";
         private const string PROUSERINFO = "/api/profile/info";
+        private const string PROITEMVOTE = " /api/items/vote";
+        private const string PROTAGVOTE = " /api/tags/vote";
+        private const string PROCOMMENTVOTE = " /api/comments/vote";
 
+        private string Nonce;
+
+        public UserCookie UserCookie { get; set; }
         #endregion
 
         private RestClient client = new RestClient(PR0URL);
@@ -60,10 +71,31 @@ namespace Pr0grammAPI
             {
                 foreach (var cookie in response.Cookies)
                 {
+                    if (cookie.Name.Equals("me"))
+                    {
+                        DecodeLoginCookie(cookie);
+                    }
                     client.CookieContainer.Add(new Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
                 }
             }
             return response.Data;
+        }
+
+        private void DecodeLoginCookie(RestResponseCookie cookie)
+        {
+            try
+            {
+                var encodedText = HttpUtility.UrlDecode(cookie.Value, Encoding.UTF8);
+                UserCookie = JsonConvert.DeserializeObject<UserCookie>(encodedText, new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                });
+                Nonce = UserCookie.Id.Substring(0, 16);
+            }
+            catch (Exception e)
+            {
+                HockeyClient.Current.TrackException(e);
+            }
         }
 
         public async Task<Feed> GetFeed(FeedFlags flags, bool promoted, string searchTags)
@@ -130,6 +162,33 @@ namespace Pr0grammAPI
             userInfoRequest.AddParameter("offset", offset);
             var userSyncInfo = await ExecuteAsync<UserSyncInfo>(userInfoRequest,false);
             return userSyncInfo;
+        }
+
+        public async Task VoteItem(int id, int voteState)
+        {
+            var voteRequest = new RestRequest(Method.POST){Resource = PROITEMVOTE};
+            voteRequest.AddParameter("id", id);
+            voteRequest.AddParameter("vote", voteState);
+            voteRequest.AddParameter("_nonce", Nonce);
+            await ExecuteAsync<object>(voteRequest, false);
+        }
+
+        public async Task VoteTag(int id, int voteState)
+        {
+            var voteRequest = new RestRequest(Method.POST) { Resource = PROTAGVOTE };
+            voteRequest.AddParameter("id", id);
+            voteRequest.AddParameter("vote", voteState);
+            voteRequest.AddParameter("_nonce", Nonce);
+            await ExecuteAsync<object>(voteRequest, false);
+        }
+
+        public async Task VoteComment(int id, int voteState)
+        {
+            var voteRequest = new RestRequest(Method.POST) { Resource = PROCOMMENTVOTE };
+            voteRequest.AddParameter("id", id);
+            voteRequest.AddParameter("vote", voteState);
+            voteRequest.AddParameter("_nonce", Nonce);
+            await ExecuteAsync<object>(voteRequest, false);
         }
     }
 }

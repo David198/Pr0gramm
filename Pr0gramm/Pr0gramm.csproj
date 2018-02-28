@@ -139,6 +139,10 @@
       <DependentUpon>FeedViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\CustomWrapPanel.cs" />
+    <Compile Include="Controls\VoteControl.xaml.cs">
+      <DependentUpon>VoteControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EventHandlers\CacheVoteChangedEvent.cs" />
     <Compile Include="EventHandlers\CameraControlEventArgs.cs" />
     <Compile Include="EventHandlers\MuteEvent.cs" />
     <Compile Include="EventHandlers\RefreshEvent.cs" />
@@ -199,7 +203,6 @@
       <DependentUpon>CameraPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Convertes\BooleanToVisibilityConverterInverse.cs" />
-    <Compile Include="Views\Convertes\ScoreConverter.cs" />
     <Compile Include="Views\Convertes\ImageSourceFromUriConverter.cs" />
     <Compile Include="Views\Convertes\MediaSourceFromUriConverter.cs" />
     <Compile Include="Views\Convertes\NullVisibilityConverter.cs" />
@@ -247,6 +250,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\FeedViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\VoteControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

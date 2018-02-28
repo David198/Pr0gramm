@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.System.Threading;
+using Windows.UI.Core;
+using Caliburn.Micro;
 using Microsoft.HockeyApp;
+using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
 using Pr0gramm.Models.Enums;
 using Pr0grammAPI.Interfaces;
@@ -16,14 +20,34 @@ namespace Pr0gramm.Services
         private readonly IProgrammApi _programmApi;
         private readonly SettingsService _settingsService;
         private readonly CacheVoteService _voteService;
+        private readonly IEventAggregator _iEventAggregator;
         private const string UserSyncOffsetKey = "UserSyncOffset";
+        private ThreadPoolTimer SyncTimer;
 
-        public UserSyncService(IProgrammApi programmApi, SettingsService settingsService, CacheVoteService voteService)
+        public UserSyncService(IProgrammApi programmApi, SettingsService settingsService, CacheVoteService voteService, IEventAggregator iEventAggregator)
         {
             _programmApi = programmApi;
             _settingsService = settingsService;
             _voteService = voteService;
+            _iEventAggregator = iEventAggregator;
             LoadUserSyncOffsetAsync();
+            
+        }
+
+        public void StartSyncRoutine()
+        {
+            Sync();
+            TimeSpan period = TimeSpan.FromSeconds(30);
+            SyncTimer = ThreadPoolTimer.CreatePeriodicTimer(async timer =>
+            {
+                await Sync();
+              
+            }, period);
+        }
+
+        public void StopSyncRoutine()
+        {
+            SyncTimer?.Cancel();
         }
 
         public async Task Sync()
@@ -40,8 +64,13 @@ namespace Pr0gramm.Services
                         var type = Convert.ToInt32(logByteList[i + 4]);
                         VoteAction voteAction = MapLogItemToVoteAction(type);
                        _voteService.SaveVote(voteAction.Type, voteAction.Vote, id);
-                    }
+                }
                 SaveUserSyncOffsetAsync(usersync.LogLength);
+               
+
+            }
+            else if( data.Length!=0)
+            {
                 HockeyClient.Current.TrackException(new Exception("Length of vote log must be a multiple of 5"));
             }
         }
@@ -50,20 +79,18 @@ namespace Pr0gramm.Services
         {
             switch (type)
             {
-                case 0:
-                    return new VoteAction(CacheVoteType.Item, Vote.Down);
                 case 1:
-                    return new VoteAction(CacheVoteType.Item, Vote.Neutral);
+                    return new VoteAction(CacheVoteType.Item, Vote.Down);
                 case 2:
-                    return new VoteAction(CacheVoteType.Item, Vote.Up);
+                    return new VoteAction(CacheVoteType.Item, Vote.Neutral);
                 case 3:
-                    return new VoteAction(CacheVoteType.Comment, Vote.Down);
+                    return new VoteAction(CacheVoteType.Item, Vote.Up);
                 case 4:
                     return new VoteAction(CacheVoteType.Comment, Vote.Down);
                 case 5:
                     return new VoteAction(CacheVoteType.Comment, Vote.Neutral);
                 case 6:
-                    return new VoteAction(CacheVoteType.Item, Vote.Up);
+                    return new VoteAction(CacheVoteType.Comment, Vote.Up);
                 case 7:
                     return new VoteAction(CacheVoteType.Tag, Vote.Down);
                 case 8:
@@ -71,7 +98,7 @@ namespace Pr0gramm.Services
                 case 9:
                     return new VoteAction(CacheVoteType.Tag, Vote.Up);
                 case 10:
-                    return new VoteAction(CacheVoteType.Item, Vote.Favorite);
+                    return new VoteAction(CacheVoteType.Tag, Vote.Favorite);
                 default:
                     break;
             }
