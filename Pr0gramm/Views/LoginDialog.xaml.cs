@@ -52,12 +52,12 @@ namespace Pr0gramm.Views
                 _userIsLogginIn = true;
                 try
                 {
-                    if (await _userLoginService.LoginUser(UserName.Text, PasswordBox.Password,true))
+                    if (await _userLoginService.LoginUser(UserName.Text, PasswordBox.Password,true,true))
                     {
                             ErrorText.Visibility = Visibility.Collapsed;
                             _userIsLogginIn = false;
                             Hide();
-                       
+                      
                     }
                     else
                     {

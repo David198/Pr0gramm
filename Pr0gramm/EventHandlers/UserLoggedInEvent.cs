@@ -9,6 +9,7 @@ namespace Pr0gramm.EventHandlers
     public class UserLoggedInEvent
     {
         public string UserName { get; set; }
+        public bool ReloadFeed { get; set; }
 
         public UserLoggedInEvent(string userName)
         {

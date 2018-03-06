@@ -17,15 +17,14 @@ namespace Pr0gramm.Models
 {
     public class TagViewModel : TagItem, INotifyPropertyChanged
     {
-        private readonly IEventAggregator _iEventAggregator;
         private readonly IProgrammApi _iProgrammApi;
-        private readonly CacheVoteService _cacheVoteService;
+        private readonly CacheService _cacheService;
 
-        public TagViewModel(TagItem item, IEventAggregator iEventAggregator, IProgrammApi iProgrammApi, CacheVoteService cacheVoteService) : base(item)
+        public TagViewModel(TagItem item, IProgrammApi iProgrammApi, CacheService cacheService) : base(item)
         {
-            _iEventAggregator = iEventAggregator;
             _iProgrammApi = iProgrammApi;
-            _cacheVoteService = cacheVoteService;
+            _cacheService = cacheService;
+            VoteState = Vote.Neutral;
         }
 
         public Vote VoteState { get; set; }
@@ -34,7 +33,7 @@ namespace Pr0gramm.Models
         {
             VoteState = VoteState == Vote.Up ? Vote.Neutral : Vote.Up;
             OnPropertyChanged(nameof(VoteState));
-            _cacheVoteService.SaveVote(CacheVoteType.Tag, VoteState, Id);
+            _cacheService.SaveVote(CacheVoteType.Tag, VoteState, Id);
             SaveToProApi();
         }
 
@@ -53,7 +52,7 @@ namespace Pr0gramm.Models
         {
             VoteState = VoteState == Vote.Down ? Vote.Neutral : Vote.Down;
             OnPropertyChanged(nameof(VoteState));
-            _cacheVoteService.SaveVote(CacheVoteType.Tag, VoteState, Id);
+            _cacheService.SaveVote(CacheVoteType.Tag, VoteState, Id);
             SaveToProApi();
         }
 
@@ -65,15 +64,15 @@ namespace Pr0gramm.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public async Task InitializeVoteState()
+        public async void InitializeVoteStateAsync()
         {
-            VoteState = Vote.Neutral;
-            var cachedVote = await _cacheVoteService.Find(CacheVoteType.Tag, Id);
+            var cachedVote = await _cacheService.FindCachedVote(CacheVoteType.Tag, Id);
             if (cachedVote != null)
             {
                 VoteState = cachedVote.Vote;
+                OnPropertyChanged(nameof(VoteState));
             }
-            OnPropertyChanged(nameof(VoteState));
+         
         }
     }
 }

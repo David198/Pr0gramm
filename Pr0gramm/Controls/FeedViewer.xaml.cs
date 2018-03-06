@@ -53,11 +53,26 @@ namespace Pr0gramm.Controls
 
         public static readonly DependencyProperty SelectedFeedItemProperty = DependencyProperty.Register(
             "SelectedFeedItem", typeof(FeedItemViewModel), typeof(FeedViewer),
-            new PropertyMetadata(default(FeedItemViewModel)));
+            new PropertyMetadata(default(FeedItemViewModel), SelectedItemChanged));
 
+        private static void SelectedItemChanged(DependencyObject dependencyObject,
+            DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            ((FeedViewer) dependencyObject).OnSelectionChanged(
+                (FeedItemViewModel) (dependencyPropertyChangedEventArgs.NewValue));
+        }
 
         public static readonly DependencyProperty IsMutedProperty = DependencyProperty.Register(
-            "IsMuted", typeof(bool), typeof(FeedViewer), new PropertyMetadata(default(bool)));
+            "IsMuted", typeof(bool), typeof(FeedViewer), new PropertyMetadata(default(bool), MuteChanged));
+
+        private static void MuteChanged(DependencyObject dependencyObject,
+            DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            if (((FeedViewer) dependencyObject)._mediaPlayer != null
+            ) //&& ((FeedViewer)dependencyObject)._mediaPlayer.CurrentState != MediaPlayerState.Closed)
+                ((FeedViewer) dependencyObject)._mediaPlayer.IsMuted =
+                    (bool) dependencyPropertyChangedEventArgs.NewValue;
+        }
 
         public FeedViewer()
         {
@@ -66,6 +81,7 @@ namespace Pr0gramm.Controls
             DataContext = this;
         }
 
+        public event EventHandler<FeedItemViewModel> SelectionChanged;
 
         private MediaPlayer _mediaPlayer;
         private readonly SettingsService _settingsService;
@@ -87,12 +103,7 @@ namespace Pr0gramm.Controls
         public bool IsMuted
         {
             get { return (bool) GetValue(IsMutedProperty); }
-            set
-            {
-                    SetValue(IsMutedProperty, value);
-                if (_mediaPlayer != null && _mediaPlayer.CurrentState!=MediaPlayerState.Closed)
-                    _mediaPlayer.IsMuted = value;
-            }
+            set { SetValue(IsMutedProperty, value); }
         }
 
         public GridLength FlipViewMainColumnWidth
@@ -190,33 +201,34 @@ namespace Pr0gramm.Controls
             LoadNewItems?.Invoke(this, e);
         }
 
-        private async void SetVideoPlayBack(FeedItemViewModel item)
+        private void SetVideoPlayBack(FeedItemViewModel item)
         {
-            if (_mediaPlayer.PlaybackSession.CanPause)
-                _mediaPlayer.Pause();
-            if (item.IsVideo)
+            try
             {
-                _mediaPlayer.Source = MediaSource.CreateFromUri(item.ImageSource);
-                var flipViewItem = FlipView.ContainerFromItem(item);
-                if (flipViewItem == null)
+                if (_mediaPlayer.PlaybackSession.CanPause)
                 {
-                    FlipView.UpdateLayout();
-                    await Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
-                    {
-                        flipViewItem = FlipView.ContainerFromItem(SelectedFeedItem);
-                    });
-                    if (flipViewItem == null) return;
+                    _mediaPlayer.Source = null;
                 }
-                var mediaPlayerElement = ViewHelper.FindVisualChild<MediaPlayerElement>(flipViewItem);
-                if (mediaPlayerElement != null)
+                if (item.IsVideo)
                 {
-
-                    mediaPlayerElement.SetMediaPlayer(_mediaPlayer);
-                    mediaPlayerElement.Stretch = Stretch.Uniform;
+                    
+                    var flipViewItem = FlipView.ContainerFromItem(item);
+                    if (flipViewItem == null)
+                    {
+                        FlipView.UpdateLayout();
+                        flipViewItem = FlipView.ContainerFromItem(item);
+                        if (flipViewItem == null) return;
+                    }
+                    _mediaPlayer.Source = MediaSource.CreateFromUri(item.ImageSource);
+                    _mediaPlayer.IsMuted = IsMuted;
+                    var mediaPlayerElement = flipViewItem.FindDescendant<MediaPlayerElement>();// ViewHelper.FindVisualChild<MediaPlayerElement>(flipViewItem);
+                    mediaPlayerElement?.SetMediaPlayer(_mediaPlayer);
                 }
             }
+            catch (Exception e)
+            {
+            }
         }
-
 
         private void FeedViewer_OnUnloaded(object sender, RoutedEventArgs e)
         {
@@ -293,5 +305,9 @@ namespace Pr0gramm.Controls
         //    //    scaleY: 1f,
         //    //    duration: 1500).StartAsync();
 
+        private void OnSelectionChanged(FeedItemViewModel e)
+        {
+            SelectionChanged?.Invoke(this, e);
+        }
     }
 }

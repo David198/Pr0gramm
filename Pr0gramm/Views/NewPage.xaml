@@ -10,9 +10,9 @@
     xmlns:controls1="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d">
     <Grid>
-    <controls:FeedViewer x:Name="FeedViewer" FeedItems="{x:Bind ViewModel.FeedItems}" IsMuted="{x:Bind ViewModel.IsMuted,Mode=TwoWay}"
+    <controls:FeedViewer  FeedItems="{x:Bind ViewModel.FeedItems}" IsMuted="{x:Bind ViewModel.IsMuted,Mode=TwoWay}"
                          SelectedFeedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
-                         micro:Message.Attach="[Event LoadNewItems] = [Action LoadOlderItems()]" />
+                          micro:Message.Attach="[Event LoadNewItems] = [Action LoadOlderItems()]; [Event SelectionChanged]=[Action SelectionChanged($eventArgs)]" />
     <controls1:Loading HorizontalContentAlignment="Center" IsLoading="{x:Bind ViewModel.IsBusy,Mode=TwoWay}"
                        VerticalContentAlignment="Center" 
                        Background="Black" Opacity="0.7">

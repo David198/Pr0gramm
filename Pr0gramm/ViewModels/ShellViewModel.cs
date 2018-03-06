@@ -22,7 +22,6 @@ namespace Pr0gramm.ViewModels
     {
         private readonly WinRTContainer _container;
         private readonly IEventAggregator _eventAggregator;
-        private readonly IProgrammApi _programmApi;
         private readonly UserLoginService _userLoginService;
         private readonly SettingsService _settingsService;
 
@@ -42,14 +41,13 @@ namespace Pr0gramm.ViewModels
         private string _searchText;
         public string ActualUser { get; set; }
 
-        public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator,IProgrammApi programmApi, UserLoginService userLoginService, SettingsService settingsService)
+        public ShellViewModel(WinRTContainer container, IEventAggregator eventAggregator, UserLoginService userLoginService, SettingsService settingsService)
         {
             _container = container;
             _eventAggregator = eventAggregator;
-            _programmApi = programmApi;
             _userLoginService = userLoginService;
             _settingsService = settingsService;
-            _eventAggregator.Subscribe(this);
+            _eventAggregator.Subscribe(this);  
         }
 
         public bool ShowFlagButton
@@ -330,11 +328,23 @@ namespace Pr0gramm.ViewModels
             //    Tag = typeof(ControversalViewModel)
             //});
             NavigationItems.Add(new NavigationViewItemSeparator());
-            NavigationItems.Add(new NavigationViewItem
+            if (_userLoginService.IsLoggedIn)
             {
-                Content = "Login".GetLocalized(),
-                Icon = new SymbolIcon(Symbol.Contact)
-            });
+                SetLoginNavItems();
+                ActualUser = _userLoginService.ActualUser;
+                IsUserLoggedIn = true;
+                _userLoginService.IsLoggedIn = true;
+                if (_settingsService.AlwaysStartWithSfw)
+                    FlagSelectorService.SetActualFeedFlagAsync(true, NsfwChecked, NsflChecked, IsUserLoggedIn);
+            }
+            else
+            {
+                NavigationItems.Add(new NavigationViewItem
+                {
+                    Content = "Login".GetLocalized(),
+                    Icon = new SymbolIcon(Symbol.Contact)
+                });
+            }
         }
 
         public void ItemInvoked(NavigationViewItemInvokedEventArgs args)
@@ -402,7 +412,6 @@ namespace Pr0gramm.ViewModels
                 });
                 IsUserLoggedIn = false;
                 FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, false, false, IsUserLoggedIn);
-
                 PublishRefreshCommand();
             }
         }
@@ -410,10 +419,21 @@ namespace Pr0gramm.ViewModels
 
         public void Handle(UserLoggedInEvent message)
         {
-            NavigationItems.Remove(NavigationItems.First(item =>
+            SetLoginNavItems();
+            ActualUser = message.UserName;
+            IsUserLoggedIn = true;
+            _userLoginService.IsLoggedIn = true;
+            if(_settingsService.AlwaysStartWithSfw)
+                FlagSelectorService.SetActualFeedFlagAsync(true, NsfwChecked, NsflChecked, IsUserLoggedIn);
+            PublishRefreshCommand();
+        }
+
+        private void SetLoginNavItems()
+        {
+            NavigationItems.Remove(NavigationItems.FirstOrDefault(item =>
             {
                 if (item.Content != null)
-                  return  item.Content.Equals("Login".GetLocalized());
+                    return item.Content.Equals("Login".GetLocalized());
                 return false;
             }));
             NavigationItems.Insert(NavigationItems.Count, new NavigationViewItem
@@ -421,12 +441,6 @@ namespace Pr0gramm.ViewModels
                 Content = "Logout".GetLocalized(),
                 Icon = new SymbolIcon(Symbol.BlockContact)
             });
-            ActualUser = message.UserName;
-            IsUserLoggedIn = true;
-            _userLoginService.IsLoggedIn = true;
-            if(_settingsService.AlwaysStartWithSfw)
-                FlagSelectorService.SetActualFeedFlagAsync(SfwChecked, NsfwChecked, NsflChecked, IsUserLoggedIn);
-            PublishRefreshCommand();
         }
 
         public void Handle(TagSearchEvent message)

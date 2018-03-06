@@ -49,16 +49,21 @@ namespace Pr0grammAPI
         private string Nonce;
 
         public UserCookie UserCookie { get; set; }
+
         #endregion
 
         private RestClient client = new RestClient(PR0URL);
 
-
-        private async Task<T> ExecuteAsync<T>(RestRequest request,bool setCookies) where T : new()
+        public void SetNonce(string newNonce)
         {
-            #if DEBUG
+            Nonce = newNonce;
+        }
+
+        private async Task<T> ExecuteAsync<T>(RestRequest request, bool setCookies) where T : new()
+        {
+#if DEBUG
             client.Proxy = new WebProxy("127.0.0.1", 8888);
-            #endif
+#endif
             var response = await client.ExecuteTaskAsync<T>(request);
 
             if (response.ErrorException != null)
@@ -67,100 +72,87 @@ namespace Pr0grammAPI
                 var programmException = new ApplicationException(message, response.ErrorException);
                 throw programmException;
             }
+
             if (response.Cookies.Count > 0 && setCookies)
             {
                 foreach (var cookie in response.Cookies)
                 {
                     if (cookie.Name.Equals("me"))
                     {
-                        DecodeLoginCookie(cookie);
+                        UserCookie = new UserCookie(cookie.Value);
+                        if (UserCookie != null)
+                            Nonce = UserCookie.Id.Substring(0, 16);
                     }
+
                     client.CookieContainer.Add(new Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
                 }
             }
+
             return response.Data;
         }
 
-        private void DecodeLoginCookie(RestResponseCookie cookie)
-        {
-            try
-            {
-                var encodedText = HttpUtility.UrlDecode(cookie.Value, Encoding.UTF8);
-                UserCookie = JsonConvert.DeserializeObject<UserCookie>(encodedText, new JsonSerializerSettings
-                {
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
-                });
-                Nonce = UserCookie.Id.Substring(0, 16);
-            }
-            catch (Exception e)
-            {
-                HockeyClient.Current.TrackException(e);
-            }
-        }
-
-        public async Task<Feed> GetFeed(FeedFlags flags, bool promoted, string searchTags)
+        public async Task<Feed> GetFeed(int promoted, int following, int older, int newer, int feedFlags,
+            string searchTags, string likes,
+            bool self, string user)
         {
             var request = new RestRequest {Resource = PROITEMSGET};
-            FinishRequest(flags, promoted, request, searchTags);
-            return await ExecuteAsync<Feed>(request,false);
+            PrepareRequest(request, promoted, following, older, newer, feedFlags, searchTags, likes, self, user);
+            return await ExecuteAsync<Feed>(request, false);
         }
 
-        public async Task<Feed> GetOlderFeed(int id, FeedFlags flags, bool promoted, string searchTags)
+        private void PrepareRequest(RestRequest request, int promoted, int following, int older, int newer,
+            int feedFlags, string searchTags, string likes, bool self, string user)
         {
-            var request = new RestRequest {Resource = PROITEMSGET};
-            request.AddParameter("older", id);
-            FinishRequest(flags, promoted, request, searchTags);
-            return await ExecuteAsync<Feed>(request,false);
-        }
-
-        private static void FinishRequest(FeedFlags flags, bool promoted, RestRequest request, string searchwords)
-        {
-            request.AddParameter("flags", (int) flags);
-            if (promoted)
+            if (older != 0)
+                request.AddParameter("older", older);
+            request.AddParameter("flags", feedFlags);
+            if (promoted == 1)
                 request.AddParameter("promoted", 1);
-            if (!string.IsNullOrEmpty(searchwords))
-                request.AddParameter("tags", searchwords);
+            if (!string.IsNullOrEmpty(searchTags))
+                request.AddParameter("tags", searchTags);
         }
 
         public async Task<FeedItemCommentItem> GetFeedItemComments(int id)
         {
             var request = new RestRequest {Resource = PROCOMMENTGET};
             request.AddParameter("itemId", id);
-            return await ExecuteAsync<FeedItemCommentItem>(request,false);
+            return await ExecuteAsync<FeedItemCommentItem>(request, false);
         }
 
-        public async Task<bool> Login(string name, string password)
+        public async Task<UserCookie> Login(string name, string password)
         {
             var request = new RestRequest(Method.POST) {Resource = PROLOGIN};
             client.CookieContainer = new CookieContainer();
             request.AddParameter("name", name);
             request.AddParameter("password", password);
-            var loginInfo = await ExecuteAsync<UserLoginInfo>(request,true);
+            var loginInfo = await ExecuteAsync<UserLoginInfo>(request, true);
             if (loginInfo.Success)
             {
-                return true;
+                return UserCookie;
             }
+
             if (loginInfo.Ban)
             {
                 throw new BannedException();
             }
-            return false;
+
+            return null;
         }
 
         public async Task<ProfileInfo> GetUserProfileInfo(string name, FeedFlags flags)
         {
-            var userInfoRequest = new RestRequest(Method.GET) { Resource = PROUSERINFO };
+            var userInfoRequest = new RestRequest(Method.GET) {Resource = PROUSERINFO};
             userInfoRequest.AddParameter("name", name);
             userInfoRequest.AddParameter("flags", (int) flags);
-            var userLoginInfo = await ExecuteAsync<ProfileInfo>(userInfoRequest,false);
+            var userLoginInfo = await ExecuteAsync<ProfileInfo>(userInfoRequest, false);
             return userLoginInfo;
         }
 
         public async Task<UserSyncInfo> UserSync(int offset)
         {
-            var userInfoRequest = new RestRequest(Method.GET) { Resource = PROUSERSYNC };
+            var userInfoRequest = new RestRequest(Method.GET) {Resource = PROUSERSYNC};
             userInfoRequest.AddParameter("offset", offset);
-            var userSyncInfo = await ExecuteAsync<UserSyncInfo>(userInfoRequest,false);
+            var userSyncInfo = await ExecuteAsync<UserSyncInfo>(userInfoRequest, false);
             return userSyncInfo;
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
@@ -22,10 +23,12 @@ using Pr0grammAPI.Interfaces;
 
 namespace Pr0gramm.ViewModels
 {
-    public class FeedViewerViewModelBase : Screen, IHandle<RefreshEvent>, IHandle<SearchFeedItemsEvent>, IHandle<MuteEvent>
+    public class FeedViewerViewModelBase : Screen, IHandle<RefreshEvent>, IHandle<SearchFeedItemsEvent>,
+        IHandle<MuteEvent>
     {
         protected readonly ToastNotificationsService ToastNotificationsService;
-        private readonly CacheVoteService _cacheVoteService;
+        private readonly CacheService _cacheService;
+        private readonly FeedService _feedService;
         protected readonly IEventAggregator EventAggregator;
         private bool _boolLoadingNewItems;
         private FeedItemViewModel _selectedItem;
@@ -36,19 +39,21 @@ namespace Pr0gramm.ViewModels
         private bool _isBusy;
 
         internal FeedViewerViewModelBase(IProgrammApi programmProgrammApi, IEventAggregator eventAggregator,
-            ToastNotificationsService toastNotificationsService, SettingsService settingsService, CacheVoteService cacheVoteService)
+            ToastNotificationsService toastNotificationsService, SettingsService settingsService,
+            CacheService cacheService, FeedService feedService)
         {
             ProgrammApi = programmProgrammApi;
             EventAggregator = eventAggregator;
             ToastNotificationsService = toastNotificationsService;
-            _cacheVoteService = cacheVoteService;
-            ShowTop = true;
+            _cacheService = cacheService;
+            _feedService = feedService;
+            Promoted = 1;
             EventAggregator.Subscribe(this);
             FeedItems = new BindableCollection<FeedItemViewModel>();
             IsMuted = settingsService.IsMuted;
         }
 
-        public bool ShowTop { get; set; }
+        public int Promoted { get; set; }
         public BindableCollection<FeedItemViewModel> FeedItems { get; set; }
 
         public bool IsMuted
@@ -63,7 +68,22 @@ namespace Pr0gramm.ViewModels
             set
             {
                 Set(ref _selectedItem, value);
-                value?.LoadTagAndCommentVotesAsync();
+            }
+        }
+
+        public async void SelectionChanged(FeedItemViewModel newItem)
+        {
+            if (newItem != null)
+            {
+                await newItem.LoadCommentsAndTagsAsync();
+                newItem.LoadTagAndCommentVotesAsync();
+                var index = FeedItems.IndexOf(newItem);
+                if (index < FeedItems.Count - 3)
+                {
+                    FeedItems[index + 1].LoadCommentsAndTagsAsync();
+                    FeedItems[index + 2].LoadCommentsAndTagsAsync();
+                    FeedItems[index + 3].LoadCommentsAndTagsAsync();
+                }
             }
         }
 
@@ -83,10 +103,6 @@ namespace Pr0gramm.ViewModels
             IsMuted = message.IsMuted;
         }
 
-        private async Task LoadComments(FeedItemViewModel itemViewModel)
-        {
-            await itemViewModel?.LoadCommentsAndTags();
-        }
 
         public void Handle(RefreshEvent message)
         {
@@ -109,9 +125,9 @@ namespace Pr0gramm.ViewModels
             try
             {
                 IsBusy = true;
-                var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
-                InitializeFeedItemViewModelsAsync(feed);
-                
+                var feed = await _feedService.GetFeed(Promoted, 0, 0, 0, (int) FlagSelectorService.ActualFlag,
+                    ActualSearchTags, "", false, "");
+                InitializeFeedItemViewModels(feed);
             }
             catch (ApplicationException)
             {
@@ -128,13 +144,14 @@ namespace Pr0gramm.ViewModels
                 _boolLoadingNewItems = true;
                 if (FeedItems.Count > 0)
                 {
-                    var id = ShowTop
+                    var id = Promoted == 1
                         ? FeedItems[FeedItems.Count - 1].Promoted
                         : FeedItems[FeedItems.Count - 1].Id;
                     try
                     {
-                        var feed = await ProgrammApi.GetOlderFeed(id, FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
-                        InitializeFeedItemViewModelsAsync(feed);
+                        var feed = await _feedService.GetFeed(Promoted, 0, id, 0, (int) FlagSelectorService.ActualFlag,
+                            ActualSearchTags, "", false, "");
+                        InitializeFeedItemViewModels(feed);
                         _boolLoadingNewItems = false;
                     }
                     catch (ApplicationException)
@@ -153,19 +170,20 @@ namespace Pr0gramm.ViewModels
             EventAggregator.PublishOnUIThread(new TagSearchEvent(tag.Tag));
         }
 
-        private void InitializeFeedItemViewModelsAsync(Feed feed)
+        private void InitializeFeedItemViewModels(Feed feed)
         {
+            if (feed == null)
+            {
+                IsBusy = false;
+                return;
+            } 
             var newList = new List<FeedItemViewModel>();
             feed.Items.ForEach(item =>
             {
-                newList.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService, _cacheVoteService, EventAggregator));
+                newList.Add(new FeedItemViewModel(item, ProgrammApi, ToastNotificationsService, _cacheService));
             });
             FeedItems.AddRange(newList);
             IsBusy = false;
-            for (int i = 0; i < newList.Count; i++)
-            {
-                LoadComments(newList[i]);
-            }
         }
 
         public async void Handle(SearchFeedItemsEvent message)
@@ -175,14 +193,14 @@ namespace Pr0gramm.ViewModels
             ActualSearchTags = message.SearchTags;
             try
             {
-                var feed = await ProgrammApi.GetFeed(FlagSelectorService.ActualFlag, ShowTop, ActualSearchTags);
-                InitializeFeedItemViewModelsAsync(feed);
+                var feed = await _feedService.GetFeed(Promoted, 0, 0, 0, (int) FlagSelectorService.ActualFlag,
+                    ActualSearchTags, "", false, "");
+                InitializeFeedItemViewModels(feed);
             }
             catch (ApplicationException)
             {
                 IsBusy = false;
             }
-
         }
 
         public void ShareSelectedItem()
@@ -197,17 +215,27 @@ namespace Pr0gramm.ViewModels
 
         public async void DownloadSelectedItem()
         {
-            var savePicker = new FileSavePicker { SuggestedStartLocation = PickerLocationId.PicturesLibrary };
+            var savePicker = new FileSavePicker {SuggestedStartLocation = PickerLocationId.PicturesLibrary};
             if (!SelectedItem.IsVideo)
             {
-                savePicker.FileTypeChoices.Add("Image", new List<string>() { ".jpg" });
-                savePicker.SuggestedFileName = "NewImage";
+                if (SelectedItem.ImageSource.ToString().Contains(".gif"))
+                {
+                    savePicker.FileTypeChoices.Add("Gif", new List<string>() { ".gif" });
+                    savePicker.SuggestedFileName = "NewGif";
+                }
+                else
+                {
+                    savePicker.FileTypeChoices.Add("Image", new List<string>() { ".jpg" });
+                    savePicker.SuggestedFileName = "NewImage";
+                }
+              
             }
             else
             {
-                savePicker.FileTypeChoices.Add("Video", new List<string>() { ".mp4" });
+                savePicker.FileTypeChoices.Add("Video", new List<string>() {".mp4"});
                 savePicker.SuggestedFileName = "NewVideo";
             }
+
             var savefile = await savePicker.PickSaveFileAsync();
             if (savefile == null)
                 return;
@@ -256,7 +284,5 @@ namespace Pr0gramm.ViewModels
             var uri = new Uri(e.Link);
             await Launcher.LaunchUriAsync(uri);
         }
-
-     
     }
 }

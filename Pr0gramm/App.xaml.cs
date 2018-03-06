@@ -69,8 +69,9 @@ namespace Pr0gramm
             _container = new WinRTContainer();
             _container.RegisterWinRTServices();
             _container.Singleton<SettingsService>();
+            _container.Singleton<FeedService>();
             _container.Singleton<UserSyncService>();
-            _container.Singleton<CacheVoteService>();
+            _container.Singleton<CacheService>();
             _container.PerRequest<ToastNotificationsService>();
             _container.Singleton<UserLoginService>();
             _container.Singleton<IProgrammApi, ProgrammApi>();
@@ -97,7 +98,7 @@ namespace Pr0gramm
 
         private ActivationService CreateActivationService()
         {
-            return new ActivationService(_container, typeof(TopViewModel), _container.GetInstance<SettingsService>(), new Lazy<UIElement>(CreateShell));
+            return new ActivationService(_container, typeof(TopViewModel), _container.GetInstance<SettingsService>(), _container.GetInstance<UserLoginService>(), new Lazy<UIElement>(CreateShell));
         }
 
         private UIElement CreateShell()

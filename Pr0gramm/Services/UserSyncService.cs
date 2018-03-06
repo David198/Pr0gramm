@@ -18,25 +18,21 @@ namespace Pr0gramm.Services
     public class UserSyncService
     {
         private readonly IProgrammApi _programmApi;
-        private readonly SettingsService _settingsService;
-        private readonly CacheVoteService _voteService;
-        private readonly IEventAggregator _iEventAggregator;
+        private readonly CacheService _cacheService;
         private const string UserSyncOffsetKey = "UserSyncOffset";
         private ThreadPoolTimer SyncTimer;
 
-        public UserSyncService(IProgrammApi programmApi, SettingsService settingsService, CacheVoteService voteService, IEventAggregator iEventAggregator)
+        public UserSyncService(IProgrammApi programmApi,  CacheService cacheService)
         {
             _programmApi = programmApi;
-            _settingsService = settingsService;
-            _voteService = voteService;
-            _iEventAggregator = iEventAggregator;
+            _cacheService = cacheService;
             LoadUserSyncOffsetAsync();
-            
+           
         }
 
-        public void StartSyncRoutine()
+        public async void StartSyncRoutine()
         {
-            Sync();
+            await Sync();
             TimeSpan period = TimeSpan.FromSeconds(30);
             SyncTimer = ThreadPoolTimer.CreatePeriodicTimer(async timer =>
             {
@@ -52,26 +48,35 @@ namespace Pr0gramm.Services
 
         public async Task Sync()
         {
-            var usersync  = await _programmApi.UserSync(UserSyncOffset);
-            if (string.IsNullOrEmpty(usersync.Log)) return;
-            byte[] data = Convert.FromBase64String(usersync.Log);
-            if (data.Length % 5 == 0)
+            try
             {
-                    var logByteList = data.ToList();
-                    for (int i = 0; i < logByteList.Count; i += 5)
+                await Task.Run(async () =>
+                {
+                    var usersync = await _programmApi.UserSync(UserSyncOffset);
+                    if (string.IsNullOrEmpty(usersync.Log)) return;
+                    byte[] data = Convert.FromBase64String(usersync.Log);
+                    if (data.Length % 5 == 0)
                     {
-                        int id = BitConverter.ToInt32(new[] { logByteList[i], logByteList[i + 1], logByteList[i + 2], logByteList[i + 3] }, 0);
-                        var type = Convert.ToInt32(logByteList[i + 4]);
-                        VoteAction voteAction = MapLogItemToVoteAction(type);
-                       _voteService.SaveVote(voteAction.Type, voteAction.Vote, id);
-                }
-                SaveUserSyncOffsetAsync(usersync.LogLength);
-               
-
+                        var logByteList = data.ToList();
+                        for (int i = 0; i < logByteList.Count; i += 5)
+                        {
+                            int id = BitConverter.ToInt32(
+                                new[] { logByteList[i], logByteList[i + 1], logByteList[i + 2], logByteList[i + 3] }, 0);
+                            var type = Convert.ToInt32(logByteList[i + 4]);
+                            VoteAction voteAction = MapLogItemToVoteAction(type);
+                            _cacheService.SaveVote(voteAction.Type, voteAction.Vote, id);
+                        }
+                        SaveUserSyncOffsetAsync(usersync.LogLength);
+                    }
+                    else if (data.Length != 0)
+                    {
+                        HockeyClient.Current.TrackException(new Exception("Length of vote log must be a multiple of 5"));
+                    }
+                });   
             }
-            else if( data.Length!=0)
+            catch (Exception)
             {
-                HockeyClient.Current.TrackException(new Exception("Length of vote log must be a multiple of 5"));
+
             }
         }
 
@@ -139,7 +144,7 @@ namespace Pr0gramm.Services
         public void ResetOffset()
         {
              SaveUserSyncOffsetAsync(0);
-             _voteService.ClearDataBase();
+             _cacheService.ClearDataBase();
         }
     }
 }

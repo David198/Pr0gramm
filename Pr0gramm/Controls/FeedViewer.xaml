@@ -69,64 +69,75 @@
                                                         VerticalAlignment="Center"
                                                         micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
                                                         Margin="{StaticResource SmallAllMargin}" />
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="{StaticResource MediumAllMargin}">
-                                <Border Margin="{StaticResource MediumLeftRightMargin}"
-                                        Background="{ThemeResource SystemControlHighlightAccentBrush}" CornerRadius="3">
-                                    <TextBlock HorizontalTextAlignment="Center"
-                                               Visibility="{x:Bind IsCreatedByOP, Converter={StaticResource BoolToVisConverter}}"
-                                               VerticalAlignment="Center" HorizontalAlignment="Left"
-                                               Margin="{StaticResource SmallLeftRightMargin}">
-                                        OP
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="{StaticResource MediumLeftRightMargin}">
+
+                                    <Border Margin="{StaticResource MediumRightMargin}"
+                                            Background="{ThemeResource SystemControlHighlightAccentBrush}"
+                                            CornerRadius="3">
+                                        <TextBlock HorizontalTextAlignment="Center"
+                                                   Visibility="{x:Bind IsCreatedByOP, Converter={StaticResource BoolToVisConverter}}"
+                                                   VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                   Margin="{StaticResource SmallLeftRightMargin}">
+                                            OP
+                                        </TextBlock>
+                                    </Border>
+                                    <HyperlinkButton Foreground="{ThemeResource SystemControlHyperlinkTextBrush}"
+                                                     micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
+                                                     NavigateUri="{x:Bind Name, Converter={StaticResource UserTextConverter}}"
+                                                     Content="{x:Bind Name}" x:Phase="5" />
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Orientation="Horizontal"
+                                            Margin="{StaticResource MediumLeftRightMargin}">
+                                    <TextBlock Margin="{StaticResource MediumLeftMargin}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Text="{x:Bind Score, Mode=OneWay}">
+                                        <ToolTipService.ToolTip>
+                                            <Grid>
+                                                <StackPanel Orientation="Horizontal"
+                                                            Visibility="{x:Bind ScoreIsAwailable, Converter={StaticResource BoolToVisConverter}}">
+                                                    <TextBlock
+                                                        Margin="{StaticResource MediumLeftMargin}"
+                                                        Text="{x:Bind Up, Mode=TwoWay}"
+                                                        VerticalAlignment="Center" x:Phase="5" />
+                                                    <Viewbox MaxHeight="15" MaxWidth="15">
+                                                        <SymbolIcon Symbol="Up"
+                                                                    Margin="{StaticResource SmallLeftMargin}" />
+                                                    </Viewbox>
+                                                    <TextBlock
+                                                        Margin="{StaticResource MediumLeftMargin}"
+                                                        Text="{x:Bind Down, Mode=TwoWay}"
+                                                        VerticalAlignment="Center" x:Phase="5" />
+                                                    <Viewbox MaxHeight="15" MaxWidth="15">
+                                                        <FontIcon FontFamily="Segoe MDL2 Assets"
+                                                                  Glyph="&#xE74B;"
+                                                                  Margin="{StaticResource SmallLeftMargin}" />
+                                                    </Viewbox>
+                                                </StackPanel>
+                                                <TextBlock x:Uid="ScoreUnawailableText"
+                                                           Visibility="{x:Bind ScoreIsAwailable, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
+                                            </Grid>
+                                        </ToolTipService.ToolTip>
                                     </TextBlock>
-                                </Border>
-                                <HyperlinkButton Foreground="{ThemeResource SystemControlHyperlinkTextBrush}"
-                                                 micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
-                                                 NavigateUri="{x:Bind Name, Converter={StaticResource UserTextConverter}}"
-                                                 Content="{x:Bind Name}" x:Phase="5" />
-                                <TextBlock Margin="10 0 0 0" VerticalAlignment="Center">-</TextBlock>
-                                <TextBlock VerticalAlignment="Center"
-                                           Text="{x:Bind CreatedString}"
-                                           Margin="{StaticResource MediumLeftMargin}"
-                                           x:Phase="2">
-                                    <ToolTipService.ToolTip>
-                                        <TextBlock VerticalAlignment="Center"
-                                                   Text="{x:Bind Created}"
-                                                   Margin="{StaticResource SmallLeftRightMargin}" />
-                                    </ToolTipService.ToolTip>
-                                </TextBlock>
-                                <TextBlock Margin="{StaticResource MediumLeftMargin}"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           Text="{x:Bind Score, Mode=OneWay}">
-                                    <ToolTipService.ToolTip>
-                                        <Grid>
-                                            <StackPanel Orientation="Horizontal"
-                                                        Visibility="{x:Bind ScoreIsAwailable, Converter={StaticResource BoolToVisConverter}}">
-                                                <TextBlock
-                                                    Margin="{StaticResource MediumLeftMargin}"
-                                                    Text="{x:Bind Up, Mode=TwoWay}"
-                                                    VerticalAlignment="Center" x:Phase="5" />
-                                                <Viewbox MaxHeight="15" MaxWidth="15">
-                                                    <SymbolIcon Symbol="Up"
-                                                                Margin="{StaticResource SmallLeftMargin}" />
-                                                </Viewbox>
-                                                <TextBlock
-                                                    Margin="{StaticResource MediumLeftMargin}"
-                                                    Text="{x:Bind Down, Mode=TwoWay}"
-                                                    VerticalAlignment="Center" x:Phase="5" />
-                                                <Viewbox MaxHeight="15" MaxWidth="15">
-                                                    <FontIcon FontFamily="Segoe MDL2 Assets"
-                                                              Glyph="&#xE74B;"
-                                                              Margin="{StaticResource SmallLeftMargin}" />
-                                                </Viewbox>
-                                            </StackPanel>
-                                            <TextBlock x:Uid="ScoreUnawailableText"
-                                                       Visibility="{x:Bind ScoreIsAwailable, Converter={StaticResource BooleanToVisibilityConverterInverse}}" />
-                                        </Grid>
-                                    </ToolTipService.ToolTip>
-                                </TextBlock>
-                            </StackPanel>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="{x:Bind CreatedString}" FontSize="{StaticResource SmallFontSize}"
+                                               Margin="{StaticResource MediumLeftMargin}"
+                                               x:Phase="2">
+                                        <ToolTipService.ToolTip>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Text="{x:Bind Created}"
+                                                       Margin="{StaticResource SmallLeftRightMargin}" />
+                                        </ToolTipService.ToolTip>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -149,7 +160,7 @@
                                    SelectionMode="Single"
                                    ItemTemplate="{StaticResource ThumbImageTemplate}" />
         <controls:GridSplitter Grid.Column="1"
-                               ResizeDirection="Auto"
+                               ResizeDirection="Columns"
                                Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                                ManipulationCompleted="GridSplitter_ManipulationCompleted"
                                Style="{StaticResource  FeedViewerGridSplitterStyle}" />
@@ -184,8 +195,8 @@
                                         <MediaPlayerElement
                                             Visibility="{x:Bind IsVideo, Converter={StaticResource BoolToVisConverter}}"
                                             AreTransportControlsEnabled="True"
-                                            VerticalContentAlignment="Stretch"
-                                            Stretch="Uniform">
+                                           Stretch="Uniform"
+                                            >
                                             <MediaPlayerElement.TransportControls>
                                                 <MediaTransportControls IsCompact="False"
                                                                         IsVolumeButtonVisible="False" />
@@ -200,28 +211,8 @@
                                                            Margin="{StaticResource MediumAllMargin}"
                                                            
                                                            micro:Message.Attach="[Event UpVote] = [Action UpVote()];[Event DownVote] = [Action DownVote()]" />
-                                    <HyperlinkButton controls:DockPanel.Dock="Left"
-                                                     micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
-                                                     NavigateUri="{x:Bind User, Converter={StaticResource UserTextConverter}}"
-                                                     Content="{x:Bind User}" x:Phase="5" />
-                                    <TextBlock Margin="10 0 0 0" VerticalAlignment="Center"
-                                               controls:DockPanel.Dock="Left">
-                                        -
-                                    </TextBlock>
-                                    <TextBlock VerticalAlignment="Center"
-                                               Text="{x:Bind CreatedString}"
-                                               Margin="{StaticResource MediumLeftMargin}"
-                                               x:Phase="2" controls:DockPanel.Dock="Left">
-                                        <ToolTipService.ToolTip>
-                                            <TextBlock VerticalAlignment="Center"
-                                                       Text="{x:Bind Created}"
-                                                       Margin="{StaticResource SmallLeftRightMargin}" />
-                                        </ToolTipService.ToolTip>
-                                    </TextBlock>
-                                    <TextBlock Margin="{StaticResource MediumLeftMargin}" HorizontalAlignment="Center"
-                                               VerticalAlignment="Center" controls:DockPanel.Dock="Left" />
-                                    <TextBlock controls:DockPanel.Dock="Left"
-                                               Margin="{StaticResource MediumLeftMargin}"
+                                    <TextBlock controls:DockPanel.Dock="Left" FontSize="{StaticResource LargeFontSize}"
+                                               Margin="{StaticResource MediumRightMargin}"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center" x:Phase="5"
                                                Text="{x:Bind Score, Mode=OneWay}">
@@ -249,6 +240,27 @@
                                             </Grid>
                                         </ToolTipService.ToolTip>
                                     </TextBlock>
+                                    <HyperlinkButton controls:DockPanel.Dock="Left"
+                                                     micro:Message.Attach="[Event LinkClicked] = [Action OpenLink($eventArgs)]"
+                                                     NavigateUri="{x:Bind User, Converter={StaticResource UserTextConverter}}"
+                                                     Content="{x:Bind User}" x:Phase="5" />
+                                    <TextBlock Margin="10 0 0 0" VerticalAlignment="Center"
+                                               controls:DockPanel.Dock="Left">
+                                        -
+                                    </TextBlock>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="{x:Bind CreatedString}"
+                                               Margin="{StaticResource MediumLeftMargin}"
+                                               x:Phase="2" controls:DockPanel.Dock="Left">
+                                        <ToolTipService.ToolTip>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Text="{x:Bind Created}"
+                                                       Margin="{StaticResource SmallLeftRightMargin}" />
+                                        </ToolTipService.ToolTip>
+                                    </TextBlock>
+                                    <TextBlock Margin="{StaticResource MediumLeftMargin}" HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" controls:DockPanel.Dock="Left" />
+
                                     <StackPanel Orientation="Horizontal" controls:DockPanel.Dock="Right"
                                                 HorizontalAlignment="Right">
                                         <AppBarButton x:Uid="SharePostButton"

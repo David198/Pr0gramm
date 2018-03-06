@@ -30,13 +30,15 @@ namespace Pr0gramm.Controls
     {
         public event EventHandler UpVote;
         public event EventHandler DownVote;
-
+        private SolidColorBrush _white = new SolidColorBrush(Colors.White);
+        private SolidColorBrush _black = new SolidColorBrush(Colors.White);
         public VoteControl()
         {
-            InitializeComponent();
-            MainPanel.DataContext = this;
-            PlusForeGround = ForegroundBrush;
-            MinusForeGround = ForegroundBrush;
+                InitializeComponent();
+                MainPanel.DataContext = this;
+                PlusForeGround = ForegroundBrush;
+                MinusForeGround = ForegroundBrush;
+                _userLoginService = IoC.Get<UserLoginService>();
         }
 
         private Brush ForegroundBrush
@@ -44,10 +46,8 @@ namespace Pr0gramm.Controls
             get
             {
                 if (ThemeSelectorService.Theme == ElementTheme.Dark)
-                    return new SolidColorBrush(
-                        (Color) Application.Current.Resources["SystemBaseHighColor"]);
-                return new SolidColorBrush(
-                    (Color) Application.Current.Resources["SystemAltHighColor"]);
+                    return _white;
+                return _black;
             }
         }
 
@@ -117,6 +117,7 @@ namespace Pr0gramm.Controls
 
         private static Brush _plusForeGround;
         private static Brush _minusForeGround;
+        private UserLoginService _userLoginService;
 
         public Thickness DynamicMargin
         {
@@ -152,6 +153,7 @@ namespace Pr0gramm.Controls
 
         private void UpVotePressed(object sender, RoutedEventArgs e)
         {
+            if (!CheckIfUserLoggedIn()) return;
             OnUpVote();
             if (VoteState == Vote.Up)
             {
@@ -167,6 +169,7 @@ namespace Pr0gramm.Controls
 
         private void DownButtonPressed(object sender, RoutedEventArgs e)
         {
+            if (!CheckIfUserLoggedIn()) return;
             OnDownVote();
             if (VoteState == Vote.Down)
             {
@@ -178,6 +181,13 @@ namespace Pr0gramm.Controls
             {
                 DownButton.Rotate(-720, RotationCenter, RotationCenter).Start();
             }
+        }
+
+        private bool CheckIfUserLoggedIn()
+        {
+            if (_userLoginService.IsLoggedIn) return true;
+            _userLoginService.ShowUserLogin();
+            return false;
         }
 
         private void OnDownVote()

@@ -116,13 +116,13 @@
     </PackageReference>
     <!-- Nuget package references -->
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
-      <Version>2.1.1</Version>
+      <Version>2.2.0</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
-      <Version>2.1.1</Version>
+      <Version>2.2.0</Version>
     </PackageReference>
     <PackageReference Include="RestSharp">
       <Version>106.2.1</Version>
@@ -155,7 +155,8 @@
     <Compile Include="Models\ChangeLog.cs" />
     <Compile Include="Models\Enums\CacheVoteType.cs" />
     <Compile Include="Models\Enums\Vote.cs" />
-    <Compile Include="Services\CacheVoteService.cs" />
+    <Compile Include="Services\CacheService.cs" />
+    <Compile Include="Services\FeedService.cs" />
     <Compile Include="Services\NewVersionDisplayService.cs" />
     <Compile Include="Services\SettingsService.FeedViewer.cs" />
     <Compile Include="Services\ToastNotificationsService.Download.cs" />

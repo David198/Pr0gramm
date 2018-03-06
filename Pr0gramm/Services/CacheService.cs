@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Pr0gramm.Models;
 using Pr0gramm.Models.Enums;
+using Pr0grammAPI.Feeds;
 
 namespace Pr0gramm.Services
 {
-    public class CacheVoteService
+    public class CacheService
     {
         private const string DbName = "Filename=Pr0gramm.db";
+        private readonly HashSet<int> Reposts= new HashSet<int>();
 
-        public CacheVoteService()
+        public event EventHandler RepostsChanged;
+        public CacheService()
         {
             PrepareDataBase();
         }
@@ -59,7 +63,7 @@ namespace Pr0gramm.Services
             }
         }
 
-        public async Task<CachedVote> Find(CacheVoteType voteActionType, int itemId)
+        public async Task<CachedVote> FindCachedVote(CacheVoteType voteActionType, int itemId)
         {
             CachedVote cachedVote = null;
             using (SqliteConnection db = new SqliteConnection(DbName))
@@ -73,16 +77,36 @@ namespace Pr0gramm.Services
                 {
                     cachedVote = new CachedVote(query.GetInt32(0), query.GetString(1), query.GetString(2));
                 }
-
                 db.Close();
             }
             return cachedVote;
+        }
+
+        public void CacheReposts(List<FeedItem> feedItems)
+        {
+            foreach (var item in feedItems)
+            {
+                if (Reposts.Contains(item.Id)) continue;
+                Reposts.Add(item.Id);
+            }
+            OnRepostsChanged();
+        }
+
+        public bool IsRepost(int id)
+        {
+            return Reposts.Contains(id);
         }
 
 
         private int VoteId(CacheVoteType voteActionType, int itemId)
         {
             return itemId * 10 + (int) voteActionType;
+        }
+
+
+        protected virtual void OnRepostsChanged()
+        {
+            RepostsChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

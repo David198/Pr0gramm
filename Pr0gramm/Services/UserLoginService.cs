@@ -27,16 +27,17 @@ namespace Pr0gramm.Services
             _iEventAggregator = iEventAggregator;
             _iprogrammApi = iprogrammApi;
             _toastNotifications = toastNotifications;
-            TryLoginAutomatically();
         }
         private const string resourceName = "Pr0gramm";
         public  bool IsLoggedIn;
-        public void SaveUserLogin(string username, string password)
+        public void SaveUserLoginToVault(string username, string password)
         {
             var vault = new PasswordVault();
             vault.Add(new PasswordCredential(
                 resourceName, username, password));
         }
+
+        public string ActualUser { get; set; }
 
         public PasswordCredential GetCredentialFromLocker()
         {
@@ -81,33 +82,36 @@ namespace Pr0gramm.Services
                         resourceName, username, credential.Password));
                     _userSyncService.ResetOffset();
                     _userSyncService.StopSyncRoutine();
+                    ActualUser = "";
                     IsLoggedIn = false;       
                 }
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }  
         }
 
-        public  async void ShowUserLogin()
+        public async void ShowUserLogin()
         {
             LoginDialog dlg = new LoginDialog(_iEventAggregator, this, _toastNotifications);
             await dlg.ShowAsync();
         }
 
-        public async Task<bool> LoginUser(string name, string password, bool savePassword)
+        public async Task<bool> LoginUser(string name, string password, bool savePassword, bool publishToUi)
         {
             try
             {
-                if (await _iprogrammApi.Login(name, password))
+                var cookie = await _iprogrammApi.Login(name, password);
+                if (cookie!=null)
                 {
-                    _iEventAggregator.PublishOnUIThread(new UserLoggedInEvent(name));
+                    if(publishToUi)
+                     _iEventAggregator.PublishOnUIThread(new UserLoggedInEvent(name));
                     IsLoggedIn = true;
                     if(savePassword)
-                        SaveUserLogin(name,password);
-                 
+                        SaveUserLoginToVault(name,password);
+                    ActualUser = name;
                     _userSyncService.StartSyncRoutine();
                     return true;
                 }
@@ -124,7 +128,7 @@ namespace Pr0gramm.Services
             return false;
         }
 
-        private async void TryLoginAutomatically()
+        public async Task TryLoginAutomatically()
         {
             var credentials = GetCredentialFromLocker();
             if (credentials != null && !IsLoggedIn)
@@ -132,7 +136,7 @@ namespace Pr0gramm.Services
                 credentials.RetrievePassword();
                 try
                 {
-                    await LoginUser(credentials.UserName, credentials.Password, false);
+                    await LoginUser(credentials.UserName, credentials.Password, false, false);
                 }
                 catch (ApplicationException)
                 {

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Windows.UI.Core;
 using Caliburn.Micro;
-using Pr0gramm.EventHandlers;
 using Pr0gramm.Helpers;
 using Pr0gramm.Models.Enums;
 using Pr0gramm.Services;
@@ -22,32 +20,28 @@ namespace Pr0gramm.Models
     {
         private readonly IProgrammApi _programmApi;
         private readonly ToastNotificationsService _toastNotificationsService;
-        private readonly CacheVoteService _cacheVoteService;
-        private readonly IEventAggregator _iEventAggregator;
-        private bool _commentsAndTagsLoaded;
+        private readonly CacheService _cacheService;
 
         public FeedItemViewModel(FeedItem feedItem, IProgrammApi api,
-            ToastNotificationsService toastNotificationsService, CacheVoteService cacheVoteService,
-            IEventAggregator iEventAggregator) : base(feedItem)
+            ToastNotificationsService toastNotificationsService, CacheService cacheService) : base(feedItem)
         {
             _programmApi = api;
             _toastNotificationsService = toastNotificationsService;
-            _cacheVoteService = cacheVoteService;
-            _iEventAggregator = iEventAggregator;
+            _cacheService = cacheService;
+            _cacheService.RepostsChanged += (sender, args) => { OnPropertyChanged(nameof(IsRepost)); };
             CommentViewModels = new BindableCollection<CommentViewModel>();
             Tags = new BindableCollection<TagViewModel>();
-            _iEventAggregator.Subscribe(this);
             VoteState = Vote.Neutral;
         }
 
-        private async Task InitializeVoteState()
+        private async void InitializeVoteStateAsync()
         {
-            var cachedVote = await _cacheVoteService.Find(CacheVoteType.Item, Id);
+            var cachedVote = await _cacheService.FindCachedVote(CacheVoteType.Item, Id);
             if (cachedVote != null)
             {
                 VoteState = cachedVote.Vote;
-            }
-            OnPropertyChanged(nameof(VoteState));
+                OnPropertyChanged(nameof(VoteState));
+            }  
         }
 
         public Vote VoteState { get; set; }
@@ -74,12 +68,12 @@ namespace Pr0gramm.Models
             }
         }
 
-        public  void UpVote()
+        public void UpVote()
         {
             var oldState = VoteState;
             VoteState = VoteState == Vote.Up ? Vote.Neutral : Vote.Up;
             OnPropertyChanged(nameof(VoteState));
-            _cacheVoteService.SaveVote(CacheVoteType.Item, VoteState,Id);
+            _cacheService.SaveVote(CacheVoteType.Item, VoteState, Id);
             AdjustScore(oldState, VoteState);
             SaveToProApi();
         }
@@ -89,7 +83,7 @@ namespace Pr0gramm.Models
             var oldState = VoteState;
             VoteState = VoteState == Vote.Down ? Vote.Neutral : Vote.Down;
             OnPropertyChanged(nameof(VoteState));
-            _cacheVoteService.SaveVote(CacheVoteType.Item, VoteState, Id);
+            _cacheService.SaveVote(CacheVoteType.Item, VoteState, Id);
             AdjustScore(oldState, VoteState);
             SaveToProApi();
         }
@@ -98,7 +92,7 @@ namespace Pr0gramm.Models
         {
             try
             {
-                _programmApi.VoteComment(Id, (int)VoteState);
+                _programmApi.VoteItem(Id, (int) VoteState);
             }
             catch (ApplicationException)
             {
@@ -140,11 +134,13 @@ namespace Pr0gramm.Models
                 Up--;
                 Down++;
             }
+
             if (oldState == Vote.Down && newState == Vote.Up)
             {
                 Up++;
                 Down--;
             }
+
             OnPropertyChanged(nameof(Up));
             OnPropertyChanged(nameof(Down));
             OnPropertyChanged(nameof(Score));
@@ -152,45 +148,52 @@ namespace Pr0gramm.Models
 
         public bool IsRepost
         {
-            get { return Tags.Any(tag => tag.Tag.ToLower().Equals("repost")); }
+            get { return _cacheService.IsRepost(Id); }
         }
+
+        private bool _loaded;
 
         public string CreatedString => DateTimeUtlis.MakeCreatedString(Created);
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public async Task LoadCommentsAndTags()
+        public async Task LoadCommentsAndTagsAsync()
         {
-            if (_commentsAndTagsLoaded)
-                return;
-            _commentsAndTagsLoaded = true;
             try
             {
+                if (_loaded) return;
+                _loaded = true;
                 CommentViewModels.Clear();
                 Tags.Clear();
                 var feedItemCommentItem = await _programmApi.GetFeedItemComments(Id);
+                Debug.WriteLine("Raw Comment Data loaded");
                 var tempList = new List<Comment>();
-                var rootNodes = Node<Comment>.CreateTree(feedItemCommentItem.Comments, l => l.Id, l => l.Parent);
+                var rootNodes = Node<Comment>.CreateTree(feedItemCommentItem.Comments, l => l.Id,
+                    l => l.Parent);
                 rootNodes = rootNodes.OrderByDescending(o => o.Value.Confidence);
                 foreach (var node in rootNodes)
                     FlatHierarchy(node, tempList);
                 var temptCommentViewModel = new List<CommentViewModel>();
                 tempList.ForEach(comment =>
                 {
-                    var commentViewModel = new CommentViewModel(comment, this,_cacheVoteService, _programmApi);
+                    var commentViewModel = new CommentViewModel(comment, this, _cacheService, _programmApi);
                     commentViewModel.CalculateCommentDepth(tempList);
                     temptCommentViewModel.Add(commentViewModel);
                 });
-
                 CommentViewModels.AddRange(temptCommentViewModel);
-                feedItemCommentItem.Tags.OrderByDescending(tag => tag.Confidence).ToList()
-                    .ForEach(item => Tags.Add(new TagViewModel(item, _iEventAggregator, _programmApi, _cacheVoteService)));
-                OnPropertyChanged(nameof(IsRepost));
+                Debug.WriteLine("Comment Data loaded");
+                var orderedTags = feedItemCommentItem.Tags.OrderByDescending(tag => tag.Confidence).ToList();
+                var tempTagList = new List<TagViewModel>();
+                foreach (var tag in orderedTags)
+                {
+                    tempTagList.Add(new TagViewModel(tag, _programmApi, _cacheService));
+                }
+                Tags.AddRange(tempTagList);              
+                Debug.WriteLine("Tag Data loaded");              
             }
             catch (ApplicationException)
             {
-                _toastNotificationsService.ShowToastNotificationWebSocketExeception();
-                _commentsAndTagsLoaded = false;
+                _loaded = false;
             }
         }
 
@@ -214,18 +217,20 @@ namespace Pr0gramm.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public async Task LoadTagAndCommentVotesAsync()
+        public void LoadTagAndCommentVotesAsync()
         {
-            await InitializeVoteState();
+            InitializeVoteStateAsync();
+            Debug.WriteLine("FeedItem VoteState Loaded");
             foreach (var tagView in Tags)
             {
-                await tagView.InitializeVoteState();
+                  tagView.InitializeVoteStateAsync();
             }
-
+            Debug.WriteLine("tags votestate loaded");
             foreach (var comment in CommentViewModels)
             {
-               await comment.InitializeVoteState();
+                  comment.InitializeVoteStateAsync();
             }
+            Debug.WriteLine("comments votestate loaded");
         }
     }
 }

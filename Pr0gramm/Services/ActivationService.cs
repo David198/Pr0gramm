@@ -20,12 +20,14 @@ namespace Pr0gramm.Services
         private readonly Type _defaultNavItem;
         private readonly Lazy<UIElement> _shell;
         private readonly SettingsService _settingsService;
+        private readonly UserLoginService _userLoginService;
 
-        public ActivationService(WinRTContainer container, Type defaultNavItem, SettingsService settingsService, Lazy<UIElement> shell = null)
+        public ActivationService(WinRTContainer container, Type defaultNavItem, SettingsService settingsService, UserLoginService userLoginService, Lazy<UIElement> shell = null)
         {
             _container = container;
             _shell = shell;
             _settingsService = settingsService;
+            _userLoginService = userLoginService;
             _defaultNavItem = defaultNavItem;
         }
 
@@ -95,6 +97,7 @@ namespace Pr0gramm.Services
             Singleton<BackgroundTaskService>.Instance.RegisterBackgroundTasks();
             await ThemeSelectorService.InitializeAsync();
             await _settingsService.InitializeSettings();
+            await _userLoginService.TryLoginAutomatically();
             await Task.CompletedTask;
         }
 

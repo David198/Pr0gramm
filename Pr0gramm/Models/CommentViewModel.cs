@@ -18,18 +18,19 @@ namespace Pr0gramm.Models
     public class CommentViewModel : Comment, INotifyPropertyChanged
     {
         private readonly FeedItem _parentFeedItem;
-        private readonly CacheVoteService _cacheVoteService;
+        private readonly CacheService _cacheService;
         private readonly IProgrammApi _iProgrammApi;
         private int _parentDepth;
 
-        public CommentViewModel(Comment comment, FeedItem parentFeedItem, CacheVoteService cacheVoteService,
+        public CommentViewModel(Comment comment, FeedItem parentFeedItem, CacheService cacheService,
             IProgrammApi iProgrammApi) : base(comment)
         {
             _parentFeedItem = parentFeedItem;
-            _cacheVoteService = cacheVoteService;
+            _cacheService = cacheService;
             _iProgrammApi = iProgrammApi;
             if (comment.Parent == 0) comment.Parent = null;
             ParentDepthList = new BindableCollection<int>();
+            VoteState = Vote.Neutral;
         }
 
         public Vote VoteState { get; set; }
@@ -101,7 +102,7 @@ namespace Pr0gramm.Models
             var oldState = VoteState;
             VoteState = VoteState == Vote.Up ? Vote.Neutral : Vote.Up;
             OnPropertyChanged(nameof(VoteState));
-            _cacheVoteService.SaveVote(CacheVoteType.Item, VoteState, Id);
+            _cacheService.SaveVote(CacheVoteType.Item, VoteState, Id);
             AdjustScore(oldState, VoteState);
             SaveToProApi();
         }
@@ -136,7 +137,7 @@ namespace Pr0gramm.Models
             var oldState = VoteState;
             VoteState = VoteState == Vote.Down ? Vote.Neutral : Vote.Down;
             OnPropertyChanged(nameof(VoteState));
-            _cacheVoteService.SaveVote(CacheVoteType.Item, VoteState, Id);
+            _cacheService.SaveVote(CacheVoteType.Item, VoteState, Id);
             AdjustScore(oldState, VoteState);
             SaveToProApi();
         }
@@ -152,16 +153,14 @@ namespace Pr0gramm.Models
             }
         }
 
-        public async Task InitializeVoteState()
+        public async void InitializeVoteStateAsync()
         {
-            VoteState = Vote.Neutral;
-            var cachedVote = await _cacheVoteService.Find(CacheVoteType.Comment, Id);
+            var cachedVote = await _cacheService.FindCachedVote(CacheVoteType.Comment, Id);
             if (cachedVote != null)
             {
                 VoteState = cachedVote.Vote;
-            }
-
-            OnPropertyChanged(nameof(VoteState));
+                OnPropertyChanged(nameof(VoteState));
+            } 
         }
     }
 }
